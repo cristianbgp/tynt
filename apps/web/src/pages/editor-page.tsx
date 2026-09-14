@@ -224,7 +224,7 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
 
   return (
     <div
-      className="app-shell grid h-full w-full grid-rows-[41px_minmax(0,1fr)_auto_25px] max-[760px]:h-auto max-[760px]:min-h-full max-[760px]:grid-rows-[auto_minmax(0,1fr)_auto_25px] max-[560px]:h-dvh max-[560px]:min-h-0 max-[560px]:grid-rows-[auto_41px_minmax(0,1fr)_auto_calc(41px+env(safe-area-inset-bottom))]"
+      className="app-shell grid h-full w-full grid-cols-[minmax(0,1fr)] grid-rows-[41px_minmax(0,1fr)_auto_25px] max-[760px]:h-auto max-[760px]:min-h-full max-[760px]:grid-rows-[auto_minmax(0,1fr)_auto_25px] max-[560px]:h-dvh max-[560px]:min-h-0 max-[560px]:grid-rows-[auto_41px_minmax(0,1fr)_auto_calc(41px+env(safe-area-inset-bottom))]"
       data-runtime-state={runtime.status}
     >
       <Toolbar
