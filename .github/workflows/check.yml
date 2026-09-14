@@ -24,4 +24,5 @@ jobs:
         with:
           bun-version: 1.4.0
       - run: bun run install:all
+      - run: bun run --cwd apps/web playwright install --with-deps chromium
       - run: bun run check

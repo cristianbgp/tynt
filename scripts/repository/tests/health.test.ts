@@ -50,17 +50,18 @@ describe("public repository health", () => {
     }
   });
 
-  test("configures the root Vercel project to build the web app with Bun 1.4", () => {
-    const deployment = JSON.parse(readProjectFile("vercel.json"));
-
-    expect(deployment).toMatchObject({
-      $schema: "https://openapi.vercel.sh/vercel.json",
-      bunVersion: "1.4.x",
-      installCommand: "bun install --frozen-lockfile && bun install --cwd apps/web --frozen-lockfile",
-      buildCommand: "bun run --cwd apps/web build",
-      outputDirectory: "apps/web/dist",
-    });
+  test("lets the apps/web Vercel root use framework defaults", () => {
+    expect(existsSync(projectPath("vercel.json"))).toBe(false);
     expect(existsSync(projectPath("apps/web/vercel.json"))).toBe(false);
+  });
+
+  test("installs the Playwright browser before running the CI check", () => {
+    const workflow = readProjectFile(".github/workflows/check.yml");
+    const browserInstall = workflow.indexOf("bun run --cwd apps/web playwright install --with-deps chromium");
+    const check = workflow.indexOf("bun run check");
+
+    expect(browserInstall).toBeGreaterThan(-1);
+    expect(check).toBeGreaterThan(browserInstall);
   });
 
   test("keeps project copy free of em dashes", () => {
