@@ -54,18 +54,20 @@ interface ToolbarProps {
   onFileChange: ChangeEventHandler<HTMLInputElement>;
 }
 
+const galleryLinkClassName = "gallery-link flex h-full items-center gap-[8px] whitespace-nowrap border-l border-border px-[12px] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background max-[560px]:[&>span]:hidden";
+
 export function Toolbar(props: ToolbarProps) {
   return (
-    <header className="topbar">
+    <header className="topbar grid grid-cols-[max-content_minmax(0,1fr)_max-content] items-stretch border-b border-border max-[760px]:w-full max-[760px]:grid-cols-[max-content_minmax(0,1fr)]">
       <BrandLink />
-      <div className="file-controls">
-        <span id="filename" className="filename" aria-label="Current cartridge file">{props.filename}</span>
+      <div className="file-controls flex min-w-0 items-center">
+        <span id="filename" className="filename min-w-0 flex-1 overflow-hidden px-[16px] text-ellipsis whitespace-nowrap max-[560px]:hidden" aria-label="Current cartridge file">{props.filename}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
               aria-label="Examples"
-              className="example-trigger"
+              className="example-trigger flex h-full min-w-[132px] cursor-pointer items-center justify-between gap-[12px] border-0 border-l border-border bg-transparent px-[12px] text-foreground hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background data-[state=open]:bg-foreground data-[state=open]:text-background max-[560px]:min-w-0 max-[560px]:flex-1"
               data-cuelume-hover="tick"
               data-cuelume-press=""
               data-cuelume-release=""
@@ -87,7 +89,7 @@ export function Toolbar(props: ToolbarProps) {
           </DropdownMenuContent>
         </DropdownMenu>
         <Link
-          className="gallery-link"
+          className={galleryLinkClassName}
           to="/gallery"
           data-cuelume-hover="tick"
           data-cuelume-press=""
@@ -97,7 +99,7 @@ export function Toolbar(props: ToolbarProps) {
           <span>Gallery</span>
         </Link>
         <Link
-          className="gallery-link"
+          className={galleryLinkClassName}
           to="/library"
           data-cuelume-hover="tick"
           data-cuelume-press=""
@@ -106,12 +108,12 @@ export function Toolbar(props: ToolbarProps) {
           <BookOpen width={24} height={24} data-icon="library" aria-hidden="true" />
           <span>Library</span>
         </Link>
-        <Link className="gallery-link" to="/sprites" data-cuelume-hover="tick" data-cuelume-press="" data-cuelume-release="">
+        <Link className={galleryLinkClassName} to="/sprites" data-cuelume-hover="tick" data-cuelume-press="" data-cuelume-release="">
           <Image width={24} height={24} data-icon="sprites" aria-hidden="true" />
           <span>Sprites</span>
         </Link>
       </div>
-      <nav className="actions" aria-label="Cartridge actions">
+      <nav className="actions flex max-[1100px]:[&>*]:px-[8px] max-[1100px]:[&_*span]:hidden max-[760px]:col-span-full max-[760px]:grid max-[760px]:grid-cols-6 max-[760px]:border-t max-[760px]:border-border max-[760px]:[&>*]:w-full max-[760px]:[&>*]:min-w-0 max-[760px]:[&>*]:px-[8px]" aria-label="Cartridge actions">
         <Action
           id="run-button"
           label={props.running ? "Stop" : "Run"}

@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
-import { BookOpen, Code, ExternalLink, GalleryThumbnails, Github, Image, Play, Search } from "pixelarticons/react";
+import { Code, ExternalLink, Github, Play, Search } from "pixelarticons/react";
 import { Link } from "react-router";
-import { BrandLink } from "@/components/brand";
 import { CartridgePreview } from "@/components/cartridge-preview";
-import { Attribution, SoundToggle } from "@/components/status-bar";
+import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { listPublicCartridges } from "@/cartridges/public-cartridges";
 
 interface GalleryPageProps { soundEnabled?: boolean; onSoundToggle?(): void; }
@@ -25,37 +24,29 @@ export function GalleryPage({ soundEnabled = true, onSoundToggle = () => {} }: G
   }, [cartridges, query, tag]);
 
   return (
-    <div className="gallery-shell">
-      <header className="gallery-topbar">
-        <BrandLink />
-        <nav className="site-navigation" aria-label="Primary navigation">
-          <Link to="/" {...soundLinkProps}><Code width={24} height={24} data-icon="code" aria-hidden="true" /><span>Editor</span></Link>
-          <Link className="active" to="/gallery" aria-current="page" {...soundLinkProps}><GalleryThumbnails width={24} height={24} data-icon="gallery" aria-hidden="true" /><span>Gallery</span></Link>
-          <Link to="/library" {...soundLinkProps}><BookOpen width={24} height={24} data-icon="library" aria-hidden="true" /><span>Library</span></Link>
-          <Link to="/sprites" {...soundLinkProps}><Image width={24} height={24} aria-hidden="true" /><span>Sprites</span></Link>
-        </nav>
-      </header>
-      <main className="gallery-main">
-        <header className="gallery-heading">
-          <div><h1>Cartridge gallery</h1><p>Play public games, inspect their source, and remix them into your local library.</p></div>
-          <a className="gallery-submit" href={`${PROJECT_REPOSITORY}/blob/main/CONTRIBUTING.md`} target="_blank" rel="noreferrer" {...soundLinkProps}><Github width={20} height={20} aria-hidden="true" />Submit a cartridge</a>
+    <div className="gallery-shell grid h-full w-full grid-rows-[41px_minmax(0,1fr)_25px] bg-background max-[560px]:h-dvh max-[560px]:grid-rows-[41px_minmax(0,1fr)_calc(41px+env(safe-area-inset-bottom))]">
+      <SiteHeader active="gallery" />
+      <main className="gallery-main overflow-auto px-[clamp(18px,5vw,72px)] pt-[42px] pb-[72px] max-[560px]:px-[14px] max-[560px]:pt-[28px] max-[560px]:pb-[28px]">
+        <header className="gallery-heading mx-auto mb-[32px] grid max-w-[1180px] grid-cols-[minmax(0,1fr)_minmax(260px,420px)] items-end gap-[32px] border-b border-foreground pb-[24px] max-[900px]:grid-cols-1 max-[560px]:gap-[18px]">
+          <div className="grid gap-[14px]"><h1 className="m-0 text-[clamp(30px,5vw,58px)] leading-[0.95] font-[580] tracking-[-0.065em]">Cartridge gallery</h1><p className="m-0 max-w-[52ch] leading-[1.55] text-[#555555]">Play public games, inspect their source, and remix them into your local library.</p></div>
+          <a className="gallery-submit inline-flex min-h-[42px] items-center justify-center justify-self-end gap-[8px] border border-foreground px-[14px] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background max-[900px]:justify-self-start" href={`${PROJECT_REPOSITORY}/blob/main/CONTRIBUTING.md`} target="_blank" rel="noreferrer" {...soundLinkProps}><Github width={20} height={20} aria-hidden="true" />Submit a cartridge</a>
         </header>
-        <section className="gallery-filters" aria-label="Filter public cartridges">
-          <label className="library-search-wrap"><Search width={20} height={20} aria-hidden="true" /><span className="sr-only">Search cartridges</span><input className="library-search" type="search" aria-label="Search cartridges" placeholder="Search cartridges" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-          <div className="gallery-tags" aria-label="Tags">{tags.map((value) => <button key={value} type="button" aria-pressed={tag === value} data-cuelume-hover="tick" data-cuelume-toggle="" onClick={() => setTag((current) => current === value ? null : value)}>{value}</button>)}</div>
+        <section className="gallery-filters mx-auto mb-[20px] flex max-w-[1180px] items-center justify-between gap-[18px] max-[700px]:flex-col max-[700px]:items-stretch" aria-label="Filter public cartridges">
+          <label className="library-search-wrap flex w-[min(360px,100%)] items-center border border-border max-[700px]:w-full"><Search className="ml-[10px] flex-none" width={20} height={20} aria-hidden="true" /><span className="sr-only">Search cartridges</span><input className="library-search w-full border-0 bg-background px-[12px] py-[10px] font-[inherit] text-foreground outline-none focus:border-foreground focus:shadow-[inset_0_0_0_1px_var(--foreground)]" type="search" aria-label="Search cartridges" placeholder="Search cartridges" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
+          <div className="gallery-tags flex flex-wrap justify-end gap-[6px] max-[700px]:flex-nowrap max-[700px]:justify-start max-[700px]:overflow-x-auto max-[700px]:p-[3px] max-[700px]:[scrollbar-width:thin]" aria-label="Tags">{tags.map((value) => <button className="cursor-pointer border border-border bg-transparent px-[7px] py-[5px] font-[inherit] text-[9px] uppercase text-muted-foreground transition-colors hover:border-foreground hover:bg-foreground hover:text-background focus-visible:border-foreground focus-visible:bg-foreground focus-visible:text-background aria-pressed:border-foreground aria-pressed:bg-foreground aria-pressed:text-background aria-pressed:hover:bg-[#555555] max-[700px]:min-h-[40px] max-[700px]:flex-none" key={value} type="button" aria-pressed={tag === value} data-cuelume-hover="tick" data-cuelume-toggle="" onClick={() => setTag((current) => current === value ? null : value)}>{value}</button>)}</div>
         </section>
-        {filtered.length === 0 ? <p className="gallery-no-results">No public cartridges match “{query || tag}”.</p> : null}
-        <section className="cartridge-grid" aria-label="Public cartridges">
+        {filtered.length === 0 ? <p className="gallery-no-results mx-auto my-[60px] max-w-[1180px] text-center text-muted-foreground">No public cartridges match “{query || tag}”.</p> : null}
+        <section className="cartridge-grid mx-auto grid max-w-[1180px] grid-cols-2 border-t border-l border-border max-[900px]:grid-cols-1" aria-label="Public cartridges">
           {filtered.map((cartridge, index) => (
-            <article className="cartridge-card" data-featured={index === 0 && !query && !tag || undefined} key={cartridge.slug}>
-              <div className="cartridge-artwork"><CartridgePreview filename={cartridge.filename} src={cartridge.coverUrl} /></div>
-              <div className="cartridge-copy">
-                <div className="cartridge-title-row"><h2>{cartridge.filename}</h2><span>{String(index + 1).padStart(2, "0")}</span></div>
-                <span className="library-author">by {cartridge.author}</span>
-                <p>{cartridge.description}</p>
-                <span className="cartridge-controls">{cartridge.controls}</span>
-                <div className="cartridge-tags">{cartridge.tags.map((value) => <span key={value}>{value}</span>)}</div>
-                <div className="cartridge-actions">
+            <article className="cartridge-card grid min-w-0 grid-cols-[minmax(160px,2fr)_minmax(180px,3fr)] border-r border-b border-border data-[featured=true]:col-span-full data-[featured=true]:grid-cols-[minmax(260px,3fr)_minmax(260px,2fr)] max-[900px]:grid-cols-1 max-[900px]:data-[featured=true]:col-auto max-[900px]:data-[featured=true]:grid-cols-1" data-featured={index === 0 && !query && !tag || undefined} key={cartridge.slug}>
+              <div className="cartridge-artwork grid min-h-[230px] place-items-center bg-muted p-[28px] max-[560px]:min-h-[172px] max-[560px]:p-[12px]"><CartridgePreview filename={cartridge.filename} src={cartridge.coverUrl} /></div>
+              <div className="cartridge-copy flex min-w-0 flex-col border-l border-border p-[22px] [overflow-wrap:anywhere] max-[900px]:border-t max-[900px]:border-l-0">
+                <div className="cartridge-title-row flex items-baseline justify-between gap-[16px]"><h2 className="m-0 text-[16px] font-semibold tracking-[-0.03em]">{cartridge.filename}</h2><span className="text-[10px] text-muted-foreground">{String(index + 1).padStart(2, "0")}</span></div>
+                <span className="library-author mt-[6px] text-[10px] text-muted-foreground">by {cartridge.author}</span>
+                <p className="my-[18px] max-w-[42ch] leading-normal text-[#555555]">{cartridge.description}</p>
+                <span className="cartridge-controls text-[10px] leading-normal text-muted-foreground">{cartridge.controls}</span>
+                <div className="cartridge-tags mt-[14px] flex flex-wrap gap-[5px]">{cartridge.tags.map((value) => <span className="border border-border px-[7px] py-[5px] text-[9px] uppercase text-muted-foreground" key={value}>{value}</span>)}</div>
+                <div className="cartridge-actions mt-auto -mr-[22px] -mb-[22px] -ml-[22px] grid grid-cols-3 border-t border-border [&>a]:flex [&>a]:min-h-[40px] [&>a]:items-center [&>a]:justify-center [&>a]:gap-[6px] [&>a]:border-r [&>a]:border-border [&>a]:px-[8px] [&>a]:no-underline [&>a:last-child]:border-r-0 [&>a:hover]:bg-foreground [&>a:hover]:text-background [&>a:focus-visible]:bg-foreground [&>a:focus-visible]:text-background">
                   <Link aria-label={`Play ${cartridge.filename}`} to={`/play/public/${cartridge.slug}`} {...soundLinkProps}><Play width={18} height={18} aria-hidden="true" />Play</Link>
                   <Link aria-label={`Open ${cartridge.filename} in editor`} to={`/?cartridge=${cartridge.slug}`} {...soundLinkProps}><Code width={18} height={18} aria-hidden="true" />Editor</Link>
                   <a aria-label={`View ${cartridge.filename} source`} href={cartridge.repository ?? `${PROJECT_REPOSITORY}/tree/main/cartridges/${cartridge.slug}`} target="_blank" rel="noreferrer" {...soundLinkProps}><ExternalLink width={18} height={18} aria-hidden="true" />Source</a>
@@ -65,7 +56,7 @@ export function GalleryPage({ soundEnabled = true, onSoundToggle = () => {} }: G
           ))}
         </section>
       </main>
-      <footer className="gallery-footer"><span>{cartridges.length} public cartridges</span><Link to="/" {...soundLinkProps}>Open editor</Link><Attribution /><SoundToggle soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} /></footer>
+      <SiteFooter summary={`${cartridges.length} public cartridges`} soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />
     </div>
   );
 }

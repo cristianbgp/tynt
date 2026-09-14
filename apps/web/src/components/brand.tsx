@@ -9,7 +9,7 @@ const soundLinkProps = {
 export function TyntMark() {
   return (
     <svg
-      className="brand-mark"
+      className="brand-mark block size-[18px] flex-none"
       viewBox="0 0 18 18"
       shapeRendering="crispEdges"
       aria-hidden="true"
@@ -26,9 +26,9 @@ export function TyntMark() {
 
 export function BrandLink() {
   return (
-    <Link className="brand" to="/" aria-label="tynt editor" {...soundLinkProps}>
+    <Link className="brand flex min-w-[94px] items-center justify-center gap-[8px] bg-foreground px-[14px] font-[650] tracking-[-0.04em] text-background no-underline transition-colors hover:bg-[#555555] focus-visible:bg-[#555555]" to="/" aria-label="tynt editor" {...soundLinkProps}>
       <TyntMark />
-      <span className="brand-wordmark">tynt</span>
+      <span className="brand-wordmark leading-none">tynt</span>
     </Link>
   );
 }

@@ -1,19 +1,13 @@
 import { useMemo, useState } from "react";
 import { play } from "cuelume";
-import { BookOpen, Code, Copy, GalleryThumbnails, Image, Trash } from "pixelarticons/react";
-import { Link } from "react-router";
-import { BrandLink } from "@/components/brand";
-import { Attribution, SoundToggle } from "@/components/status-bar";
+import { Copy, Trash } from "pixelarticons/react";
+import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 
 interface SpritePageProps {
   soundEnabled: boolean;
   onSoundToggle(): void;
 }
-
-const soundLinkProps = {
-  "data-cuelume-hover": "tick", "data-cuelume-press": "", "data-cuelume-release": "",
-} as const;
 
 function spriteCode(pixels: readonly number[]): string {
   const rows = Array.from({ length: 8 }, (_, row) => `  ${pixels.slice(row * 8, row * 8 + 8).join(", ")},`);
@@ -43,59 +37,55 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
   };
 
   return (
-    <div className="gallery-shell sprite-shell">
-      <header className="gallery-topbar">
-        <BrandLink />
-        <nav className="site-navigation" aria-label="Primary navigation">
-          <Link to="/" {...soundLinkProps}><Code width={24} height={24} aria-hidden="true" /><span>Editor</span></Link>
-          <Link to="/gallery" {...soundLinkProps}><GalleryThumbnails width={24} height={24} aria-hidden="true" /><span>Gallery</span></Link>
-          <Link to="/library" {...soundLinkProps}><BookOpen width={24} height={24} aria-hidden="true" /><span>Library</span></Link>
-          <Link className="active" to="/sprites" aria-current="page" {...soundLinkProps}><Image width={24} height={24} aria-hidden="true" /><span>Sprites</span></Link>
-        </nav>
-      </header>
-      <main className="sprite-main">
-        <header className="sprite-heading">
-          <h1>Sprite editor</h1>
-          <p>Paint an indexed 8×8 sprite, then copy it directly into a cartridge.</p>
+    <div className="gallery-shell sprite-shell grid h-full w-full grid-rows-[41px_minmax(0,1fr)_25px] bg-background max-[560px]:h-dvh max-[560px]:grid-rows-[41px_minmax(0,1fr)_calc(41px+env(safe-area-inset-bottom))]">
+      <SiteHeader active="sprites" />
+      <main className="sprite-main overflow-auto px-[clamp(18px,5vw,72px)] pt-[42px] pb-[72px] max-[560px]:pb-[28px]">
+        <header className="sprite-heading mx-auto flex w-[min(100%,960px)] items-end justify-between gap-[32px] border-b border-foreground pb-[24px] max-[700px]:grid max-[560px]:gap-[12px] max-[560px]:pb-[16px]">
+          <h1 className="m-0 text-[clamp(30px,5vw,58px)] leading-[0.95] font-[580] tracking-[-0.065em]">Sprite editor</h1>
+          <p className="m-0 max-w-[42ch] leading-[1.55] text-[#555555]">Paint an indexed 8×8 sprite, then copy it directly into a cartridge.</p>
         </header>
-        <section className="sprite-workspace">
-          <div className="sprite-canvas" aria-label="Eight by eight sprite canvas">
+        <section className="sprite-workspace mx-auto grid w-[min(100%,960px)] grid-cols-[minmax(280px,1fr)_minmax(300px,1fr)] border-b border-l border-border max-[700px]:grid-cols-1">
+          <div className="sprite-canvas grid self-start aspect-square grid-cols-[repeat(8,minmax(28px,1fr))] bg-foreground" aria-label="Eight by eight sprite canvas">
             {pixels.map((value, index) => (
               <button
+                className={`min-w-0 cursor-crosshair border-0 border-t border-r border-[#777777] hover:outline-2 hover:-outline-offset-4 focus-visible:outline-offset-[-4px] ${value < 2 ? "hover:outline-background" : "hover:outline-foreground"}`}
                 key={index}
                 type="button"
                 aria-label={`Pixel ${index % 8 + 1}, ${Math.floor(index / 8) + 1} color ${value}`}
                 style={{ background: ["#000", "#555", "#aaa", "#fff"][value] }}
                 onClick={() => paint(index)}
+                data-cuelume-hover="tick"
                 data-cuelume-press=""
                 data-cuelume-release=""
               />
             ))}
           </div>
-          <aside className="sprite-controls">
-            <div className="sprite-palette" aria-label="Sprite palette">
+          <aside className="sprite-controls grid min-h-0 grid-rows-[64px_minmax(0,1fr)_41px_32px] border-r border-border">
+            <div className="sprite-palette grid h-[64px] grid-cols-4" aria-label="Sprite palette">
               {[0, 1, 2, 3].map((value) => (
                 <button
+                  className={`cursor-pointer border-0 border-t border-r border-border hover:outline-2 hover:-outline-offset-4 aria-pressed:outline-3 aria-pressed:-outline-offset-6 aria-pressed:outline-foreground first:aria-pressed:outline-background ${value < 2 ? "hover:outline-background" : "hover:outline-foreground"}`}
                   key={value}
                   type="button"
                   aria-label={`Color ${value}`}
                   aria-pressed={color === value}
                   style={{ background: ["#000", "#555", "#aaa", "#fff"][value] }}
                   onClick={() => { setColor(value); setStatus(`8 × 8 · color ${value} selected`); }}
+                  data-cuelume-hover="tick"
                   data-cuelume-toggle=""
                 />
               ))}
             </div>
-            <textarea aria-label="Sprite code" readOnly value={code} />
-            <div className="sprite-actions">
-              <Button aria-label="Copy sprite code" onClick={() => { void copy(); }}><Copy width={24} height={24} aria-hidden="true" />Copy code</Button>
-              <Button aria-label="Clear sprite" onClick={() => { setPixels(Array(64).fill(0)); setStatus("cleared"); }}><Trash width={24} height={24} aria-hidden="true" />Clear</Button>
+            <textarea className="min-h-0 w-full resize-none border-0 border-t border-border bg-muted p-[16px] font-[inherit] leading-normal max-[560px]:min-h-[190px]" aria-label="Sprite code" readOnly value={code} />
+            <div className="sprite-actions grid grid-cols-2">
+              <Button className="min-h-[41px] justify-center" aria-label="Copy sprite code" onClick={() => { void copy(); }}><Copy width={24} height={24} aria-hidden="true" />Copy code</Button>
+              <Button className="min-h-[41px] justify-center" aria-label="Clear sprite" onClick={() => { setPixels(Array(64).fill(0)); setStatus("cleared"); }}><Trash width={24} height={24} aria-hidden="true" />Clear</Button>
             </div>
-            <p className="sprite-status" role="status" aria-live="polite">{status}</p>
+            <p className="sprite-status m-0 min-h-[32px] border-t border-border px-[12px] py-[8px] text-[#555555]" role="status" aria-live="polite">{status}</p>
           </aside>
         </section>
       </main>
-      <footer className="gallery-footer"><span>four indexed colors</span><Link to="/" {...soundLinkProps}>Open editor</Link><Attribution /><SoundToggle soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} /></footer>
+      <SiteFooter summary="four indexed colors" soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />
     </div>
   );
 }

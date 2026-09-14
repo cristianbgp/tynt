@@ -1,3 +1,8 @@
+import { BookOpen, Github, Volume2, VolumeX } from "pixelarticons/react";
+
+const PROJECT_REPOSITORY = "https://github.com/cristianbgp/tynt";
+const DOCUMENTATION_SOURCE = `${PROJECT_REPOSITORY}/tree/main/apps/docs`;
+
 interface StatusBarProps {
   status: string;
   draftStatus: string;
@@ -5,10 +10,29 @@ interface StatusBarProps {
   onSoundToggle(): void;
 }
 
+function FooterIconLink({ href, label, icon }: { href: string; label: string; icon: "github" | "docs" }) {
+  const Icon = icon === "github" ? Github : BookOpen;
+  return (
+    <a
+      className="footer-icon-link flex w-[36px] items-center justify-center border-l border-border text-[#555555] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background"
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      title={icon === "github" ? "GitHub" : "Docs"}
+      data-cuelume-hover="tick"
+      data-cuelume-press=""
+      data-cuelume-release=""
+    >
+      <Icon width={18} height={18} data-icon={icon} aria-hidden="true" />
+    </a>
+  );
+}
+
 export function Attribution() {
   return (
     <a
-      className="attribution"
+      className="attribution flex items-center self-stretch whitespace-nowrap border-l border-border px-[10px] text-[#555555] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background"
       href="https://cristianbgp.com"
       target="_blank"
       rel="noreferrer"
@@ -17,7 +41,7 @@ export function Attribution() {
       data-cuelume-press=""
       data-cuelume-release=""
     >
-      <span className="attribution-prefix">made by&nbsp;</span>@cristianbgp
+      <span className="attribution-prefix max-[560px]:hidden">made by&nbsp;</span>@cristianbgp
     </a>
   );
 }
@@ -26,10 +50,11 @@ export function SoundToggle({ soundEnabled, onSoundToggle }: Pick<StatusBarProps
   const Icon = soundEnabled ? Volume2 : VolumeX;
   return (
     <button
-      className="sound-toggle"
+      className="sound-toggle mr-[-12px] flex cursor-pointer items-center gap-[6px] self-stretch border-0 border-l border-border bg-transparent px-[12px] text-[10px] text-[#555555] hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background"
       type="button"
       aria-label={soundEnabled ? "Sound on" : "Sound off"}
       aria-pressed={soundEnabled}
+      data-cuelume-hover="tick"
       onClick={onSoundToggle}
     >
       <Icon width={24} height={24} data-icon={soundEnabled ? "volume" : "volume-x"} aria-hidden="true" />
@@ -38,15 +63,24 @@ export function SoundToggle({ soundEnabled, onSoundToggle }: Pick<StatusBarProps
   );
 }
 
+export function FooterActions({ soundEnabled, onSoundToggle }: Pick<StatusBarProps, "soundEnabled" | "onSoundToggle">) {
+  return (
+    <div className="footer-actions flex items-stretch self-stretch">
+      <Attribution />
+      <FooterIconLink href={PROJECT_REPOSITORY} label="Open tynt on GitHub" icon="github" />
+      <FooterIconLink href={DOCUMENTATION_SOURCE} label="Open tynt documentation" icon="docs" />
+      <SoundToggle soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />
+    </div>
+  );
+}
+
 export function StatusBar({ status, draftStatus, soundEnabled, onSoundToggle }: StatusBarProps) {
   return (
-    <footer className="status-bar">
+    <footer className="status-bar row-start-4 flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:row-start-5 max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)]">
       <span id="status" role="status" aria-live="polite">{status}</span>
-      <span id="draft-status">{draftStatus}</span>
-      <span id="status-hint">Ctrl Shift Enter run or rerun · preview focuses automatically</span>
-      <Attribution />
-      <SoundToggle soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />
+      <span className="text-border max-[560px]:hidden" id="draft-status">{draftStatus}</span>
+      <span className="ml-auto text-border max-[560px]:hidden" id="status-hint">Ctrl Shift Enter run or rerun · preview focuses automatically</span>
+      <FooterActions soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />
     </footer>
   );
 }
-import { Volume2, VolumeX } from "pixelarticons/react";

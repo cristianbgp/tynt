@@ -77,9 +77,15 @@ a {
 }
 
 a:hover {
-  background: #f4f4f4;
-  color: #000000;
+  background: #000000;
+  color: #ffffff;
   text-decoration: underline;
+}
+
+.tsd-page-toolbar button:hover,
+.site-menu button:hover {
+  background: #000000;
+  color: #ffffff;
 }
 
 :focus-visible {
@@ -232,11 +238,14 @@ th {
 }
 
 .tsd-navigation a.current,
-.tsd-navigation a.current:hover,
-.tsd-page-navigation a.current,
-.tsd-page-navigation a.current:hover {
+.tsd-page-navigation a.current {
   background: #000000;
   color: #ffffff;
+}
+
+.tsd-navigation a.current:hover,
+.tsd-page-navigation a.current:hover {
+  background: #555555;
 }
 
 .tsd-navigation a.current svg,
@@ -317,8 +326,20 @@ pre,
   }
 
   a:hover {
-    background: #222222;
-    color: #ffffff;
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .tsd-page-toolbar button:hover,
+  .site-menu button:hover {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .tsd-navigation a.current:hover,
+  .tsd-page-navigation a.current:hover {
+    background: #aaaaaa;
+    color: #000000;
   }
 
   :focus-visible {

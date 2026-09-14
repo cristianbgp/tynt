@@ -8,10 +8,10 @@ interface EmulatorControlsProps {
 }
 
 const controls: Array<{ input: InputName; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>>; iconName: string; className: string }> = [
-  { input: "up", label: "Direction up", Icon: ArrowUp, iconName: "arrow-up", className: "dpad-up" },
-  { input: "left", label: "Direction left", Icon: ArrowLeft, iconName: "arrow-left", className: "dpad-left" },
-  { input: "right", label: "Direction right", Icon: ArrowRight, iconName: "arrow-right", className: "dpad-right" },
-  { input: "down", label: "Direction down", Icon: ArrowDown, iconName: "arrow-down", className: "dpad-down" },
+  { input: "up", label: "Direction up", Icon: ArrowUp, iconName: "arrow-up", className: "dpad-up col-start-2 row-start-1" },
+  { input: "left", label: "Direction left", Icon: ArrowLeft, iconName: "arrow-left", className: "dpad-left col-start-1 row-start-2" },
+  { input: "right", label: "Direction right", Icon: ArrowRight, iconName: "arrow-right", className: "dpad-right col-start-3 row-start-2" },
+  { input: "down", label: "Direction down", Icon: ArrowDown, iconName: "arrow-down", className: "dpad-down col-start-2 row-start-3" },
 ];
 
 export function EmulatorControls({ onInput }: EmulatorControlsProps) {
@@ -44,7 +44,7 @@ export function EmulatorControls({ onInput }: EmulatorControlsProps) {
     <Button
       key={input}
       variant="control"
-      className={className}
+      className={`size-[40px] bg-foreground text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground data-[pressed=true]:bg-background data-[pressed=true]:text-foreground data-[pressed=true]:hover:bg-background data-[pressed=true]:hover:text-foreground ${className ?? ""}`}
       aria-label={label}
       aria-pressed={pressed.has(input)}
       data-pressed={pressed.has(input)}
@@ -59,18 +59,18 @@ export function EmulatorControls({ onInput }: EmulatorControlsProps) {
   );
 
   return (
-    <div className="emulator-controls" aria-label="Emulator controls">
-      <div className="dpad" aria-label="Direction pad">
+    <div className="emulator-controls mt-[18px] flex touch-none select-none items-end justify-between" aria-label="Emulator controls">
+      <div className="dpad grid grid-cols-[repeat(3,40px)] grid-rows-[repeat(3,40px)]" aria-label="Direction pad">
         {controls.map(({ input, label, Icon, iconName, className }) => control(
           input,
           label,
           <Icon width={24} height={24} data-icon={iconName} aria-hidden="true" />,
           className,
         ))}
-        <span className="dpad-center" aria-hidden="true" />
+        <span className="dpad-center col-start-2 row-start-2 border border-foreground bg-foreground" aria-hidden="true" />
       </div>
-      <div className="action-buttons">
-        <div>{control("b", "Action B", "B")}</div>
+      <div className="action-buttons flex items-end gap-[12px] pb-[10px]">
+        <div className="translate-y-[8px]">{control("b", "Action B", "B")}</div>
         <div>{control("a", "Action A", "A")}</div>
       </div>
     </div>

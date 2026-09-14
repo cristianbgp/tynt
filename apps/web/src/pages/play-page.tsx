@@ -6,7 +6,7 @@ import { Link } from "react-router";
 import { BrandLink, TyntMark } from "@/components/brand";
 import { ErrorConsole } from "@/components/error-console";
 import { Preview } from "@/components/preview";
-import { Attribution, SoundToggle } from "@/components/status-bar";
+import { FooterActions } from "@/components/status-bar";
 import { Button } from "@/components/ui/button";
 import { useRuntime } from "@/hooks/use-runtime";
 
@@ -19,15 +19,15 @@ interface PlayPageProps {
 
 const soundLinkProps = { "data-cuelume-hover": "tick", "data-cuelume-press": "", "data-cuelume-release": "" } as const;
 const playLinkClassName = "flex items-center justify-center gap-[8px] border-l border-border px-[14px] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background max-[900px]:w-full max-[900px]:min-w-0 max-[900px]:px-[8px]";
-const playButtonClassName = "max-[900px]:w-full max-[900px]:min-w-0 max-[900px]:px-2";
+const playButtonClassName = "max-[900px]:w-full max-[900px]:min-w-0 max-[900px]:px-[8px]";
 
 export function CartridgeNotFound({ local = false }: { local?: boolean }) {
   return (
-    <main className="not-found-page">
-      <span className="state-mark"><TyntMark /></span><span>404</span>
+    <main className="not-found-page grid min-h-full place-content-center justify-items-start gap-[12px] [&_h1]:m-0 [&_p]:m-0">
+      <span className="state-mark inline-grid size-[42px] place-items-center bg-foreground [&_.brand-mark]:size-[24px]"><TyntMark /></span><span>404</span>
       <h1>Cartridge not found</h1>
       <p>{local ? "It may have been removed from this device." : "This public cartridge is not in the gallery."}</p>
-      <Link to={local ? "/library" : "/gallery"} {...soundLinkProps}>{local ? "Open library" : "Open gallery"}</Link>
+      <Link className="border-b border-current px-[2px] pb-[2px] hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background" to={local ? "/library" : "/gallery"} {...soundLinkProps}>{local ? "Open library" : "Open gallery"}</Link>
     </main>
   );
 }
@@ -78,11 +78,11 @@ export function PlayPage({ cartridge, editorHref, soundEnabled, onSoundToggle }:
           </div>
         </div>
       </header>
-      <main ref={stageRef} className="play-stage min-h-0 min-w-0 bg-background fullscreen:bg-muted max-[900px]:min-h-[680px] max-[560px]:min-h-0 max-[560px]:overflow-auto">
+      <main ref={stageRef} className="play-stage min-h-0 min-w-0 bg-background fullscreen:bg-muted [&_.preview-pane]:h-full [&_.preview-pane]:w-full [&_.preview-pane]:min-h-0 [&_.preview-pane]:min-w-0 max-[900px]:min-h-[680px] max-[560px]:min-h-0 max-[560px]:overflow-auto max-[560px]:[&_.preview-pane]:h-auto max-[560px]:[&_.preview-pane]:min-h-full max-[560px]:[&_.preview-pane]:content-start max-[560px]:[&_.preview-pane]:items-start max-[560px]:[&_.preview-pane]:p-0 max-[560px]:[&_.preview-frame]:border-0 max-[560px]:[&_.preview-frame]:outline max-[560px]:[&_.preview-frame]:-outline-offset-1 max-[560px]:[&_.preview-frame]:outline-foreground max-[560px]:[&_canvas]:w-[min(320px,100vw)] max-[560px]:[&_.preview-hints]:px-[8px] max-[560px]:[&_.emulator-controls]:mx-[8px] max-[560px]:[&_.emulator-controls]:mt-[10px] max-[560px]:[&_.emulator-controls]:mb-[8px]">
         <Preview interactionRef={previewRef} canvasRef={runtime.canvasRef} onKeyDown={(code) => runtime.setKey(code, true)} onKeyUp={(code) => runtime.setKey(code, false)} onInput={runtime.setInput} onBlur={runtime.resetInput} showError={runtime.showPreviewError} />
       </main>
       <ErrorConsole error={pageError || runtime.error} />
-      <footer className="play-footer flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)]"><span role="status" aria-live="polite">{paused ? "paused" : runtime.status}</span><span className="ml-auto max-[560px]:hidden">{cartridge.controls || "ARROWS · Z / X"}</span><Attribution /><SoundToggle soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} /></footer>
+      <footer className="play-footer flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)]"><span role="status" aria-live="polite">{paused ? "paused" : runtime.status}</span><span className="ml-auto max-[560px]:hidden">{cartridge.controls || "ARROWS · Z / X"}</span><FooterActions soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} /></footer>
     </div>
   );
 }

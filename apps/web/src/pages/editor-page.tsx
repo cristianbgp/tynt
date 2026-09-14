@@ -223,7 +223,10 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
   });
 
   return (
-    <div className="app-shell" data-runtime-state={runtime.status}>
+    <div
+      className="app-shell grid h-full w-full grid-rows-[41px_minmax(0,1fr)_auto_25px] max-[760px]:h-auto max-[760px]:min-h-full max-[760px]:grid-rows-[auto_minmax(0,1fr)_auto_25px] max-[560px]:h-dvh max-[560px]:min-h-0 max-[560px]:grid-rows-[auto_41px_minmax(0,1fr)_auto_calc(41px+env(safe-area-inset-bottom))]"
+      data-runtime-state={runtime.status}
+    >
       <Toolbar
         filename={safeFilename(draft.title)}
         examples={listPublicCartridges().map(({ slug, filename }) => ({ id: slug, filename }))}
@@ -240,7 +243,7 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
         onFileChange={importCartridge}
       />
       <MobilePaneSwitch value={mobilePane} onChange={setMobilePane} />
-      <main className="workspace" data-mobile-pane={mobilePane}>
+      <main className="workspace grid min-h-0 grid-cols-[minmax(0,13fr)_minmax(340px,7fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[minmax(360px,55vh)_auto] max-[560px]:row-start-3 max-[560px]:h-full max-[560px]:grid-rows-[minmax(0,1fr)]" data-mobile-pane={mobilePane}>
         <Editor source={draft.source} onChange={(source) => setDraft((current) => ({ ...current, source }))} />
         <Preview
           interactionRef={previewRef}

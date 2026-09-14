@@ -65,8 +65,8 @@ export function Editor({ source, onChange }: EditorProps) {
   }, [source]);
 
   return (
-    <section className="editor-pane" aria-label="TypeScript editor">
-      <div id="editor" ref={hostRef} />
+    <section className="editor-pane h-full min-h-0 overflow-hidden border-r border-border max-[760px]:border-r-0 max-[760px]:border-b" aria-label="TypeScript editor">
+      <div className="h-full min-h-0" id="editor" ref={hostRef} />
     </section>
   );
 }

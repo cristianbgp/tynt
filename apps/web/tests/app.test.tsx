@@ -78,10 +78,21 @@ describe("tynt creator shell", () => {
     expect(screen.getByRole("button", { name: "Import" }).querySelector('[data-icon="upload"]')).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Export" }).querySelector('[data-icon="download"]')).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sound on" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Sound on" })).toHaveAttribute("data-cuelume-hover", "tick");
     expect(screen.getByRole("button", { name: "Sound on" }).querySelector('[data-icon="volume"]')).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute("href", "https://cristianbgp.com");
     expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute("target", "_blank");
     expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute("rel", "noreferrer");
+    expect(screen.getByRole("link", { name: "Open tynt on GitHub" })).toHaveAttribute(
+      "href",
+      "https://github.com/cristianbgp/tynt",
+    );
+    expect(screen.getByRole("link", { name: "Open tynt documentation" })).toHaveAttribute(
+      "href",
+      "https://github.com/cristianbgp/tynt/tree/main/apps/docs",
+    );
+    expect(screen.getByRole("link", { name: "Open tynt on GitHub" }).querySelector('[data-icon="github"]')).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Open tynt documentation" }).querySelector('[data-icon="docs"]')).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Game preview" })).toBeVisible();
     expect(screen.getByRole("status")).toHaveTextContent("ready");
   });
@@ -99,6 +110,8 @@ describe("tynt creator shell", () => {
     window.history.replaceState({}, "", "/sprites");
     renderApp();
     expect(screen.getByRole("heading", { name: "Sprite editor" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Pixel 1, 1 color 0" })).toHaveAttribute("data-cuelume-hover", "tick");
+    expect(screen.getByRole("button", { name: "Color 0" })).toHaveAttribute("data-cuelume-hover", "tick");
   });
 
   test("offers a route back to the editor for unknown paths", () => {

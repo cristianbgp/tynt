@@ -6,6 +6,16 @@ async function expectNoHorizontalOverflow(page: import("@playwright/test").Page,
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
 }
 
+async function expectHoverColors(
+  locator: import("@playwright/test").Locator,
+  background: string,
+  color: string,
+) {
+  await locator.hover();
+  await expect(locator).toHaveCSS("background-color", background);
+  await expect(locator).toHaveCSS("color", color);
+}
+
 const validCartridge = {
   format: "tynt",
   version: 1,
@@ -29,6 +39,67 @@ test("shows the compact controls and two-pane workspace", async ({ page }) => {
   await expect(page.locator("#draft-status")).toHaveText("autosave on");
   await expect(page.locator(".actions")).toHaveCSS("border-left-width", "0px");
   await expect(page.locator("#run-button")).toHaveCSS("border-left-width", "1px");
+});
+
+test("gives every editor interaction a distinct hover state", async ({ page }) => {
+  await page.goto("/");
+
+  await expectHoverColors(page.getByRole("link", { name: "tynt editor" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+  await expectHoverColors(page.getByRole("button", { name: "Run" }), "rgb(0, 0, 0)", "rgb(255, 255, 255)");
+  await expectHoverColors(page.getByRole("button", { name: "Direction right" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+
+  await page.getByRole("button", { name: "Run" }).click();
+  await expectHoverColors(page.getByRole("button", { name: "Stop" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+  await page.getByRole("button", { name: "Stop" }).click();
+
+  const disabledRun = page.getByRole("button", { name: "Run" });
+  await disabledRun.evaluate((button) => button.setAttribute("disabled", ""));
+  await expectHoverColors(disabledRun, "rgba(0, 0, 0, 0)", "rgb(119, 119, 119)");
+
+  await page.setViewportSize({ width: 320, height: 568 });
+  const gamePane = page.getByRole("button", { name: "Show game" });
+  await expectHoverColors(gamePane, "rgb(0, 0, 0)", "rgb(255, 255, 255)");
+  await gamePane.click();
+  await expectHoverColors(gamePane, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+});
+
+test("gives sprite and recovery controls a distinct hover state", async ({ page }) => {
+  await page.goto("/sprites");
+
+  const darkPixel = page.getByRole("button", { name: "Pixel 1, 1 color 0" });
+  await darkPixel.hover();
+  await expect(darkPixel).toHaveCSS("outline-color", "rgb(255, 255, 255)");
+  await expect(darkPixel).toHaveCSS("outline-style", "solid");
+
+  const lightColor = page.getByRole("button", { name: "Color 3" });
+  await lightColor.hover();
+  await expect(lightColor).toHaveCSS("outline-color", "rgb(0, 0, 0)");
+  await expect(lightColor).toHaveCSS("outline-style", "solid");
+
+  await page.goto("/missing");
+  await expectHoverColors(page.getByRole("link", { name: "Open editor" }), "rgb(0, 0, 0)", "rgb(255, 255, 255)");
+
+  await page.goto("/gallery");
+  await expectHoverColors(page.getByRole("link", { name: "Gallery" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+  const puzzle = page.getByRole("button", { name: "puzzle" });
+  await puzzle.click();
+  await expectHoverColors(puzzle, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+});
+
+test("uses strong hover feedback in the generated documentation", async ({ page }) => {
+  await page.goto("http://127.0.0.1:4174/");
+
+  const guideLink = page.getByRole("link", { name: "Getting Started" }).first();
+  await expectHoverColors(guideLink, "rgb(0, 0, 0)", "rgb(255, 255, 255)");
+
+  const menuButton = page.locator("#tsd-search-trigger");
+  await expect(menuButton).toBeVisible();
+  await expectHoverColors(menuButton, "rgb(0, 0, 0)", "rgb(255, 255, 255)");
+
+  await page.goto("http://127.0.0.1:4174/documents/Getting_Started.html");
+  const currentNavigation = page.locator(".tsd-navigation a.current").first();
+  await expect(currentNavigation).toBeVisible();
+  await expectHoverColors(currentNavigation, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
 });
 
 test("responsive editor switches from code to a focused game", async ({ page }) => {
@@ -470,6 +541,20 @@ test("keeps the status bar flush with the viewport when errors are hidden or vis
 
   await expect(page.locator("#error-console")).toBeVisible();
   await expect.poll(statusBox).toEqual({ bottom: 800, height: 25, viewportBottom: 800 });
+});
+
+test("keeps the editor footer actions contiguous without horizontal overflow", async ({ page }) => {
+  await page.goto("/");
+
+  const footerActions = page.locator(".status-bar .footer-actions");
+  await expect(footerActions).toBeVisible();
+  await expect.poll(() => footerActions.evaluate((actions) => {
+    const items = [...actions.children].map((item) => item.getBoundingClientRect());
+    return {
+      gaps: items.slice(1).map((item, index) => Math.round(item.left - items[index].right)),
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  })).toEqual({ gaps: [0, 0, 0], pageOverflow: 0 });
 });
 
 test("keeps keyboard focus on the screen and renders the D-pad as one cross", async ({ page }) => {

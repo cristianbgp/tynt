@@ -7,9 +7,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "hover:bg-foreground hover:text-background",
-        active: "bg-foreground text-background",
-        control: "size-10 border border-foreground p-0 data-[pressed=true]:bg-foreground data-[pressed=true]:text-background",
+        default: "enabled:hover:bg-foreground enabled:hover:text-background",
+        active: "bg-foreground text-background enabled:hover:bg-[#555555]",
+        control: "size-10 border border-foreground p-0 enabled:hover:bg-[#555555] enabled:hover:text-background data-[pressed=true]:bg-foreground data-[pressed=true]:text-background data-[pressed=true]:hover:bg-foreground data-[pressed=true]:hover:text-background",
       },
     },
     defaultVariants: {
