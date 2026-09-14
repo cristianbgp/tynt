@@ -50,6 +50,19 @@ describe("public repository health", () => {
     }
   });
 
+  test("configures the root Vercel project to build the web app with Bun 1.4", () => {
+    const deployment = JSON.parse(readProjectFile("vercel.json"));
+
+    expect(deployment).toMatchObject({
+      $schema: "https://openapi.vercel.sh/vercel.json",
+      bunVersion: "1.4.x",
+      installCommand: "bun install --frozen-lockfile && bun install --cwd apps/web --frozen-lockfile",
+      buildCommand: "bun run --cwd apps/web build",
+      outputDirectory: "apps/web/dist",
+    });
+    expect(existsSync(projectPath("apps/web/vercel.json"))).toBe(false);
+  });
+
   test("keeps every local README link available in the public repository", () => {
     const links = [...readProjectFile("README.md").matchAll(/\[[^\]]*\]\(([^)]+)\)/g)]
       .map((match) => match[1])
