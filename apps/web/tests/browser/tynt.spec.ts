@@ -603,14 +603,14 @@ test("keeps keyboard focus on the screen and renders the D-pad as one cross", as
   });
 });
 
-test("uses matching 40 pixel cells for every part of the D-pad", async ({ page }) => {
+test("uses matching 48 pixel touch targets for every part of the D-pad", async ({ page }) => {
   await page.goto("/");
   const cells = await page.locator(".dpad button, .dpad-center").evaluateAll((elements) => elements.map((element) => {
     const rect = element.getBoundingClientRect();
     return { width: rect.width, height: rect.height };
   }));
 
-  expect(cells).toEqual(Array.from({ length: 5 }, () => ({ width: 40, height: 40 })));
+  expect(cells).toEqual(Array.from({ length: 5 }, () => ({ width: 48, height: 48 })));
 });
 
 test("uses the same black surface and pressed feedback for A and B", async ({ page }) => {
