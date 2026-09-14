@@ -86,20 +86,39 @@ test("gives sprite and recovery controls a distinct hover state", async ({ page 
   await expectHoverColors(puzzle, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
 });
 
-test("uses strong hover feedback in the generated documentation", async ({ page }) => {
-  await page.goto("http://127.0.0.1:4174/");
+test("uses strong hover feedback for every docs control in explicit light and dark themes", async ({ page }) => {
+  for (const theme of [
+    {
+      name: "light",
+      system: "dark",
+      pageBackground: "rgb(255, 255, 255)",
+      hoverBackground: "rgb(0, 0, 0)",
+      hoverColor: "rgb(255, 255, 255)",
+      currentHoverBackground: "rgb(85, 85, 85)",
+    },
+    {
+      name: "dark",
+      system: "light",
+      pageBackground: "rgb(0, 0, 0)",
+      hoverBackground: "rgb(255, 255, 255)",
+      hoverColor: "rgb(0, 0, 0)",
+      currentHoverBackground: "rgb(170, 170, 170)",
+    },
+  ] as const) {
+    await page.emulateMedia({ colorScheme: theme.system });
+    await page.goto("http://127.0.0.1:4174/documents/Getting_Started.html");
+    await page.evaluate((name) => { document.documentElement.dataset.theme = name; }, theme.name);
+    await expect(page.locator("body")).toHaveCSS("background-color", theme.pageBackground);
 
-  const guideLink = page.getByRole("link", { name: "Getting Started" }).first();
-  await expectHoverColors(guideLink, "rgb(0, 0, 0)", "rgb(255, 255, 255)");
+    await expectHoverColors(page.getByRole("link", { name: "Examples and Recipes", exact: true }), theme.hoverBackground, theme.hoverColor);
+    await expectHoverColors(page.locator("#tsd-search-trigger"), theme.hoverBackground, theme.hoverColor);
+    await expectHoverColors(page.getByRole("button", { name: "Copy" }), theme.hoverBackground, theme.hoverColor);
+    await expectHoverColors(page.locator("summary.tsd-accordion-summary").first(), theme.hoverBackground, theme.hoverColor);
 
-  const menuButton = page.locator("#tsd-search-trigger");
-  await expect(menuButton).toBeVisible();
-  await expectHoverColors(menuButton, "rgb(0, 0, 0)", "rgb(255, 255, 255)");
-
-  await page.goto("http://127.0.0.1:4174/documents/Getting_Started.html");
-  const currentNavigation = page.locator(".tsd-navigation a.current").first();
-  await expect(currentNavigation).toBeVisible();
-  await expectHoverColors(currentNavigation, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+    const currentNavigation = page.locator(".tsd-navigation a.current").first();
+    await expectHoverColors(currentNavigation, theme.currentHoverBackground, theme.hoverColor);
+    await expect(currentNavigation.locator("svg")).toHaveCSS("color", theme.hoverColor);
+  }
 });
 
 test("responsive editor switches from code to a focused game", async ({ page }) => {

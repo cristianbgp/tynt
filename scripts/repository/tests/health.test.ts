@@ -55,6 +55,18 @@ describe("public repository health", () => {
     expect(existsSync(projectPath("apps/web/vercel.json"))).toBe(false);
   });
 
+  test("deploys docs with the Bun version that owns its lockfile", () => {
+    const configuration = JSON.parse(readProjectFile("apps/docs/vercel.json"));
+
+    expect(configuration).toMatchObject({
+      framework: null,
+      bunVersion: "1.4.x",
+      installCommand: "bunx bun@1.4.0 install --frozen-lockfile",
+      buildCommand: "bunx bun@1.4.0 run build",
+      outputDirectory: "dist",
+    });
+  });
+
   test("installs the Playwright browser before running the CI check", () => {
     const workflow = readProjectFile(".github/workflows/check.yml");
     const browserInstall = workflow.indexOf("bun run --cwd apps/web playwright install --with-deps chromium");
