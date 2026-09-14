@@ -52,7 +52,10 @@ test("loads, starts, and exposes focused play controls for a local cartridge", a
   await waitFor(() => expect(runtime.run).toHaveBeenCalledWith(source));
   expect(document.querySelector("#preview")).toHaveFocus();
   expect(screen.getByRole("link", { name: "Edit cartridge" })).toHaveAttribute("href", "/?local=play-one");
+  expect(screen.getByRole("link", { name: "Open gallery" })).toHaveAttribute("href", "/gallery");
   expect(screen.getByRole("link", { name: "Open library" })).toHaveAttribute("href", "/library");
+  expect(screen.getByRole("link", { name: "Open sprites" })).toHaveAttribute("href", "/sprites");
+  expect(screen.getByRole("group", { name: "Play controls" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Pause" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Restart" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Enter fullscreen" })).toBeVisible();
@@ -69,6 +72,9 @@ test("loads a repository cartridge at its public route", async () => {
 
   expect(await screen.findByRole("heading", { name: "snake" })).toBeVisible();
   expect(screen.getByRole("link", { name: "Edit cartridge" })).toHaveAttribute("href", "/?cartridge=snake");
+  expect(screen.getByRole("link", { name: "Open gallery" })).toHaveAttribute("href", "/gallery");
+  expect(screen.getByRole("link", { name: "Open library" })).toHaveAttribute("href", "/library");
+  expect(screen.getByRole("link", { name: "Open sprites" })).toHaveAttribute("href", "/sprites");
   expect(runtime.run).toHaveBeenCalledWith(expect.stringContaining("segments"));
 });
 

@@ -50,6 +50,9 @@ test("responsive play keeps the game and controls close together", async ({ page
     await page.setViewportSize(viewport);
     await page.goto("/play/public/coin-dash");
     await expect(page.locator("#preview")).toBeFocused();
+    await expect(page.getByRole("link", { name: "Open gallery" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Open library" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Open sprites" })).toBeVisible();
     await expectNoHorizontalOverflow(page, viewport.width);
     const geometry = await page.evaluate(() => {
       const canvas = document.querySelector("canvas")!.getBoundingClientRect();
