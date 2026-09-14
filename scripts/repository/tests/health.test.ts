@@ -63,6 +63,21 @@ describe("public repository health", () => {
     expect(existsSync(projectPath("apps/web/vercel.json"))).toBe(false);
   });
 
+  test("keeps project copy free of em dashes", () => {
+    const emDash = String.fromCodePoint(0x2014);
+    for (const path of ["README.md", "apps/web/index.html", "apps/web/vite.config.ts"]) {
+      expect(readProjectFile(path), `${path} should not contain em dashes`).not.toContain(emDash);
+    }
+  });
+
+  test("centers social artwork inside a crop-safe composition", () => {
+    const social = readProjectFile("apps/web/public/tynt-social.svg");
+
+    expect(social).toContain('viewBox="0 0 1200 630"');
+    expect(social).toContain('id="social-content" transform="translate(600 315)"');
+    expect(social.match(/text-anchor="middle"/g)).toHaveLength(2);
+  });
+
   test("keeps every local README link available in the public repository", () => {
     const links = [...readProjectFile("README.md").matchAll(/\[[^\]]*\]\(([^)]+)\)/g)]
       .map((match) => match[1])

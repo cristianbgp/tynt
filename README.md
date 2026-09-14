@@ -3,7 +3,9 @@
 [![check](https://github.com/cristianbgp/tynt/actions/workflows/check.yml/badge.svg)](https://github.com/cristianbgp/tynt/actions/workflows/check.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 
-![tynt — tiny browser game console](apps/web/public/tynt-social.png)
+<p align="center">
+  <img src="apps/web/public/tynt-social.png" alt="tynt: tiny browser game console" width="720" />
+</p>
 
 tynt is a tiny browser game console. Write a cartridge in TypeScript, press Run, and draw on a fixed 160 × 144 canvas with four shades of gray.
 
@@ -13,11 +15,11 @@ The project is local-first and static: no server, accounts, publishing service, 
 
 This repository keeps the product and engine separate without using Bun workspaces:
 
-- `apps/web` — the React, Vite, Tailwind CSS, and shadcn/ui application.
-- `apps/docs` — the generated TypeDoc reference and its custom tynt theme.
-- `packages/core` — the browser-independent TypeScript engine and cartridge format.
-- `cartridges` — every bundled and community-submitted game, using one shared publication format.
-- `scripts/cartridges` — validation and catalog generation for public cartridges.
+- `apps/web`: the React, Vite, Tailwind CSS, and shadcn/ui application.
+- `apps/docs`: the generated TypeDoc reference and its custom tynt theme.
+- `packages/core`: the browser-independent TypeScript engine and cartridge format.
+- `cartridges`: every bundled and community-submitted game, using one shared publication format.
+- `scripts/cartridges`: validation and catalog generation for public cartridges.
 
 Each package owns its own `package.json`, `bun.lock`, and `node_modules`. The root package has no application dependencies; it only coordinates commands.
 
@@ -41,12 +43,12 @@ The app opens at `http://127.0.0.1:4173`.
 
 Routes:
 
-- `/` — cartridge editor and game preview.
-- `/gallery` — searchable bundled and community-submitted games.
-- `/library` — searchable cartridges saved on this device.
-- `/play/public/:slug` — focused play mode for a public cartridge.
-- `/play/local/:id` — focused play mode for a cartridge saved on this device.
-- `/sprites` — an 8×8 four-color sprite editor with cartridge-ready output.
+- `/`: cartridge editor and game preview.
+- `/gallery`: searchable bundled and community-submitted games.
+- `/library`: searchable cartridges saved on this device.
+- `/play/public/:slug`: focused play mode for a public cartridge.
+- `/play/local/:id`: focused play mode for a cartridge saved on this device.
+- `/sprites`: an 8×8 four-color sprite editor with cartridge-ready output.
 
 Root commands:
 
@@ -88,9 +90,9 @@ The emulator buttons and keyboard feed the same input state:
 
 Run or rerun focuses the preview automatically so gameplay keys are ready immediately. Toolbar actions also have global shortcuts:
 
-- Control + Shift + Enter — Run or rerun on every platform.
-- Command/Control + O — Import a `.tynt` cartridge.
-- Command/Control + S — Export the current cartridge.
+- Control + Shift + Enter: Run or rerun on every platform.
+- Command/Control + O: Import a `.tynt` cartridge.
+- Command/Control + S: Export the current cartridge.
 
 On phones, the editor uses **Code** and **Play** panes instead of placing both full workspaces in one long page. A successful run selects Play and focuses the console; switching back preserves the editor and running game state.
 
@@ -158,21 +160,21 @@ Coordinates are rounded to integers and clipped to the canvas. Color indexes are
 
 The editor dropdown and gallery are generated from the top-level `cartridges/` collection:
 
-- `starter.tynt` — movement, actions, reset, and scoring.
-- `shapes.tynt` — every drawing primitive.
-- `animation.tynt` — fixed-step movement.
-- `snake.tynt` — grid movement, growth, collision, and scoring.
-- `asteroids.tynt` — rotation, velocity, projectiles, and collision.
-- `platformer.tynt` — gravity, jumping, and platforms.
-- `flappy.tynt` — one-button movement and scrolling obstacles.
-- `coin-dash.tynt` — a timed scrolling game using sprites, maps, camera, seeded randomness, collisions, timers, and synthesized audio.
-- `sprites.tynt` — the 8×8 tynt mark, transparent pixel sprites, and two-frame animation.
-- `soundboard.tynt` — individual tones and short synthesized effects.
-- `pong.tynt` — paddle collision, opponent movement, serving, and scoring.
-- `sokoban.tynt` — a compact tile-map pushing puzzle.
-- `lunar.tynt` — gravity, limited fuel, procedural terrain, and safe landing.
+- `starter.tynt`: movement, actions, reset, and scoring.
+- `shapes.tynt`: every drawing primitive.
+- `animation.tynt`: fixed-step movement.
+- `snake.tynt`: grid movement, growth, collision, and scoring.
+- `asteroids.tynt`: rotation, velocity, projectiles, and collision.
+- `platformer.tynt`: gravity, jumping, and platforms.
+- `flappy.tynt`: one-button movement and scrolling obstacles.
+- `coin-dash.tynt`: a timed scrolling game using sprites, maps, camera, seeded randomness, collisions, timers, and synthesized audio.
+- `sprites.tynt`: the 8×8 tynt mark, transparent pixel sprites, and two-frame animation.
+- `soundboard.tynt`: individual tones and short synthesized effects.
+- `pong.tynt`: paddle collision, opponent movement, serving, and scoring.
+- `sokoban.tynt`: a compact tile-map pushing puzzle.
+- `lunar.tynt`: gravity, limited fuel, procedural terrain, and safe landing.
 
-Opening a gallery cartridge creates an editable local copy. Every game shown in the gallery—including tynt's bundled examples—is a normal repository submission under `cartridges/<slug>/` containing `game.tynt`, `cartridge.json`, `cover.png`, and an optional README. The catalog discovers these directories automatically; adding a game does not require editing an application registry or central list. The Bun generator validates and compiles them before they can enter a production build.
+Opening a gallery cartridge creates an editable local copy. Every game shown in the gallery, including tynt's bundled examples, is a normal repository submission under `cartridges/<slug>/` containing `game.tynt`, `cartridge.json`, `cover.png`, and an optional README. The catalog discovers these directories automatically; adding a game does not require editing an application registry or central list. The Bun generator validates and compiles them before they can enter a production build.
 
 To submit a game, copy `cartridges/_template`, export your cartridge from the editor, add a 320 × 288 nearest-neighbor cover captured from the 160 × 144 game canvas, run `bun run check`, and open a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete format and license requirements. Merging the pull request publishes the cartridge; no account or upload server is required.
 

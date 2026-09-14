@@ -14,7 +14,7 @@ export default defineConfig({
       devOptions: { enabled: true },
       includeAssets: ["tynt-mark.svg", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "tynt-social.png"],
       manifest: {
-        name: "tynt — tiny browser game console",
+        name: "tynt: tiny browser game console",
         short_name: "tynt",
         description: "Build tiny TypeScript games on a four-color 160 × 144 console.",
         start_url: "/",
