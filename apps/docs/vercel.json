@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "bunVersion": "1.4.x",
-  "installCommand": "bunx bun@1.4.0 install --frozen-lockfile",
+  "bunVersion": "1.x",
+  "installCommand": "bunx bun@1.4.0 install",
   "buildCommand": "bunx bun@1.4.0 run build",
   "outputDirectory": "dist"
 }

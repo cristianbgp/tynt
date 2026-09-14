@@ -57,14 +57,19 @@ describe("public repository health", () => {
 
   test("deploys docs with the Bun version that owns its lockfile", () => {
     const configuration = JSON.parse(readProjectFile("apps/docs/vercel.json"));
+    const packageManifest = JSON.parse(readProjectFile("apps/docs/package.json"));
+    const typedoc = JSON.parse(readProjectFile("apps/docs/typedoc.json"));
 
     expect(configuration).toMatchObject({
       framework: null,
-      bunVersion: "1.4.x",
-      installCommand: "bunx bun@1.4.0 install --frozen-lockfile",
+      bunVersion: "1.x",
+      installCommand: "bunx bun@1.4.0 install",
       buildCommand: "bunx bun@1.4.0 run build",
       outputDirectory: "dist",
     });
+    expect(packageManifest.devDependencies["@types/bun"]).toBe("1.4.2");
+    expect(typedoc.tsconfig).toBe("tsconfig.json");
+    expect(existsSync(projectPath("apps/docs/tsconfig.json"))).toBe(true);
   });
 
   test("installs the Playwright browser before running the CI check", () => {

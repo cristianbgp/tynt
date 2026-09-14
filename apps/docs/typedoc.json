@@ -1,7 +1,7 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["../../packages/core/src/index.ts"],
-  "tsconfig": "../../packages/core/tsconfig.json",
+  "tsconfig": "tsconfig.json",
   "out": "dist",
   "name": "tynt",
   "favicon": "../web/public/tynt-mark.svg",
