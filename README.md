@@ -16,7 +16,7 @@ The project is local-first and static: no server, accounts, publishing service, 
 This repository keeps the product and engine separate without using Bun workspaces:
 
 - `apps/web`: the React, Vite, Tailwind CSS, and shadcn/ui application.
-- `apps/docs`: the generated TypeDoc reference and its custom tynt theme.
+- `apps/docs`: the custom Next.js and MDX documentation site at [docs.tynt.dev](https://docs.tynt.dev).
 - `packages/core`: the browser-independent TypeScript engine and cartridge format.
 - `cartridges`: every bundled and community-submitted game, using one shared publication format.
 - `scripts/cartridges`: validation and catalog generation for public cartridges.
@@ -57,7 +57,7 @@ bun run test       # core and web unit tests
 bun run test:e2e   # Playwright browser tests
 bun run cartridges:check # validate every public cartridge
 bun run dev:docs   # serve docs on http://127.0.0.1:4174 and regenerate on changes
-bun run docs:build # generate the static documentation site
+bun run docs:build # generate the API reference and build the documentation site
 bun run build      # type-check and build every package
 bun run check      # all tests and builds
 ```
@@ -78,7 +78,7 @@ bun install
 bun run build
 ```
 
-The docs are organized for cartridge creators: overview, getting started, cartridge API, examples, cartridge files, publishing, and security come before the contributor-facing Engine reference. Cartridge API metadata lives in `packages/core/src/cartridge-api.ts`; the editor autocomplete and generated API page both consume that catalog. Handwritten guides live in `apps/docs/content`, generated docs input lives in `apps/docs/generated`, and the static site is written to `apps/docs/dist`.
+The docs are organized for cartridge creators: overview, getting started, examples, cartridge files, publishing, security, and the cartridge API. Cartridge API metadata lives in `packages/core/src/cartridge-api.ts`; the editor autocomplete and generated API page both consume that catalog. Guides live as MDX in `apps/docs/content/docs`, while the API generator writes `apps/docs/content/docs/reference/cartridge-api.mdx`. The app also exposes searchable docs, raw Markdown routes, `llms.txt`, and `llms-full.txt`.
 
 ## Controls
 

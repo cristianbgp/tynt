@@ -1,0 +1,29 @@
+---
+title: Overview
+description: Create tiny monochrome browser games with tynt.
+---
+
+# Create tiny games with tynt
+
+tynt is a tiny browser game console for making and sharing monochrome TypeScript games on a fixed 160 × 144 canvas.
+
+```ts title="hello.tynt"
+export function init(): void {
+  clear(0);
+}
+
+export function update(): void {}
+
+export function draw(): void {
+  clear(0);
+  text("hello tynt", 48, 68, 3);
+}
+```
+
+Start with [Getting started](/docs/getting-started), explore the generated [Cartridge API](/docs/reference/cartridge-api), or learn how to [publish a cartridge](/docs/publishing).
+
+The editor, gallery, local library, and sprite editor live together in the web app. Every public example is a normal repository cartridge you can inspect and remix.
+
+<LinkCard href="https://tynt.dev" title="Open the editor">
+  Create a cartridge directly in your browser.
+</LinkCard>

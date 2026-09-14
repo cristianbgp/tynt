@@ -1,0 +1,30 @@
+---
+title: Publishing
+description: Submit a complete MIT-licensed cartridge to the public gallery.
+---
+
+# Publish a cartridge
+
+<Steps>
+
+### Create the directory
+
+Copy `cartridges/_template` to `cartridges/your-game`.
+
+### Add the cartridge
+
+Replace `game.tynt`, complete `cartridge.json`, and write the cartridge README.
+
+### Capture the cover
+
+Add a 320 × 288 nearest-neighbor `cover.png` captured from the 160 × 144 game canvas.
+
+### Verify the repository
+
+Run `bun run check` from the repository root and submit the complete cartridge directory in one pull request.
+
+</Steps>
+
+All submitted cartridge source and artwork must use the MIT License and declare `"license": "MIT"` in `cartridge.json`. By submitting a cartridge, you confirm that you created its contents or have permission to distribute them under MIT.
+
+The gallery generator discovers every valid `cartridges/<slug>/` directory automatically. Contributors never edit a central registry. Keep unrelated application, dependency, workflow, and configuration changes out of a cartridge submission.

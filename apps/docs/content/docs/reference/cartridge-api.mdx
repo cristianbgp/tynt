@@ -1,0 +1,158 @@
+---
+title: Cartridge API
+description: The complete API available to every cartridge.
+---
+
+# Cartridge API
+
+The complete API available to every cartridge. Functions are deterministic unless noted.
+
+## Lifecycle
+
+### `init`
+
+`export function init(): void`
+
+Run once when the cartridge starts.
+
+### `update`
+
+`export function update(): void`
+
+Run at 60 Hz to update game state and read input.
+
+### `draw`
+
+`export function draw(): void`
+
+Run after every update to emit drawing commands.
+
+## Drawing
+
+### `clear`
+
+`clear(color = 0)`
+
+Fill the canvas with one palette color.
+
+### `pixel`
+
+`pixel(x, y, color)`
+
+Draw one pixel.
+
+### `line`
+
+`line(x0, y0, x1, y1, color)`
+
+Draw a line between two points.
+
+### `rect`
+
+`rect(x, y, width, height, color, fill = false)`
+
+Draw an outlined or filled rectangle.
+
+### `circle`
+
+`circle(x, y, radius, color, fill = false)`
+
+Draw an outlined or filled circle.
+
+### `text`
+
+`text(value, x, y, color)`
+
+Draw text with the built-in bitmap font.
+
+### `sprite`
+
+`sprite(pixels, width, height, x, y, transparent = 0)`
+
+Draw row-major indexed sprite pixels.
+
+### `map`
+
+`map(tiles, columns, tileWidth, tileHeight, spritesheet, sheetColumns, x = 0, y = 0, transparent = 0)`
+
+Draw a row-major tile map from an indexed spritesheet.
+
+## Input
+
+### `button`
+
+`button(input)`
+
+Check whether an input is currently held.
+
+### `buttonPressed`
+
+`buttonPressed(input)`
+
+Check whether an input was pressed this update.
+
+## World and camera
+
+### `camera`
+
+`camera(x = 0, y = 0)`
+
+Offset subsequent drawing coordinates; call without arguments to reset.
+
+## Deterministic utilities
+
+### `seed`
+
+`seed(value = 1)`
+
+Reset the deterministic random sequence.
+
+### `random`
+
+`random(min = 0, max = 1)`
+
+Return the next deterministic random number.
+
+### `overlap`
+
+`overlap(ax, ay, aw, ah, bx, by, bw, bh)`
+
+Check two axis-aligned rectangles for overlap.
+
+### `pointInRect`
+
+`pointInRect(px, py, x, y, width, height)`
+
+Check whether a point is inside a rectangle.
+
+### `frame`
+
+`frame()`
+
+Return the current deterministic update number.
+
+### `every`
+
+`every(interval, offset = 0)`
+
+Return true on a repeating frame interval.
+
+### `after`
+
+`after(frames)`
+
+Return true after a frame threshold.
+
+## Audio
+
+### `tone`
+
+`tone(frequency, duration = 100, volume = 0.15, wave = "square")`
+
+Play one bounded cartridge tone.
+
+### `sfx`
+
+`sfx(notes, step = 80, volume = 0.15, wave = "square")`
+
+Play up to 32 frequencies as a short effect.

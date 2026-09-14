@@ -55,20 +55,25 @@ describe("public repository health", () => {
     expect(existsSync(projectPath("apps/web/vercel.json"))).toBe(false);
   });
 
-  test("deploys docs with the Bun version that owns its lockfile", () => {
+  test("deploys the custom Next.js docs with Bun and framework defaults", () => {
     const configuration = JSON.parse(readProjectFile("apps/docs/vercel.json"));
     const packageManifest = JSON.parse(readProjectFile("apps/docs/package.json"));
-    const typedoc = JSON.parse(readProjectFile("apps/docs/typedoc.json"));
 
     expect(configuration).toMatchObject({
-      framework: null,
+      framework: "nextjs",
       bunVersion: "1.x",
-      installCommand: "bunx bun@1.4.0 install",
-      buildCommand: "bunx bun@1.4.0 run build",
-      outputDirectory: "dist",
     });
+    expect(configuration).not.toHaveProperty("installCommand");
+    expect(configuration).not.toHaveProperty("buildCommand");
+    expect(configuration).not.toHaveProperty("outputDirectory");
+    expect(packageManifest.dependencies).toMatchObject({
+      next: "16.3.5",
+      "fumadocs-core": "16.15.10",
+      "fumadocs-mdx": "15.4.0",
+    });
+    expect(packageManifest.devDependencies).not.toHaveProperty("typedoc");
     expect(packageManifest.devDependencies["@types/bun"]).toBe("1.4.2");
-    expect(typedoc.tsconfig).toBe("tsconfig.json");
+    expect(existsSync(projectPath("apps/docs/typedoc.json"))).toBe(false);
     expect(existsSync(projectPath("apps/docs/tsconfig.json"))).toBe(true);
   });
 

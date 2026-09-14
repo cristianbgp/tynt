@@ -15,5 +15,7 @@ coverage/
 docs/superpowers/
 .cache/
 apps/docs/generated/
+apps/docs/.next/
+apps/docs/.source/
 apps/web/src/generated/public-cartridges.ts
 apps/web/public/generated/cartridges/

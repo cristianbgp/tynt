@@ -94,7 +94,6 @@ test("uses strong hover feedback for every docs control in explicit light and da
       pageBackground: "rgb(255, 255, 255)",
       hoverBackground: "rgb(0, 0, 0)",
       hoverColor: "rgb(255, 255, 255)",
-      currentHoverBackground: "rgb(85, 85, 85)",
     },
     {
       name: "dark",
@@ -102,22 +101,25 @@ test("uses strong hover feedback for every docs control in explicit light and da
       pageBackground: "rgb(0, 0, 0)",
       hoverBackground: "rgb(255, 255, 255)",
       hoverColor: "rgb(0, 0, 0)",
-      currentHoverBackground: "rgb(170, 170, 170)",
     },
   ] as const) {
     await page.emulateMedia({ colorScheme: theme.system });
     await page.goto("http://127.0.0.1:4174/documents/Getting_Started.html");
-    await page.evaluate((name) => { document.documentElement.dataset.theme = name; }, theme.name);
+    await page.evaluate((name) => {
+      document.documentElement.classList.toggle("dark", name === "dark");
+      document.documentElement.dataset.theme = name;
+      document.documentElement.style.colorScheme = name;
+    }, theme.name);
     await expect(page.locator("body")).toHaveCSS("background-color", theme.pageBackground);
 
-    await expectHoverColors(page.getByRole("link", { name: "Examples and Recipes", exact: true }), theme.hoverBackground, theme.hoverColor);
-    await expectHoverColors(page.locator("#tsd-search-trigger"), theme.hoverBackground, theme.hoverColor);
-    await expectHoverColors(page.getByRole("button", { name: "Copy" }), theme.hoverBackground, theme.hoverColor);
-    await expectHoverColors(page.locator("summary.tsd-accordion-summary").first(), theme.hoverBackground, theme.hoverColor);
+    const documentation = page.getByRole("navigation", { name: "Documentation" });
+    await expectHoverColors(documentation.getByRole("link", { name: "Examples and recipes", exact: true }), theme.hoverBackground, theme.hoverColor);
+    await expectHoverColors(page.getByRole("button", { name: "Search documentation" }), theme.hoverBackground, theme.hoverColor);
+    await expectHoverColors(page.getByRole("button", { name: "Copy code" }).first(), theme.hoverBackground, theme.hoverColor);
+    await expectHoverColors(page.getByRole("link", { name: "Raw Markdown" }), theme.hoverBackground, theme.hoverColor);
 
-    const currentNavigation = page.locator(".tsd-navigation a.current").first();
-    await expectHoverColors(currentNavigation, theme.currentHoverBackground, theme.hoverColor);
-    await expect(currentNavigation.locator("svg")).toHaveCSS("color", theme.hoverColor);
+    const currentNavigation = page.getByRole("navigation", { name: "Documentation" }).getByRole("link", { name: "Getting started" });
+    await expectHoverColors(currentNavigation, theme.hoverBackground, theme.hoverColor);
   }
 });
 

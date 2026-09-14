@@ -1,0 +1,12 @@
+{
+  "title": "tynt docs",
+  "pages": [
+    "index",
+    "getting-started",
+    "examples",
+    "cartridge-files",
+    "publishing",
+    "security",
+    "reference"
+  ]
+}

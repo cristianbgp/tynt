@@ -6,17 +6,41 @@
   "type": "module",
   "scripts": {
     "generate:api": "bun run scripts/generate-api.ts",
-    "dev": "bun run scripts/dev.ts",
-    "build": "bun run generate:api && typedoc && cp node_modules/@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2 dist/assets/geist-mono.woff2",
-    "test": "bun run build && bun test tests"
+    "generate:api:check": "bun run scripts/generate-api.ts --check",
+    "dev": "bun run generate:api && bun run --bun next dev --webpack --hostname 127.0.0.1 --port ${TYNT_DOCS_PORT:-4174}",
+    "build": "bun run generate:api && bun run --bun next build --webpack",
+    "start": "bun run --bun next start --hostname 127.0.0.1 --port ${TYNT_DOCS_PORT:-4174}",
+    "test:unit": "vitest run",
+    "test": "bun run generate:api:check && vitest run && bun run --bun next build --webpack"
   },
   "dependencies": {
-    "@tynt/core": "file:../../packages/core"
+    "@radix-ui/react-dialog": "^1.1.23",
+    "@radix-ui/react-tooltip": "^1.2.16",
+    "@tynt/core": "file:../../packages/core",
+    "@types/mdx": "^2.0.14",
+    "clsx": "^2.1.1",
+    "fumadocs-core": "16.15.10",
+    "fumadocs-mdx": "15.4.0",
+    "next": "16.3.5",
+    "pixelarticons": "2.4.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwind-merge": "^3.7.0",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@fontsource-variable/geist-mono": "5.2.8",
+    "@tailwindcss/postcss": "4.3.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/bun": "1.4.2",
-    "typedoc": "0.28.20",
-    "typescript": "5.9.3"
+    "@types/node": "^26.5.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "jsdom": "^30.0.1",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vitest": "^5.0.0"
   }
 }
