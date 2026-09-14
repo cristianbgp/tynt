@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "shapes",
+  "source": "export function init(): void {\n  clear(0);\n}\n\nexport function update(): void {}\n\nexport function draw(): void {\n  clear(0);\n\n  pixel(18, 24, 3);\n  line(28, 24, 66, 24, 2);\n  rect(18, 42, 48, 28, 3, false);\n  rect(78, 42, 48, 28, 2, true);\n  circle(42, 98, 18, 1, false);\n  circle(102, 98, 18, 3, true);\n\n  text(\"PIXEL + LINE\", 18, 14, 3);\n  text(\"RECT\", 18, 76, 2);\n  text(\"CIRCLE\", 78, 126, 3);\n}\n",
+  "author": "tynt",
+  "description": "See every drawing primitive on one cartridge.",
+  "controls": "No input · drawing reference",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

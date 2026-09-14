@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "sokoban",
+  "source": "const WIDTH = 10;\nconst LEVEL = [\n  1,1,1,1,1,1,1,1,1,1,\n  1,0,0,0,0,0,0,0,0,1,\n  1,0,0,1,0,0,1,0,0,1,\n  1,0,0,1,0,0,1,0,0,1,\n  1,0,0,0,0,0,0,0,0,1,\n  1,0,1,0,0,0,0,1,0,1,\n  1,0,0,0,0,0,0,0,0,1,\n  1,1,1,1,1,1,1,1,1,1,\n];\nconst TILES: number[] = [];\nfor (let y = 0; y < 6; y++) for (let x = 0; x < 12; x++) TILES.push(x < 6 ? 0 : 1);\nlet playerX = 2, playerY = 4;\nlet crateX = 4, crateY = 4;\nconst goalX = 7, goalY = 4;\n\nfunction wall(x: number, y: number): boolean { return LEVEL[y * WIDTH + x] === 1; }\n\nexport function init(): void {}\n\nexport function update(): void {\n  let dx = 0, dy = 0;\n  if (buttonPressed(\"left\")) dx = -1;\n  if (buttonPressed(\"right\")) dx = 1;\n  if (buttonPressed(\"up\")) dy = -1;\n  if (buttonPressed(\"down\")) dy = 1;\n  if (dx === 0 && dy === 0) return;\n  const nextX = playerX + dx, nextY = playerY + dy;\n  if (wall(nextX, nextY)) return;\n  if (nextX === crateX && nextY === crateY) {\n    const pushedX = crateX + dx, pushedY = crateY + dy;\n    if (wall(pushedX, pushedY)) return;\n    crateX = pushedX; crateY = pushedY; tone(220, 45, 0.08);\n    if (crateX === goalX && crateY === goalY) sfx([330, 440, 660], 80, 0.12);\n  }\n  playerX = nextX; playerY = nextY;\n}\n\nexport function draw(): void {\n  clear(0);\n  text(\"SOKOBAN\", 66, 12, 3);\n  map(LEVEL, WIDTH, 6, 6, TILES, 2, 50, 42, 0);\n  rect(50 + goalX * 6 + 1, 42 + goalY * 6 + 1, 4, 4, 2, false);\n  rect(50 + crateX * 6, 42 + crateY * 6, 6, 6, crateX === goalX && crateY === goalY ? 3 : 2, true);\n  rect(50 + playerX * 6 + 1, 42 + playerY * 6 + 1, 4, 4, 3, true);\n  text(crateX === goalX && crateY === goalY ? \"SOLVED\" : \"PUSH THE BOX\", 56, 104, 2);\n}\n",
+  "author": "tynt",
+  "description": "Use a tile map for walls and push a box onto its goal.",
+  "controls": "Arrows move and push",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

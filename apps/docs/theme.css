@@ -1,0 +1,373 @@
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./geist-mono.woff2") format("woff2-variations");
+}
+
+:root,
+html[data-theme="light"] {
+  --color-background: #ffffff;
+  --color-background-secondary: #ffffff;
+  --color-background-active: #000000;
+  --color-accent: #000000;
+  --color-active-menu-item: #000000;
+  --color-text: #000000;
+  --color-text-aside: #555555;
+  --color-link: #000000;
+  --color-focus-outline: #000000;
+  --color-ts-keyword: #000000;
+  --color-ts-project: #555555;
+  --color-ts-module: #555555;
+  --color-ts-namespace: #555555;
+  --color-ts-enum: #000000;
+  --color-ts-enum-member: #555555;
+  --color-ts-variable: #000000;
+  --color-ts-function: #000000;
+  --color-ts-class: #000000;
+  --color-ts-interface: #000000;
+  --color-ts-constructor: #555555;
+  --color-ts-property: #000000;
+  --color-ts-method: #000000;
+  --color-ts-reference: #555555;
+  --light-hl-0: #000000;
+  --light-hl-1: #000000;
+  --light-hl-2: #111111;
+  --light-hl-3: #333333;
+  --light-hl-4: #000000;
+  --light-hl-5: #111111;
+  --light-hl-6: #555555;
+  --light-hl-7: #555555;
+  --light-hl-8: #666666;
+  --light-hl-9: #888888;
+  --dark-hl-0: #ffffff;
+  --dark-hl-1: #ffffff;
+  --dark-hl-2: #eeeeee;
+  --dark-hl-3: #cccccc;
+  --dark-hl-4: #ffffff;
+  --dark-hl-5: #eeeeee;
+  --dark-hl-6: #aaaaaa;
+  --dark-hl-7: #aaaaaa;
+  --dark-hl-8: #999999;
+  --dark-hl-9: #777777;
+}
+
+* {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html,
+body {
+  background: #ffffff;
+  color: #000000;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+}
+
+body {
+  border-top: 4px solid #000000;
+}
+
+a {
+  color: #000000;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  background: #f4f4f4;
+  color: #000000;
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid #000000 !important;
+  outline-offset: 3px;
+}
+
+.container {
+  max-width: 1200px;
+}
+
+.site-menu,
+.page-menu,
+.col-sidebar,
+.tsd-navigation,
+.tsd-page-navigation {
+  border-color: #000000 !important;
+}
+
+.site-menu {
+  border-bottom: 1px solid #000000;
+}
+
+.tsd-page-toolbar .title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+
+.tsd-page-toolbar .title::before {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  background: url("./favicon.svg") center / contain no-repeat;
+  content: "";
+  image-rendering: pixelated;
+}
+
+.site-menu a,
+.site-menu button {
+  min-height: 40px;
+}
+
+.tsd-page-title {
+  border-bottom: 1px solid #000000;
+}
+
+.tsd-page-title h1,
+.tsd-page-title h2,
+h1,
+h2,
+h3,
+h4 {
+  font-family: inherit;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+h1 {
+  font-size: clamp(1.9rem, 5vw, 3.25rem);
+}
+
+h2 {
+  border-top: 1px solid #aaaaaa;
+  font-size: 1.35rem;
+  padding-top: 1rem;
+}
+
+.tsd-panel,
+.tsd-signature,
+.tsd-member,
+pre,
+code,
+table,
+th,
+td,
+kbd {
+  border-color: #000000 !important;
+}
+
+.tsd-panel {
+  border-top: 1px solid #000000;
+  padding-block: 1.25rem;
+}
+
+.tsd-signature,
+pre {
+  background: #ffffff !important;
+  border: 1px solid #000000;
+}
+
+code,
+pre,
+kbd {
+  font-family: inherit;
+}
+
+code {
+  background: #eeeeee;
+}
+
+pre code {
+  background: transparent;
+}
+
+.hl-0,
+.hl-4 {
+  font-weight: 650;
+}
+
+.hl-3 {
+  font-weight: 600;
+}
+
+.hl-9 {
+  font-style: italic;
+}
+
+kbd {
+  background: #000000;
+  border: 1px solid #000000;
+  color: #ffffff;
+  padding: 0.1rem 0.35rem;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid #aaaaaa;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+}
+
+th {
+  background: #000000;
+  color: #ffffff;
+}
+
+.tsd-kind-icon,
+.tsd-accordion-summary svg,
+.tsd-navigation a svg {
+  color: #000000 !important;
+}
+
+.tsd-navigation a.current,
+.tsd-navigation a.current:hover,
+.tsd-page-navigation a.current,
+.tsd-page-navigation a.current:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.tsd-navigation a.current svg,
+.tsd-page-navigation a.current svg,
+.tsd-navigation a.current > *,
+.tsd-page-navigation a.current > * {
+  color: inherit !important;
+}
+
+.tsd-navigation a.current svg,
+.tsd-page-navigation a.current svg {
+  color: #ffffff !important;
+}
+
+.tsd-generator {
+  display: none;
+}
+
+.tsd-typography {
+  max-width: 76ch;
+}
+
+.tsd-signature,
+.tsd-member-summary,
+pre,
+.tsd-typography table {
+  max-width: 100%;
+}
+
+.tsd-signature,
+pre,
+.tsd-typography table {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.tsd-member-summary,
+.tsd-signature {
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  html[data-theme="dark"] {
+    --color-background: #000000;
+    --color-background-secondary: #000000;
+    --color-background-active: #ffffff;
+    --color-accent: #ffffff;
+    --color-active-menu-item: #ffffff;
+    --color-text: #ffffff;
+    --color-text-aside: #aaaaaa;
+    --color-link: #ffffff;
+    --color-focus-outline: #ffffff;
+  }
+
+  html,
+  body,
+  .tsd-signature,
+  pre {
+    background: #000000 !important;
+    color: #ffffff;
+  }
+
+  body {
+    border-top-color: #ffffff;
+  }
+
+  a {
+    color: #ffffff;
+  }
+
+  .tsd-navigation a.current,
+  .tsd-page-navigation a.current,
+  th,
+  kbd {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  a:hover {
+    background: #222222;
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline-color: #ffffff !important;
+  }
+
+  code {
+    background: #222222;
+  }
+}
+
+@media (max-width: 768px) {
+  html,
+  body {
+    font-size: 13px;
+  }
+
+  .container {
+    padding-inline: 1rem;
+  }
+
+  .tsd-page-toolbar a,
+  .tsd-page-toolbar button,
+  .site-menu a,
+  .site-menu button {
+    min-height: 44px;
+  }
+
+  .tsd-page-title {
+    padding-block: 1.25rem;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 9vw, 2.5rem);
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  .tsd-anchor-link {
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+  }
+
+  pre,
+  .tsd-typography table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}

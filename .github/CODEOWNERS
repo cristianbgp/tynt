@@ -1,0 +1,13 @@
+# Default ownership
+* @cristianbgp
+
+# Security-sensitive execution and publishing boundaries
+/.github/workflows/ @cristianbgp
+/apps/web/src/runtime/ @cristianbgp
+/scripts/cartridges/ @cristianbgp
+/SECURITY.md @cristianbgp
+
+# Public documentation and contribution policy
+/apps/docs/ @cristianbgp
+/CONTRIBUTING.md @cristianbgp
+/CODE_OF_CONDUCT.md @cristianbgp

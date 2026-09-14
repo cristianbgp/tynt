@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "snake",
+  "source": "type Point = { x: number; y: number };\n\nconst foodPath: Point[] = [\n  { x: 14, y: 6 },\n  { x: 5, y: 13 },\n  { x: 16, y: 14 },\n  { x: 3, y: 4 },\n];\n\nlet segments: Point[] = [];\nlet direction = { x: 1, y: 0 };\nlet foodIndex = 0;\nlet frame = 0;\nlet score = 0;\nlet over = false;\n\nfunction reset(): void {\n  segments = [{ x: 8, y: 9 }, { x: 7, y: 9 }, { x: 6, y: 9 }];\n  direction = { x: 1, y: 0 };\n  foodIndex = 0;\n  frame = 0;\n  score = 0;\n  over = false;\n}\n\nexport function init(): void {\n  reset();\n}\n\nexport function update(): void {\n  if (over) {\n    if (buttonPressed(\"a\") || buttonPressed(\"b\")) reset();\n    return;\n  }\n\n  if (buttonPressed(\"left\") && direction.x !== 1) direction = { x: -1, y: 0 };\n  if (buttonPressed(\"right\") && direction.x !== -1) direction = { x: 1, y: 0 };\n  if (buttonPressed(\"up\") && direction.y !== 1) direction = { x: 0, y: -1 };\n  if (buttonPressed(\"down\") && direction.y !== -1) direction = { x: 0, y: 1 };\n\n  frame++;\n  if (frame % 7 !== 0) return;\n\n  const head = segments[0]!;\n  const next = { x: head.x + direction.x, y: head.y + direction.y };\n  if (next.x < 1 || next.x > 18 || next.y < 3 || next.y > 16) {\n    over = true;\n    return;\n  }\n  for (const segment of segments) {\n    if (segment.x === next.x && segment.y === next.y) {\n      over = true;\n      return;\n    }\n  }\n\n  segments.unshift(next);\n  const food = foodPath[foodIndex % foodPath.length]!;\n  if (next.x === food.x && next.y === food.y) {\n    score++;\n    foodIndex++;\n  } else {\n    segments.pop();\n  }\n}\n\nexport function draw(): void {\n  clear(0);\n  text(\"SNAKE\", 8, 7, 3);\n  text(\"SCORE \" + score, 96, 7, 2);\n  rect(7, 19, 146, 118, 1, false);\n\n  const food = foodPath[foodIndex % foodPath.length]!;\n  rect(food.x * 8 + 1, food.y * 8 + 1, 6, 6, 2, true);\n  for (let index = 0; index < segments.length; index++) {\n    const segment = segments[index]!;\n    rect(segment.x * 8 + 1, segment.y * 8 + 1, 6, 6, index === 0 ? 3 : 2, true);\n  }\n\n  if (over) {\n    rect(35, 61, 90, 24, 0, true);\n    rect(35, 61, 90, 24, 3, false);\n    text(\"GAME OVER\", 49, 66, 3);\n    text(\"A TO RETRY\", 45, 76, 2);\n  }\n}\n",
+  "author": "tynt",
+  "description": "Learn grid movement, growth, collision, and scoring.",
+  "controls": "Arrows steer · A or B restarts",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

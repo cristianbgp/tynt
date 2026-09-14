@@ -1,0 +1,17 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "my game",
+  "source": "export function init(): void {\n  clear(0);\n}\n\nexport function update(): void {\n  if (buttonPressed(\"a\")) tone(440, 60, 0.1);\n}\n\nexport function draw(): void {\n  clear(0);\n  text(\"MY GAME\", 58, 68, 3);\n}\n",
+  "author": "your name",
+  "description": "Describe the game in one short sentence.",
+  "controls": "A acts",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": ["#000000", "#555555", "#aaaaaa", "#ffffff"]
+  }
+}

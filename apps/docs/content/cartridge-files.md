@@ -1,0 +1,12 @@
+---
+title: Cartridge Files
+group: Creator guide
+---
+
+# Cartridge files
+
+Export creates a readable `.tynt` JSON file with non-empty `title`, `author`, `description`, `controls`, and `source`, plus exact format, canvas, and palette metadata.
+
+The editor accepts incomplete local drafts while you work. Export and publication require complete details. Import rejects missing, blank, oversized, or unknown version 1 fields before replacing the active draft.
+
+The format always uses a 160 × 144 canvas and four indexed colors. This strict boundary keeps public cartridges portable and reviewable.

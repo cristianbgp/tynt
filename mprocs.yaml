@@ -1,0 +1,7 @@
+procs:
+  web:
+    shell: "bun run dev:web"
+    cwd: "<CONFIG_DIR>"
+  docs:
+    shell: "bun run dev"
+    cwd: "<CONFIG_DIR>/apps/docs"

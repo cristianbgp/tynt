@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "flappy",
+  "source": "type Pipe = { x: number; gap: number; scored: boolean };\n\nlet birdY = 68;\nlet velocity = 0;\nlet pipes: Pipe[] = [];\nlet score = 0;\nlet over = false;\n\nfunction reset(): void {\n  birdY = 68;\n  velocity = 0;\n  pipes = [\n    { x: 126, gap: 62, scored: false },\n    { x: 206, gap: 88, scored: false },\n  ];\n  score = 0;\n  over = false;\n}\n\nexport function init(): void {\n  reset();\n}\n\nexport function update(): void {\n  if (over) {\n    if (buttonPressed(\"a\") || buttonPressed(\"b\")) reset();\n    return;\n  }\n  if (buttonPressed(\"a\")) velocity = -3.2;\n  if (buttonPressed(\"b\")) reset();\n\n  velocity += 0.18;\n  birdY += velocity;\n\n  for (const pipe of pipes) {\n    pipe.x -= 1;\n    if (!pipe.scored && pipe.x + 14 < 40) {\n      pipe.scored = true;\n      score++;\n    }\n    const touchesX = 46 >= pipe.x && 34 <= pipe.x + 14;\n    const missesGap = birdY - 4 < pipe.gap - 18 || birdY + 4 > pipe.gap + 18;\n    if (touchesX && missesGap) over = true;\n  }\n\n  if (pipes[0]!.x < -16) {\n    const pipe = pipes.shift()!;\n    const last = pipes[pipes.length - 1]!;\n    pipe.x = last.x + 80;\n    pipe.gap = pipe.gap === 62 ? 92 : 62;\n    pipe.scored = false;\n    pipes.push(pipe);\n  }\n  if (birdY < 20 || birdY > 138) over = true;\n}\n\nexport function draw(): void {\n  clear(0);\n  text(\"FLAPPY\", 7, 7, 3);\n  text(\"SCORE \" + score, 100, 7, 2);\n  line(0, 139, 159, 139, 1);\n\n  for (const pipe of pipes) {\n    rect(pipe.x, 18, 14, pipe.gap - 36, 2, true);\n    rect(pipe.x, pipe.gap + 18, 14, 121 - pipe.gap, 2, true);\n  }\n  circle(40, birdY, 4, 3, true);\n  pixel(42, birdY - 1, 0);\n\n  if (over) {\n    rect(35, 61, 90, 24, 0, true);\n    rect(35, 61, 90, 24, 3, false);\n    text(\"GAME OVER\", 49, 66, 3);\n    text(\"A TO RETRY\", 45, 76, 2);\n  }\n}\n",
+  "author": "tynt",
+  "description": "Build a one-button game with gravity and moving obstacles.",
+  "controls": "A flaps · B resets",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

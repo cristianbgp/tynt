@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "sprites",
+  "source": "const TYNT_MARK = [\n  0,0,0,0,0,0,0,0,\n  0,3,3,2,2,1,1,0,\n  0,3,3,2,2,1,1,0,\n  0,0,0,3,3,0,0,0,\n  0,0,0,3,3,0,0,0,\n  0,0,0,2,2,0,0,0,\n  0,0,0,2,2,0,0,0,\n  0,0,0,0,0,0,0,0,\n];\n\nconst WALK_A = [\n  0,0,3,3,3,3,0,0,\n  0,3,2,2,2,2,3,0,\n  3,2,3,2,2,3,2,3,\n  3,2,2,2,2,2,2,3,\n  0,3,2,2,2,2,3,0,\n  0,0,3,2,2,3,0,0,\n  0,3,0,3,3,0,0,0,\n  3,0,0,0,0,3,0,0,\n];\nconst WALK_B = [\n  0,0,3,3,3,3,0,0,\n  0,3,2,2,2,2,3,0,\n  3,2,3,2,2,3,2,3,\n  3,2,2,2,2,2,2,3,\n  0,3,2,2,2,2,3,0,\n  0,0,3,2,2,3,0,0,\n  0,0,0,3,3,0,3,0,\n  0,0,3,0,0,0,0,3,\n];\nlet x = 76;\n\nexport function init(): void {}\n\nexport function update(): void {\n  if (button(\"left\")) x = Math.max(0, x - 1);\n  if (button(\"right\")) x = Math.min(152, x + 1);\n  if (buttonPressed(\"a\")) tone(520, 70, 0.1);\n}\n\nexport function draw(): void {\n  clear(0);\n  text(\"SPRITES\", 8, 8, 3);\n  sprite(TYNT_MARK, 8, 8, 12, 28, 0);\n  text(\"TYNT MARK\", 24, 30, 2);\n  const walking = button(\"left\") || button(\"right\");\n  const pose = walking && Math.floor(frame() / 8) % 2 === 1 ? WALK_B : WALK_A;\n  sprite(pose, 8, 8, x, 68, 0);\n  line(8, 78, 151, 78, 1);\n  text(\"MOVE + A\", 58, 94, 2);\n}\n",
+  "author": "tynt",
+  "description": "Draw the tynt mark and animate two transparent 8×8 sprite frames.",
+  "controls": "Left/right walk · A plays a tone",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

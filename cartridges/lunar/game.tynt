@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "lunar",
+  "source": "const terrain: number[] = [];\nlet x = 80, y = 24, velocityX = 0, velocityY = 0;\nlet fuel = 100;\nlet state = \"FLY\";\n\nfunction reset(): void {\n  x = 80; y = 24; velocityX = 0; velocityY = 0; fuel = 100; state = \"FLY\";\n}\n\nexport function init(): void {\n  seed(1969);\n  terrain.length = 0;\n  for (let point = 0; point <= 10; point++) terrain.push(point === 5 || point === 6 ? 118 : Math.floor(random(105, 136)));\n  reset();\n}\n\nexport function update(): void {\n  if (state !== \"FLY\") { if (buttonPressed(\"b\")) reset(); return; }\n  if (button(\"left\")) velocityX -= 0.025;\n  if (button(\"right\")) velocityX += 0.025;\n  if (button(\"a\") && fuel > 0) { velocityY -= 0.055; fuel--; }\n  velocityY += 0.018;\n  x = Math.max(4, Math.min(156, x + velocityX));\n  y += velocityY;\n  if (y >= 110) {\n    const safePad = x >= 72 && x <= 96;\n    state = safePad && Math.abs(velocityX) < 0.45 && velocityY < 0.75 ? \"LANDED\" : \"CRASH\";\n    y = 110;\n    sfx(state === \"LANDED\" ? [330,440,660] : [180,120,60], 90, 0.12, \"triangle\");\n  }\n}\n\nexport function draw(): void {\n  clear(0);\n  text(\"LUNAR\", 8, 8, 3);\n  text(\"FUEL \" + fuel, 112, 8, 2);\n  for (let point = 0; point < 10; point++) line(point * 16, terrain[point], (point + 1) * 16, terrain[point + 1], point === 4 || point === 5 ? 3 : 1);\n  line(x, y - 7, x - 5, y + 2, 3);\n  line(x - 5, y + 2, x + 5, y + 2, 3);\n  line(x + 5, y + 2, x, y - 7, 3);\n  if (button(\"a\") && fuel > 0 && state === \"FLY\") line(x, y + 3, x, y + 7 + (frame() % 3), 2);\n  if (state !== \"FLY\") text(state + \"  B RETRY\", 48, 72, state === \"LANDED\" ? 3 : 2);\n}\n",
+  "author": "tynt",
+  "description": "Land with limited fuel on deterministic procedural terrain.",
+  "controls": "Left/right steer · A thrusts · B retries",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

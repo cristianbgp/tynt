@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "pong",
+  "source": "let playerY = 58;\nlet cpuY = 58;\nlet ballX = 80;\nlet ballY = 70;\nlet velocityX = 1.35;\nlet velocityY = 0.8;\nlet playerScore = 0;\nlet cpuScore = 0;\n\nfunction serve(direction: number): void {\n  ballX = 80; ballY = 70;\n  velocityX = 1.35 * direction;\n  velocityY = random(-1, 1);\n}\n\nexport function init(): void { seed(7); serve(-1); }\n\nexport function update(): void {\n  if (button(\"up\")) playerY = Math.max(18, playerY - 1.5);\n  if (button(\"down\")) playerY = Math.min(112, playerY + 1.5);\n  cpuY += Math.sign(ballY - (cpuY + 8)) * 0.75;\n  cpuY = Math.max(18, Math.min(112, cpuY));\n  ballX += velocityX; ballY += velocityY;\n  if (ballY <= 18 || ballY >= 132) { velocityY *= -1; tone(180, 35, 0.06); }\n  if (velocityX < 0 && overlap(ballX, ballY, 4, 4, 9, playerY, 4, 20)) { ballX = 13; velocityX *= -1.05; tone(320, 45, 0.08); }\n  if (velocityX > 0 && overlap(ballX, ballY, 4, 4, 147, cpuY, 4, 20)) { ballX = 143; velocityX *= -1.05; tone(260, 45, 0.08); }\n  if (ballX < -4) { cpuScore++; serve(1); }\n  if (ballX > 160) { playerScore++; serve(-1); }\n  if (buttonPressed(\"a\")) { playerScore = 0; cpuScore = 0; serve(-1); }\n}\n\nexport function draw(): void {\n  clear(0);\n  text(\"PONG\", 72, 6, 3);\n  text(String(playerScore), 56, 6, 2);\n  text(String(cpuScore), 100, 6, 2);\n  for (let y = 20; y < 140; y += 8) rect(79, y, 2, 4, 1, true);\n  rect(9, playerY, 4, 20, 3, true);\n  rect(147, cpuY, 4, 20, 2, true);\n  rect(ballX, ballY, 4, 4, 3, true);\n}\n",
+  "author": "tynt",
+  "description": "Build paddle collision, a small opponent, serving, and scoring.",
+  "controls": "Up/down move · A resets",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

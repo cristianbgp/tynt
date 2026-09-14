@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "starter",
+  "source": "let x = 76;\nlet y = 61;\nlet shade = 3;\nlet score = 0;\n\nexport function init(): void {\n  clear(0);\n}\n\nexport function update(): void {\n  if (button(\"left\")) x = Math.max(0, x - 1);\n  if (button(\"right\")) x = Math.min(152, x + 1);\n  if (button(\"up\")) y = Math.max(0, y - 1);\n  if (button(\"down\")) y = Math.min(136, y + 1);\n  if (buttonPressed(\"a\")) {\n    shade = shade === 3 ? 1 : shade + 1;\n    score++;\n  }\n  if (buttonPressed(\"b\")) {\n    x = 76;\n    y = 61;\n    shade = 3;\n    score = 0;\n  }\n}\n\nexport function draw(): void {\n  clear(0);\n  rect(x, y, 8, 8, shade, true);\n  text(\"tynt\", 72, 77, 2);\n  text(\"SCORE \" + score, 8, 10, 2);\n}\n",
+  "author": "tynt",
+  "description": "Start with movement, actions, reset, and a simple score.",
+  "controls": "Arrows move · A changes shade · B resets",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

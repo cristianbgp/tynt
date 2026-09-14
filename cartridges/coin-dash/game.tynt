@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "coin dash",
+  "author": "tynt",
+  "description": "Collect five coins in a scrolling world before the 30-second timer expires.",
+  "controls": "Left/right move · A or B restarts after a round",
+  "source": "const HERO = [\n  0, 0, 3, 3, 3, 3, 0, 0,\n  0, 3, 2, 2, 2, 2, 3, 0,\n  3, 2, 3, 2, 2, 3, 2, 3,\n  3, 2, 2, 2, 2, 2, 2, 3,\n  0, 3, 2, 2, 2, 2, 3, 0,\n  0, 0, 3, 2, 2, 3, 0, 0,\n  0, 3, 0, 3, 3, 0, 3, 0,\n  3, 0, 0, 0, 0, 0, 0, 3,\n];\nconst COIN = [\n  0, 2, 2, 2, 0,\n  2, 3, 3, 3, 2,\n  2, 3, 2, 3, 2,\n  2, 3, 3, 3, 2,\n  0, 2, 2, 2, 0,\n];\nconst GROUND_TILE = [\n  2, 1, 2, 1,\n  1, 2, 1, 2,\n  2, 1, 2, 1,\n  1, 2, 1, 2,\n];\nconst GROUND = Array(240).fill(0);\nconst WORLD_WIDTH = 480;\nconst TARGET = 5;\nconst ROUND_FRAMES = 30 * 60;\nlet x = 12;\nlet coinX = 80;\nlet coins = 0;\nlet startedAt = 0;\nlet state = \"playing\";\n\nfunction placeCoin(): void {\n  coinX = Math.floor(random(32, WORLD_WIDTH - 24));\n  if (Math.abs(coinX - x) < 28) coinX = (coinX + 80) % (WORLD_WIDTH - 24) + 12;\n}\n\nfunction resetRound(): void {\n  seed(2026);\n  x = 12;\n  coins = 0;\n  startedAt = frame();\n  state = \"playing\";\n  placeCoin();\n  sfx([220, 330, 440], 45, 0.08);\n}\n\nexport function init(): void {\n  resetRound();\n}\n\nexport function update(): void {\n  if (state !== \"playing\") {\n    if (buttonPressed(\"a\") || buttonPressed(\"b\")) resetRound();\n    return;\n  }\n\n  if (button(\"left\")) x = Math.max(4, x - 2);\n  if (button(\"right\")) x = Math.min(WORLD_WIDTH - 12, x + 2);\n\n  if (overlap(x, 108, 8, 8, coinX, 110, 5, 5)) {\n    coins++;\n    tone(660 + coins * 45, 70, 0.12);\n    if (coins === TARGET) {\n      state = \"won\";\n      sfx([440, 550, 660, 880], 65, 0.1);\n    } else {\n      placeCoin();\n    }\n  }\n\n  if (after(startedAt + ROUND_FRAMES) && state === \"playing\") {\n    state = \"lost\";\n    sfx([330, 220, 110], 90, 0.1);\n  }\n}\n\nexport function draw(): void {\n  clear(0);\n  const viewX = Math.max(0, Math.min(WORLD_WIDTH - 160, Math.floor(x - 76)));\n  camera(viewX, 0);\n  map(GROUND, 120, 4, 4, GROUND_TILE, 1, 0, 120, 0);\n  for (let marker = 40; marker < WORLD_WIDTH; marker += 40) line(marker, 116, marker, 119, 1);\n  sprite(HERO, 8, 8, x, 108, 0);\n  sprite(COIN, 5, 5, coinX, 110, 0);\n  if (every(15)) pixel(coinX + 2, 109, 3);\n  camera();\n\n  const elapsed = Math.floor((frame() - startedAt) / 60);\n  const remaining = Math.max(0, 30 - elapsed);\n  text(\"COIN DASH\", 6, 6, 3);\n  text(\"COINS \" + coins + \"/\" + TARGET, 6, 18, 2);\n  text(\"TIME \" + remaining, 116, 6, remaining < 6 ? 3 : 2);\n  if (state === \"won\") {\n    rect(42, 52, 76, 34, 0, true);\n    rect(42, 52, 76, 34, 3, false);\n    text(\"YOU WIN\", 66, 62, 3);\n    text(\"A/B AGAIN\", 60, 74, 2);\n  }\n  if (state === \"lost\") {\n    rect(42, 52, 76, 34, 0, true);\n    rect(42, 52, 76, 34, 2, false);\n    text(\"TIME UP\", 66, 62, 3);\n    text(\"A/B AGAIN\", 60, 74, 2);\n  }\n}\n",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

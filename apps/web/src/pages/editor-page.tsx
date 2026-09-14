@@ -1,0 +1,274 @@
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { parseCartridge, safeFilename, serializeCartridge, type Draft } from "@tynt/core";
+import { play } from "cuelume";
+import { useNavigate, useSearchParams } from "react-router";
+import { CartridgeDetailsDialog } from "@/components/cartridge-details-dialog";
+import { createAutosaver, readAutosave } from "@/autosave";
+import { Editor } from "@/components/editor";
+import { ErrorConsole } from "@/components/error-console";
+import { Preview } from "@/components/preview";
+import { MobilePaneSwitch, type MobilePane } from "@/components/mobile-pane-switch";
+import { StatusBar } from "@/components/status-bar";
+import { Toolbar } from "@/components/toolbar";
+import { useAppShortcuts } from "@/hooks/use-app-shortcuts";
+import { useRuntime } from "@/hooks/use-runtime";
+import type { CartridgeLibrary } from "@/library/cartridge-library";
+import { captureThumbnail } from "@/library/thumbnail";
+import { copyPublicDraft, findPublicCartridge, listPublicCartridges } from "@/cartridges/public-cartridges";
+
+function copyDraft(value: Draft): Draft {
+  return {
+    title: value.title,
+    source: value.source,
+    ...(value.author ? { author: value.author } : {}),
+    ...(value.description ? { description: value.description } : {}),
+    ...(value.controls ? { controls: value.controls } : {}),
+  };
+}
+
+function initialDraft(publicSlug: string | null): Draft {
+  const selected = publicSlug ? findPublicCartridge(publicSlug) : undefined;
+  if (selected) return copyPublicDraft(selected);
+  const saved = readAutosave(window.localStorage);
+  return saved ?? copyPublicDraft(findPublicCartridge("starter") ?? listPublicCartridges()[0]!);
+}
+
+interface EditorPageProps {
+  library: CartridgeLibrary;
+  soundEnabled: boolean;
+  onSoundToggle(): void;
+}
+
+export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const selectedPublicSlug = searchParams.get("cartridge");
+  const selectedLocalId = searchParams.get("local");
+  const [draft, setDraft] = useState(() => initialDraft(selectedPublicSlug));
+  const [libraryId, setLibraryId] = useState<string | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [mobilePane, setMobilePane] = useState<MobilePane>("code");
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+  const [draftStatus, setDraftStatus] = useState("autosave on");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const canvasElementRef = useRef<HTMLCanvasElement | null>(null);
+  const scheduledDraft = useRef(JSON.stringify(draft));
+  const runtime = useRuntime(soundEnabled);
+  const reportRuntimeError = runtime.reportError;
+  const runtimeCanvasRef = runtime.canvasRef;
+  const canvasRef = useCallback((canvas: HTMLCanvasElement | null) => {
+    canvasElementRef.current = canvas;
+    runtimeCanvasRef(canvas);
+  }, [runtimeCanvasRef]);
+
+  const autosaver = useMemo(() => createAutosaver(
+    window.localStorage,
+    250,
+    () => setDraftStatus("save failed"),
+    () => setDraftStatus((current) => current === "saved to library" ? current : "saved"),
+  ), []);
+
+  useEffect(() => {
+    const serialized = JSON.stringify(draft);
+    if (scheduledDraft.current === serialized) return;
+    scheduledDraft.current = serialized;
+    setDraftStatus("saving…");
+    autosaver.schedule(draft);
+  }, [autosaver, draft]);
+
+  useEffect(() => () => autosaver.cancel(), [autosaver]);
+
+  useEffect(() => {
+    if (!selectedPublicSlug) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("cartridge");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, selectedPublicSlug, setSearchParams]);
+
+  useEffect(() => {
+    if (!selectedLocalId) return;
+    let active = true;
+    void library.get(selectedLocalId).then((record) => {
+      if (!active) return;
+      if (!record) throw new Error("Saved cartridge not found");
+      const nextDraft: Draft = {
+        title: record.title,
+        source: record.source,
+        ...(record.author ? { author: record.author } : {}),
+        ...(record.description ? { description: record.description } : {}),
+        ...(record.controls ? { controls: record.controls } : {}),
+      };
+      draftRef.current = nextDraft;
+      setDraft(nextDraft);
+      setLibraryId(record.id);
+      setDraftStatus("saved to library");
+      const next = new URLSearchParams(searchParams);
+      next.delete("local");
+      setSearchParams(next, { replace: true });
+    }).catch((error) => {
+      if (!active) return;
+      reportRuntimeError(error);
+    });
+    return () => { active = false; };
+  }, [library, reportRuntimeError, searchParams, selectedLocalId, setSearchParams]);
+
+  useEffect(() => {
+    if (runtime.error) play("error");
+  }, [runtime.error]);
+
+  useEffect(() => {
+    if (mobilePane === "play") previewRef.current?.focus();
+  }, [mobilePane]);
+
+  const loadExample = (id: string) => {
+    const example = findPublicCartridge(id);
+    if (!example) return;
+    const nextDraft = copyPublicDraft(example);
+    draftRef.current = nextDraft;
+    runtime.stop();
+    setLibraryId(null);
+    setDraft(nextDraft);
+    runtime.clearError();
+  };
+
+  const importCartridge = async (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    input.value = "";
+    if (!file) return;
+    try {
+      const text = new TextDecoder("utf-8", { fatal: true }).decode(await file.arrayBuffer());
+      const cartridge = parseCartridge(text);
+      const imported = copyDraft(cartridge);
+      draftRef.current = imported;
+      setLibraryId(null);
+      setDraft(imported);
+      runtime.clearError();
+      runtime.announce("imported");
+      play("success");
+    } catch (error) {
+      runtime.reportError(error);
+    }
+  };
+
+  const exportCartridge = () => {
+    try {
+      const current = draftRef.current;
+      const blob = new Blob([serializeCartridge(current)], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = safeFilename(current.title);
+      anchor.click();
+      URL.revokeObjectURL(url);
+      runtime.clearError();
+      runtime.announce("exported");
+      play("success");
+    } catch (error) {
+      runtime.reportError(error);
+    }
+  };
+
+  const run = async () => {
+    if (runtime.isCompiling) return;
+    if (await runtime.run(draftRef.current.source)) {
+      setMobilePane("play");
+      if (mobilePane === "play") previewRef.current?.focus();
+    }
+  };
+
+  const saveToLibrary = async () => {
+    try {
+      setDraftStatus("saving to library…");
+      const record = await library.save({
+        id: libraryId ?? undefined,
+        draft: draftRef.current,
+        thumbnail: captureThumbnail(canvasElementRef.current),
+      });
+      setLibraryId(record.id);
+      setDraftStatus("saved to library");
+      runtime.clearError();
+      play("success");
+      return record;
+    } catch (error) {
+      setDraftStatus("library save failed");
+      runtime.reportError(error);
+      return undefined;
+    }
+  };
+
+  const openPlayMode = async () => {
+    const record = await saveToLibrary();
+    if (record) navigate(`/play/local/${record.id}`);
+  };
+
+  const runOrStop = () => {
+    if (runtime.isRunning) runtime.stop();
+    else void run();
+  };
+
+  const rerun = () => {
+    void run();
+  };
+
+  const openImport = () => fileInputRef.current?.click();
+
+  useAppShortcuts({
+    onRun: rerun,
+    onImport: openImport,
+    onExport: exportCartridge,
+    runDisabled: runtime.isCompiling,
+  });
+
+  return (
+    <div className="app-shell" data-runtime-state={runtime.status}>
+      <Toolbar
+        filename={safeFilename(draft.title)}
+        examples={listPublicCartridges().map(({ slug, filename }) => ({ id: slug, filename }))}
+        running={runtime.isRunning}
+        compiling={runtime.isCompiling}
+        fileInputRef={fileInputRef}
+        onExampleChange={loadExample}
+        onRun={runOrStop}
+        onSave={() => { void saveToLibrary(); }}
+        onPlay={() => { void openPlayMode(); }}
+        onDetails={() => setDetailsOpen(true)}
+        onImport={openImport}
+        onExport={exportCartridge}
+        onFileChange={importCartridge}
+      />
+      <MobilePaneSwitch value={mobilePane} onChange={setMobilePane} />
+      <main className="workspace" data-mobile-pane={mobilePane}>
+        <Editor source={draft.source} onChange={(source) => setDraft((current) => ({ ...current, source }))} />
+        <Preview
+          interactionRef={previewRef}
+          canvasRef={canvasRef}
+          onKeyDown={(code) => runtime.setKey(code, true)}
+          onKeyUp={(code) => runtime.setKey(code, false)}
+          onInput={runtime.setInput}
+          onBlur={runtime.resetInput}
+          showError={runtime.showPreviewError}
+        />
+      </main>
+      <ErrorConsole error={runtime.error} />
+      <StatusBar
+        status={runtime.status}
+        draftStatus={draftStatus}
+        soundEnabled={soundEnabled}
+        onSoundToggle={onSoundToggle}
+      />
+      <CartridgeDetailsDialog
+        open={detailsOpen}
+        draft={draft}
+        onOpenChange={setDetailsOpen}
+        onSave={(nextDraft) => {
+          draftRef.current = nextDraft;
+          setDraft(nextDraft);
+          setDraftStatus("unsaved changes");
+        }}
+      />
+    </div>
+  );
+}

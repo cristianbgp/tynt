@@ -1,0 +1,44 @@
+name: Cartridge submission help
+description: Ask for help preparing a cartridge pull request.
+title: "[cartridge] "
+body:
+  - type: markdown
+    attributes:
+      value: Completed cartridges are submitted through pull requests. Use this form when you need help getting one ready.
+  - type: input
+    id: title
+    attributes:
+      label: Cartridge title
+    validations:
+      required: true
+  - type: input
+    id: slug
+    attributes:
+      label: Proposed slug
+      description: Use lowercase letters, numbers, and single hyphens.
+      placeholder: tiny-dungeon
+    validations:
+      required: true
+  - type: textarea
+    id: concept
+    attributes:
+      label: Game concept and controls
+    validations:
+      required: true
+  - type: textarea
+    id: help
+    attributes:
+      label: What do you need help with?
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission requirements
+      options:
+        - label: I have read CONTRIBUTING.md.
+          required: true
+        - label: I can license the cartridge source and artwork under MIT.
+          required: true
+        - label: I understand that completed cartridges are submitted through a pull request.
+          required: true

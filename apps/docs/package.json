@@ -1,0 +1,21 @@
+{
+  "name": "@tynt/docs",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate:api": "bun run scripts/generate-api.ts",
+    "dev": "bun run scripts/dev.ts",
+    "build": "bun run generate:api && typedoc && cp node_modules/@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2 dist/assets/geist-mono.woff2",
+    "test": "bun run build && bun test tests"
+  },
+  "dependencies": {
+    "@tynt/core": "file:../../packages/core"
+  },
+  "devDependencies": {
+    "@fontsource-variable/geist-mono": "5.2.8",
+    "typedoc": "0.28.20",
+    "typescript": "5.9.3"
+  }
+}
