@@ -89,7 +89,7 @@ describe("tynt creator shell", () => {
     );
     expect(screen.getByRole("link", { name: "Open tynt documentation" })).toHaveAttribute(
       "href",
-      "https://github.com/cristianbgp/tynt/tree/main/apps/docs",
+      "https://docs.tynt.dev",
     );
     expect(screen.getByRole("link", { name: "Open tynt on GitHub" }).querySelector('[data-icon="github"]')).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Open tynt documentation" }).querySelector('[data-icon="docs"]')).toBeInTheDocument();

@@ -1,7 +1,7 @@
 import { BookOpen, Github, Volume2, VolumeX } from "pixelarticons/react";
 
 const PROJECT_REPOSITORY = "https://github.com/cristianbgp/tynt";
-const DOCUMENTATION_SOURCE = `${PROJECT_REPOSITORY}/tree/main/apps/docs`;
+const DOCUMENTATION_SOURCE = "https://docs.tynt.dev";
 
 interface StatusBarProps {
   status: string;
