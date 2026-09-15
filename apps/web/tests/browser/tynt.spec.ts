@@ -522,6 +522,7 @@ test("the default cartridge demonstrates clickable directions, A, and B", async 
   await page.goto("/");
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#status")).toHaveText("running");
+  await expect.poll(() => pixel(page, 76, 61)).toEqual([255, 255, 255, 255]);
 
   const right = page.getByRole("button", { name: "Direction right" });
   const box = await right.boundingBox();
