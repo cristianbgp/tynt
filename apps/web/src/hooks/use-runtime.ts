@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type RefCallback } from "react";
 import type { InputName } from "@tynt/core";
 import { RuntimeController } from "@/runtime/controller";
+import { createRuntimeDebugStore } from "@/runtime/debug-store";
 import { CanvasRenderer, type CanvasTarget } from "@/runtime/renderer";
 
-type RuntimeStatus = "ready" | "compiling" | "starting" | "running" | "stopped" | "imported" | "exported" | "error";
+type RuntimeStatus = "ready" | "compiling" | "starting" | "running" | "paused" | "stopped" | "imported" | "exported" | "error";
 
 function messageFrom(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -15,6 +16,7 @@ export function useRuntime(soundEnabled = true) {
   const [status, setStatus] = useState<RuntimeStatus>("ready");
   const [error, setError] = useState("");
   const [showPreviewError, setShowPreviewError] = useState(false);
+  const debugStoreRef = useRef(createRuntimeDebugStore());
 
   const canvasRef: RefCallback<HTMLCanvasElement> = useCallback((canvas) => {
     if (!canvas || typeof CanvasRenderingContext2D === "undefined") return;
@@ -33,6 +35,7 @@ export function useRuntime(soundEnabled = true) {
         setShowPreviewError(!previewAvailable);
       },
       (frame) => renderer.replay(frame.commands),
+      debugStoreRef.current.update,
     );
   }, []);
 
@@ -53,6 +56,9 @@ export function useRuntime(soundEnabled = true) {
   }, []);
 
   const stop = useCallback(() => controllerRef.current?.stop(), []);
+  const pause = useCallback(() => controllerRef.current?.pause() ?? false, []);
+  const resume = useCallback(() => controllerRef.current?.resume() ?? false, []);
+  const step = useCallback(() => controllerRef.current?.step() ?? false, []);
   const setKey = useCallback((code: string, down: boolean) => controllerRef.current?.setKey(code, down) ?? false, []);
   const setInput = useCallback((input: InputName, down: boolean) => controllerRef.current?.setInput(input, down), []);
   const resetInput = useCallback(() => controllerRef.current?.resetInput(), []);
@@ -74,9 +80,14 @@ export function useRuntime(soundEnabled = true) {
     error,
     showPreviewError,
     isRunning,
+    isPaused: status === "paused",
     isCompiling: status === "compiling",
+    debugStore: debugStoreRef.current,
     run,
     stop,
+    pause,
+    resume,
+    step,
     setKey,
     setInput,
     resetInput,

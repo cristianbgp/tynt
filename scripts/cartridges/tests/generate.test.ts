@@ -95,6 +95,19 @@ describe("public cartridge generation", () => {
     expect(readPngDimensions(publishedCover)).toEqual({ width: 320, height: 288 });
   });
 
+  test("includes README content when present and omits it when absent", async () => {
+    const paths = await fixture();
+    await addCartridge(paths.cartridgesDir, "documented");
+    await addCartridge(paths.cartridgesDir, "minimal");
+    await writeFile(join(paths.cartridgesDir, "documented", "README.md"), "# How to play\n\nPress **A**.");
+
+    const result = await generatePublicCartridges(paths);
+
+    expect(result.find(({ slug }) => slug === "documented")?.readme).toBe("# How to play\n\nPress **A**.");
+    expect(result.find(({ slug }) => slug === "minimal")?.readme).toBeUndefined();
+    expect(await readFile(paths.outputFile, "utf8")).toContain('"readme": "# How to play\\n\\nPress **A**."');
+  });
+
   test("reports every invalid cartridge without replacing existing output", async () => {
     const paths = await fixture();
     await mkdir(paths.cartridgesDir, { recursive: true });

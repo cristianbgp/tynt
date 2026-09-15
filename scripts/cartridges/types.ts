@@ -25,6 +25,7 @@ export interface GeneratedCartridge extends PublishingMetadata {
   controls: string;
   source: string;
   coverUrl: string;
+  readme?: string;
   cartridge: TyntCartridgeV1;
 }
 

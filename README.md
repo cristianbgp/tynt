@@ -45,6 +45,7 @@ Routes:
 
 - `/`: cartridge editor and game preview.
 - `/gallery`: searchable bundled and community-submitted games.
+- `/cartridges/:slug`: cartridge details, README, source, and play/remix actions.
 - `/library`: searchable cartridges saved on this device.
 - `/play/public/:slug`: focused play mode for a public cartridge.
 - `/play/local/:id`: focused play mode for a cartridge saved on this device.
@@ -174,7 +175,7 @@ The editor dropdown and gallery are generated from the top-level `cartridges/` c
 - `sokoban.tynt`: a compact tile-map pushing puzzle.
 - `lunar.tynt`: gravity, limited fuel, procedural terrain, and safe landing.
 
-Opening a gallery cartridge creates an editable local copy. Every game shown in the gallery, including tynt's bundled examples, is a normal repository submission under `cartridges/<slug>/` containing `game.tynt`, `cartridge.json`, `cover.png`, and an optional README. The catalog discovers these directories automatically; adding a game does not require editing an application registry or central list. The Bun generator validates and compiles them before they can enter a production build.
+Every gallery game has a canonical `/cartridges/<slug>` page with its cover, metadata, controls, rendered README, source, Play action, and Remix action. Remix opens an editable local copy in the editor. Every game shown in the gallery, including tynt's bundled examples, is a normal repository submission under `cartridges/<slug>/` containing `game.tynt`, `cartridge.json`, `cover.png`, and an optional README. The catalog discovers these directories automatically; adding a game does not require editing an application registry or central list. The Bun generator validates and compiles them before they can enter a production build.
 
 To submit a game, copy `cartridges/_template`, export your cartridge from the editor, add a 320 × 288 nearest-neighbor cover captured from the 160 × 144 game canvas, run `bun run check`, and open a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete format and license requirements. Merging the pull request publishes the cartridge; no account or upload server is required.
 
@@ -187,6 +188,8 @@ Use **Details** in the editor to set a cartridge title, author, description, and
 The library is ordered by most recently updated and searches titles, authors, descriptions, and controls. Each cartridge can be opened in the editor, played, edited, duplicated, or deleted. This data is stored only in the current browser's IndexedDB; deleting browser storage removes it.
 
 Play mode starts automatically and focuses the console. It provides pause/resume, restart, mute, fullscreen, editor, and library controls. Pausing preserves the visible frame; resuming and restarting begin again from the cartridge's `init` function.
+
+The editor preview also includes a compact debugger. Open it to pause or resume execution, inspect the current frame and held or newly pressed inputs, advance exactly one update while paused, restart the cartridge, or download the current canvas as a nearest-neighbor 320 × 288 PNG.
 
 ## Cartridge files and isolation
 

@@ -43,6 +43,10 @@ describe("iframe bootstrap", () => {
     expect(document).toContain("default-src 'none'");
     expect(document).toContain("connect-src 'none'");
     expect(document).toContain("worker-src blob:");
+    expect(document).toContain("object-src 'none'");
+    expect(document).toContain("form-action 'none'");
+    expect(document).toContain("base-uri 'none'");
+    expect(document).not.toContain("navigate-to");
     expect(document).not.toContain("allow-same-origin");
   });
 

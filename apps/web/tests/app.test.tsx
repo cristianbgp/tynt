@@ -16,22 +16,34 @@ const sound = vi.hoisted(() => ({
 
 vi.mock("cuelume", () => sound);
 
-const runtime = vi.hoisted(() => ({
-  canvasRef: () => {},
-  status: "ready",
-  error: "",
-  showPreviewError: false,
-  isRunning: false,
-  isCompiling: false,
-  run: vi.fn(),
-  stop: vi.fn(),
-  setKey: vi.fn(() => false),
-  setInput: vi.fn(),
-  resetInput: vi.fn(),
-  clearError: vi.fn(),
-  reportError: vi.fn(),
-  announce: vi.fn(),
-}));
+const runtime = vi.hoisted(() => {
+  const debugSnapshot = { frame: 0, held: [], pressed: [] };
+  return {
+    canvasRef: () => {},
+    status: "ready",
+    error: "",
+    showPreviewError: false,
+    isRunning: false,
+    isCompiling: false,
+    isPaused: false,
+    debugStore: {
+      getSnapshot: () => debugSnapshot,
+      subscribe: () => () => {},
+      update: vi.fn(),
+    },
+    run: vi.fn(),
+    stop: vi.fn(),
+    pause: vi.fn(),
+    resume: vi.fn(),
+    step: vi.fn(),
+    setKey: vi.fn(() => false),
+    setInput: vi.fn(),
+    resetInput: vi.fn(),
+    clearError: vi.fn(),
+    reportError: vi.fn(),
+    announce: vi.fn(),
+  };
+});
 
 vi.mock("@/hooks/use-runtime", () => ({
   useRuntime: () => runtime,
@@ -39,12 +51,14 @@ vi.mock("@/hooks/use-runtime", () => ({
 
 import { App } from "@/app";
 
-function renderApp(library?: CartridgeLibrary) {
-  return render(
+async function renderApp(library?: CartridgeLibrary) {
+  const result = render(
     <MemoryRouter initialEntries={[`${window.location.pathname}${window.location.search}`]}>
       <App library={library} />
     </MemoryRouter>,
   );
+  await waitFor(() => expect(screen.queryByText("Loading tynt…")).not.toBeInTheDocument());
+  return result;
 }
 
 describe("tynt creator shell", () => {
@@ -57,8 +71,8 @@ describe("tynt creator shell", () => {
     runtime.run.mockResolvedValue(true);
   });
 
-  test("shows the creator and accessible toolbar shortcuts", () => {
-    renderApp();
+  test("shows the creator and accessible toolbar shortcuts", async () => {
+    await renderApp();
 
     expect(screen.getByText("tynt")).toBeVisible();
     const brand = screen.getByRole("link", { name: "tynt editor" });
@@ -97,54 +111,54 @@ describe("tynt creator shell", () => {
     expect(screen.getByRole("status")).toHaveTextContent("ready");
   });
 
-  test("renders the cartridge gallery at its own route", () => {
+  test("renders the cartridge gallery at its own route", async () => {
     window.history.replaceState({}, "", "/gallery");
 
-    renderApp();
+    await renderApp();
 
     expect(screen.getByRole("heading", { name: "Cartridge gallery" })).toBeVisible();
     expect(screen.queryByRole("region", { name: "Game preview" })).not.toBeInTheDocument();
   });
 
-  test("renders the sprite editor at its own route", () => {
+  test("renders the sprite editor at its own route", async () => {
     window.history.replaceState({}, "", "/sprites");
-    renderApp();
+    await renderApp();
     expect(screen.getByRole("heading", { name: "Sprite editor" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Pixel 1, 1 color 0" })).toHaveAttribute("data-cuelume-hover", "tick");
     expect(screen.getByRole("button", { name: "Color 0" })).toHaveAttribute("data-cuelume-hover", "tick");
   });
 
-  test("offers a route back to the editor for unknown paths", () => {
+  test("offers a route back to the editor for unknown paths", async () => {
     window.history.replaceState({}, "", "/missing");
 
-    renderApp();
+    await renderApp();
 
     expect(screen.getByRole("heading", { name: "Page not found" })).toBeVisible();
     expect(document.querySelector(".state-mark .brand-mark")).toBeVisible();
     expect(screen.getByRole("link", { name: "Open editor" })).toHaveAttribute("href", "/");
   });
 
-  test("ignores the removed example query parameter", () => {
+  test("ignores the removed example query parameter", async () => {
     window.history.replaceState({}, "", "/?example=snake");
 
-    renderApp();
+    await renderApp();
 
     expect(screen.getByLabelText("Current cartridge file")).toHaveTextContent("starter.tynt");
   });
 
-  test("does not rewrite an untitled autosave through a removed migration", () => {
+  test("does not rewrite an untitled autosave through a removed migration", async () => {
     const starter = findPublicCartridge("starter")!;
     window.localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({ version: 1, title: "untitled", source: starter.source }));
 
-    renderApp();
+    await renderApp();
 
     expect(screen.getByLabelText("Current cartridge file")).toHaveTextContent("untitled.tynt");
   });
 
-  test("does not redirect removed legacy play routes", () => {
+  test("does not redirect removed legacy play routes", async () => {
     window.history.replaceState({}, "", "/play/old-local-id");
 
-    renderApp();
+    await renderApp();
 
     expect(screen.getByRole("heading", { name: "Page not found" })).toBeVisible();
   });
@@ -157,16 +171,16 @@ describe("tynt creator shell", () => {
     await library.save({ draft: { title: "local game", source: "const localMarker = true;" } });
     window.history.replaceState({}, "", "/?local=local-one");
 
-    renderApp(library);
+    await renderApp(library);
 
     expect(await screen.findByLabelText("Current cartridge file")).toHaveTextContent("local-game.tynt");
     expect(document.querySelector(".cm-content")).toHaveTextContent("localMarker");
   });
 
-  test("opens a public cartridge through the canonical editor query", () => {
+  test("opens a public cartridge through the canonical editor query", async () => {
     window.history.replaceState({}, "", "/?cartridge=snake");
 
-    renderApp();
+    await renderApp();
 
     expect(screen.getByLabelText("Current cartridge file")).toHaveTextContent("snake.tynt");
     expect(document.querySelector(".cm-content")).toHaveTextContent("segments");
@@ -177,7 +191,7 @@ describe("tynt creator shell", () => {
       createId: () => "saved-one",
       now: () => "2026-09-14T00:00:00.000Z",
     });
-    renderApp(library);
+    await renderApp(library);
 
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
@@ -186,7 +200,7 @@ describe("tynt creator shell", () => {
   });
 
   test("focuses the preview after a run starts", async () => {
-    renderApp();
+    await renderApp();
 
     fireEvent.click(screen.getByRole("button", { name: "Run" }));
 
@@ -194,8 +208,8 @@ describe("tynt creator shell", () => {
     expect(screen.getByRole("button", { name: "Show game" })).toHaveAttribute("aria-pressed", "true");
   });
 
-  test("offers an accessible mobile workspace switch", () => {
-    renderApp();
+  test("offers an accessible mobile workspace switch", async () => {
+    await renderApp();
 
     const code = screen.getByRole("button", { name: "Show code" });
     const game = screen.getByRole("button", { name: "Show game" });
@@ -209,7 +223,7 @@ describe("tynt creator shell", () => {
 
   test("keeps the code pane selected when a run cannot start", async () => {
     runtime.run.mockResolvedValueOnce(false);
-    renderApp();
+    await renderApp();
 
     fireEvent.click(screen.getByRole("button", { name: "Run" }));
 
@@ -219,7 +233,7 @@ describe("tynt creator shell", () => {
 
   test("loads an editable copy from the examples dropdown", async () => {
     const user = userEvent.setup();
-    renderApp();
+    await renderApp();
 
     await user.click(screen.getByRole("button", { name: "Examples" }));
     const shapes = await screen.findByRole("menuitem", { name: "shapes.tynt" });
@@ -232,8 +246,8 @@ describe("tynt creator shell", () => {
     expect(runtime.stop).toHaveBeenCalledOnce();
   });
 
-  test("disables silently and confirms only after sound is enabled again", () => {
-    renderApp();
+  test("disables silently and confirms only after sound is enabled again", async () => {
+    await renderApp();
     sound.play.mockClear();
     sound.setEnabled.mockClear();
 
@@ -255,10 +269,10 @@ describe("tynt creator shell", () => {
     expect(sound.setEnabled.mock.invocationCallOrder.at(-2)).toBeLessThan(sound.play.mock.invocationCallOrder[0]);
   });
 
-  test("plays the error cue when a new user-triggered error is shown", () => {
+  test("plays the error cue when a new user-triggered error is shown", async () => {
     runtime.error = "compile failed";
 
-    renderApp();
+    await renderApp();
 
     expect(sound.play).toHaveBeenCalledWith("error");
   });

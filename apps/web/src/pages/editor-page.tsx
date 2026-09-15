@@ -10,10 +10,12 @@ import { Preview } from "@/components/preview";
 import { MobilePaneSwitch, type MobilePane } from "@/components/mobile-pane-switch";
 import { StatusBar } from "@/components/status-bar";
 import { Toolbar } from "@/components/toolbar";
+import { RuntimeDebugger } from "@/components/runtime-debugger";
 import { useAppShortcuts } from "@/hooks/use-app-shortcuts";
 import { useRuntime } from "@/hooks/use-runtime";
 import type { CartridgeLibrary } from "@/library/cartridge-library";
 import { captureThumbnail } from "@/library/thumbnail";
+import { downloadCanvasPng } from "@/lib/canvas-download";
 import { copyPublicDraft, findPublicCartridge, listPublicCartridges } from "@/cartridges/public-cartridges";
 
 function copyDraft(value: Draft): Draft {
@@ -215,6 +217,12 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
 
   const openImport = () => fileInputRef.current?.click();
 
+  const downloadScreenshot = () => {
+    const canvas = canvasElementRef.current;
+    if (!canvas) return;
+    void downloadCanvasPng(canvas, safeFilename(draftRef.current.title)).then(() => play("success")).catch(reportRuntimeError);
+  };
+
   useAppShortcuts({
     onRun: rerun,
     onImport: openImport,
@@ -253,6 +261,16 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
           onInput={runtime.setInput}
           onBlur={runtime.resetInput}
           showError={runtime.showPreviewError}
+          debuggerPanel={<RuntimeDebugger
+            active={runtime.isRunning}
+            paused={runtime.isPaused}
+            store={runtime.debugStore}
+            onPause={runtime.pause}
+            onResume={runtime.resume}
+            onStep={runtime.step}
+            onRestart={rerun}
+            onScreenshot={downloadScreenshot}
+          />}
         />
       </main>
       <ErrorConsole error={runtime.error} />

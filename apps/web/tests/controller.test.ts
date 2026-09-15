@@ -5,9 +5,11 @@ const compiled = { code: "compiled", map: "{}" };
 
 function harness() {
   const events: string[] = [];
+  const debugStates: Array<{ frame: number; held: readonly string[]; pressed: readonly string[] }> = [];
   const runs: Array<RuntimeRun & { ready(): void; fail(): void; ticks: unknown[]; stopped: boolean }> = [];
   let frame: ((time: number) => void) | undefined;
   let compileFails = false;
+  let now = 0;
   const dependencies: RuntimeDependencies = {
     compile: async () => { events.push("compile"); if (compileFails) throw new Error("bad source"); return compiled; },
     createRun: (_compiled, callbacks) => {
@@ -26,13 +28,14 @@ function harness() {
     },
     requestFrame: (callback) => { frame = callback; return 1; },
     cancelFrame: () => { frame = undefined; },
-    now: () => 0,
+    now: () => now,
     onStatus: (status) => events.push(status),
     onError: (error) => events.push(`error:${error.message}`),
     onAudio: (audio) => events.push(`audio:${audio.frequency}`),
     onAudioStop: () => events.push("audio:stop"),
+    onDebugState: (state) => debugStates.push(state),
   };
-  return { dependencies, events, runs, frame: (time: number) => frame?.(time), failCompile: () => { compileFails = true; } };
+  return { dependencies, debugStates, events, runs, frame: (time: number) => frame?.(time), setNow: (value: number) => { now = value; }, failCompile: () => { compileFails = true; } };
 }
 
 test("compiles successfully before replacing an active run", async () => {
@@ -105,4 +108,57 @@ test("a newer run request supersedes an older compilation", async () => {
   await older;
   expect(testbed.runs).toHaveLength(1);
   expect(testbed.runs[0]!.stopped).toBe(false);
+});
+
+test("pause prevents scheduled updates and resume discards elapsed wall time", async () => {
+  const testbed = harness();
+  const controller = new RuntimeController(testbed.dependencies);
+  await controller.run("good");
+  testbed.runs[0]!.ready();
+
+  expect(controller.pause()).toBe(true);
+  expect(controller.isPaused).toBe(true);
+  testbed.frame(5000);
+  expect(testbed.runs[0]!.ticks).toEqual([]);
+
+  testbed.setNow(5000);
+  expect(controller.resume()).toBe(true);
+  testbed.frame(5000);
+  expect(testbed.runs[0]!.ticks).toEqual([]);
+  testbed.frame(5017);
+  expect(testbed.runs[0]!.ticks).toHaveLength(1);
+  expect(controller.isPaused).toBe(false);
+});
+
+test("step executes exactly one update while paused and reports its input", async () => {
+  const testbed = harness();
+  const controller = new RuntimeController(testbed.dependencies);
+  await controller.run("good");
+  testbed.runs[0]!.ready();
+  controller.setInput("a", true);
+  controller.pause();
+
+  expect(controller.step()).toBe(true);
+  expect(controller.step()).toBe(true);
+
+  expect(testbed.runs[0]!.ticks).toEqual([
+    { held: ["a"], pressed: ["a"] },
+    { held: ["a"], pressed: [] },
+  ]);
+  expect(testbed.debugStates.at(-1)).toEqual({ frame: 2, held: ["a"], pressed: [] });
+});
+
+test("stop resets paused, frame, and inspected input state", async () => {
+  const testbed = harness();
+  const controller = new RuntimeController(testbed.dependencies);
+  await controller.run("good");
+  testbed.runs[0]!.ready();
+  controller.setInput("right", true);
+  controller.pause();
+  controller.step();
+
+  controller.stop();
+
+  expect(controller.isPaused).toBe(false);
+  expect(testbed.debugStates.at(-1)).toEqual({ frame: 0, held: [], pressed: [] });
 });

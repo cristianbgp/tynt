@@ -41,5 +41,5 @@ window.addEventListener("message",(event)=>{
   else if(message.kind==="stop")dispose();
 });`;
 
-  return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${safeToken}'; worker-src blob:; connect-src 'none'; img-src 'none'; style-src 'none'; frame-src 'none'; child-src 'none'; object-src 'none'; form-action 'none'; base-uri 'none'; navigate-to 'none'"></head><body><script nonce="${safeToken}">${script}</script></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${safeToken}'; worker-src blob:; connect-src 'none'; img-src 'none'; style-src 'none'; frame-src 'none'; child-src 'none'; object-src 'none'; form-action 'none'; base-uri 'none'"></head><body><script nonce="${safeToken}">${script}</script></body></html>`;
 }

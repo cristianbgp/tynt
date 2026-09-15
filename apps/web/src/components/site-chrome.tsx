@@ -18,7 +18,7 @@ const routes = [
 
 export type SiteRoute = (typeof routes)[number]["id"];
 
-export function SiteHeader({ active }: { active: SiteRoute }) {
+export function SiteHeader({ active }: { active?: SiteRoute }) {
   return (
     <header className="gallery-topbar flex border-b border-border">
       <BrandLink />

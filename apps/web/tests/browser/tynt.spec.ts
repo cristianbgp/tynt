@@ -136,6 +136,7 @@ test("responsive editor switches from code to a focused game", async ({ page }) 
 test("mobile editor keeps both toolbar rows at the site header height", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
+  await expect(page.locator(".topbar")).toBeVisible();
 
   const geometry = await page.evaluate(() => {
     const topbar = document.querySelector(".topbar")!.getBoundingClientRect();
@@ -158,6 +159,7 @@ test("mobile editor keeps both toolbar rows at the site header height", async ({
 test("mobile play keeps its identity and controls rows at the site header height", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/play/public/starter");
+  await expect(page.locator(".play-topbar")).toBeVisible();
 
   const geometry = await page.evaluate(() => {
     const topbar = document.querySelector(".play-topbar")!.getBoundingClientRect();
@@ -214,6 +216,7 @@ test("mobile play disables page zoom and accidental text selection", async ({ pa
 test("mobile play balances the game stack and keeps its controls compact", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/play/public/asteroids");
+  await expect(page.locator(".play-stage")).toBeVisible();
 
   const geometry = await page.evaluate(() => {
     const stage = document.querySelector(".play-stage")!.getBoundingClientRect();
@@ -251,6 +254,63 @@ test("serves standard browser metadata without installing a PWA", async ({ page 
   await expect(page.locator('link[rel="manifest"]')).toHaveCount(0);
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/apple-touch-icon.png");
   await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
+});
+
+test("content routes do not load editor or compiler resources", async ({ page }) => {
+  for (const path of ["/gallery", "/library", "/sprites", "/cartridges/starter", "/missing"]) {
+    const loaded: string[] = [];
+    const onResponse = (response: import("@playwright/test").Response) => {
+      loaded.push(new URL(response.url()).pathname);
+    };
+    page.on("response", onResponse);
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+    page.off("response", onResponse);
+
+    expect(loaded.filter((url) =>
+      url.includes("/runtime/compiler") ||
+      url.includes("esbuild.wasm") ||
+      url.includes("/@codemirror/") ||
+      url.includes("/components/editor")), path).toEqual([]);
+  }
+});
+
+test("opens a responsive cartridge detail page from the gallery", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto("/gallery");
+  await page.getByRole("link", { name: "View starter details" }).click();
+
+  await expect(page).toHaveURL(/\/cartridges\/starter$/);
+  await expect(page.getByRole("heading", { level: 1, name: "starter" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Play starter" })).toHaveAttribute("data-cuelume-hover", "tick");
+  await expect(page.getByRole("link", { name: "Remix starter" })).toHaveAttribute("href", "/?cartridge=starter");
+  await expect(page.getByRole("heading", { name: "About this cartridge" })).toBeVisible();
+  await expectNoHorizontalOverflow(page, 320);
+});
+
+test("pauses, steps, restarts, and captures a cartridge in the editor debugger", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Run" }).click();
+  await expect(page.locator("#status")).toHaveText("running");
+  await page.getByRole("button", { name: "Open debugger" }).click();
+  const debuggerPanel = page.getByRole("region", { name: "Runtime debugger" });
+
+  await debuggerPanel.getByRole("button", { name: "Pause" }).click();
+  await expect(page.locator("#status")).toHaveText("paused");
+  const pausedFrame = Number((await debuggerPanel.getByText(/frame \d+/).textContent())?.match(/\d+/)?.[0]);
+  await page.locator("#preview").dispatchEvent("keydown", { code: "KeyZ", key: "z" });
+  await expect(debuggerPanel.locator('[data-held="true"]')).toContainText("a");
+  await debuggerPanel.getByRole("button", { name: "Step frame" }).click();
+  await expect(debuggerPanel.getByText(`frame ${pausedFrame + 1}`)).toBeVisible();
+  await page.locator("#preview").dispatchEvent("keyup", { code: "KeyZ", key: "z" });
+
+  const downloadPromise = page.waitForEvent("download");
+  await debuggerPanel.getByRole("button", { name: "Screenshot" }).click();
+  expect((await downloadPromise).suggestedFilename()).toBe("starter.png");
+
+  await debuggerPanel.getByRole("button", { name: "Restart" }).click();
+  await expect(page.locator("#status")).toHaveText("running");
+  await expect.poll(async () => Number((await debuggerPanel.getByText(/frame \d+/).textContent())?.match(/\d+/)?.[0])).toBeGreaterThan(0);
 });
 
 test("opens a bundled cartridge from the gallery as an editable copy", async ({ page }) => {
@@ -678,6 +738,7 @@ test("keeps keyboard focus on the screen and renders the D-pad as one cross", as
 
 test("uses matching 48 pixel touch targets for every part of the D-pad", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator(".dpad button, .dpad-center")).toHaveCount(5);
   const cells = await page.locator(".dpad button, .dpad-center").evaluateAll((elements) => elements.map((element) => {
     const rect = element.getBoundingClientRect();
     return { width: rect.width, height: rect.height };

@@ -1,4 +1,4 @@
-import type { Ref, RefCallback } from "react";
+import type { ReactNode, Ref, RefCallback } from "react";
 import type { InputName } from "@tynt/core";
 import { EmulatorControls } from "@/components/emulator-controls";
 
@@ -10,9 +10,10 @@ interface PreviewProps {
   onInput(input: InputName, down: boolean): void;
   onBlur(): void;
   showError?: boolean;
+  debuggerPanel?: ReactNode;
 }
 
-export function Preview({ interactionRef, canvasRef, onKeyDown, onKeyUp, onInput, onBlur, showError = false }: PreviewProps) {
+export function Preview({ interactionRef, canvasRef, onKeyDown, onKeyUp, onInput, onBlur, showError = false, debuggerPanel }: PreviewProps) {
   return (
     <section className="preview-pane grid min-h-0 place-content-center items-center bg-muted px-[8px] py-[24px] [container-name:preview] [container-type:inline-size]" aria-label="Game preview">
       <div
@@ -45,6 +46,7 @@ export function Preview({ interactionRef, canvasRef, onKeyDown, onKeyUp, onInput
           <span>ARROWS · Z / X</span>
         </div>
         <EmulatorControls onInput={onInput} />
+        {debuggerPanel}
       </div>
     </section>
   );
