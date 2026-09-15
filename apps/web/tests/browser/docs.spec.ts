@@ -12,6 +12,7 @@ test("custom docs are creator-first and responsive", async ({ page }) => {
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-docs-ready", "true");
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await expect(page.getByRole("button", { name: "Open documentation navigation" })).toBeVisible();
   await page.getByRole("button", { name: "Open documentation navigation" }).click();

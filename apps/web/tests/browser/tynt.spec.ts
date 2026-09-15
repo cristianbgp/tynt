@@ -153,6 +153,36 @@ test("responsive play keeps the game and controls close together", async ({ page
   }
 });
 
+test("mobile play disables page zoom and accidental text selection", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/play/public/coin-dash");
+
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute(
+    "content",
+    /maximum-scale=1.*user-scalable=no/,
+  );
+  await expect(page.locator(".play-stage")).toHaveCSS("user-select", "none");
+});
+
+test("mobile play balances the game stack and keeps its controls compact", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/play/public/asteroids");
+
+  const geometry = await page.evaluate(() => {
+    const stage = document.querySelector(".play-stage")!.getBoundingClientRect();
+    const interaction = document.querySelector(".preview-interaction")!.getBoundingClientRect();
+    const controls = document.querySelector(".emulator-controls")!.getBoundingClientRect();
+    return {
+      topGap: Math.round(interaction.top - stage.top),
+      bottomGap: Math.round(stage.bottom - interaction.bottom),
+      controlsWidth: Math.round(controls.width),
+    };
+  });
+
+  expect(Math.abs(geometry.topGap - geometry.bottomGap)).toBeLessThanOrEqual(2);
+  expect(geometry.controlsWidth).toBe(288);
+});
+
 test("responsive content routes reflow without footer overlap", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/gallery");
