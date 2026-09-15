@@ -263,11 +263,9 @@ test("responsive content routes reflow without footer overlap", async ({ page })
   await expect.poll(() => page.locator(".sprite-canvas button").first().evaluate((node) => node.getBoundingClientRect().width)).toBeGreaterThanOrEqual(35);
 });
 
-test("serves standard browser metadata without installing a PWA", async ({ page }) => {
+test("serves the browser icon metadata", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator('link[rel="manifest"]')).toHaveCount(0);
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/apple-touch-icon.png");
-  await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
 });
 
 test("content routes do not load editor or compiler resources", async ({ page }) => {

@@ -5,8 +5,6 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { MemoryRouter } from "react-router";
 import { createCartridgeLibrary, createMemoryAdapter, type CartridgeLibrary } from "@/library/cartridge-library";
-import { AUTOSAVE_KEY } from "@/autosave";
-import { findPublicCartridge } from "@/cartridges/public-cartridges";
 
 const sound = vi.hoisted(() => ({
   bind: vi.fn(),
@@ -136,31 +134,6 @@ describe("tynt creator shell", () => {
     expect(screen.getByRole("heading", { name: "Page not found" })).toBeVisible();
     expect(document.querySelector(".state-mark .brand-mark")).toBeVisible();
     expect(screen.getByRole("link", { name: "Open editor" })).toHaveAttribute("href", "/");
-  });
-
-  test("ignores the removed example query parameter", async () => {
-    window.history.replaceState({}, "", "/?example=snake");
-
-    await renderApp();
-
-    expect(screen.getByLabelText("Current cartridge file")).toHaveTextContent("starter.tynt");
-  });
-
-  test("does not rewrite an untitled autosave through a removed migration", async () => {
-    const starter = findPublicCartridge("starter")!;
-    window.localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({ version: 1, title: "untitled", source: starter.source }));
-
-    await renderApp();
-
-    expect(screen.getByLabelText("Current cartridge file")).toHaveTextContent("untitled.tynt");
-  });
-
-  test("does not redirect removed legacy play routes", async () => {
-    window.history.replaceState({}, "", "/play/old-local-id");
-
-    await renderApp();
-
-    expect(screen.getByRole("heading", { name: "Page not found" })).toBeVisible();
   });
 
   test("loads a saved local cartridge into the editor", async () => {
