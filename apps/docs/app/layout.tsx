@@ -24,9 +24,11 @@ export const metadata: Metadata = {
 
 const themeScript = `(() => {
   const saved = localStorage.getItem("tynt-docs-theme");
-  const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const preference = saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
+  const dark = preference === "dark" || (preference === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.classList.toggle("dark", dark);
   document.documentElement.dataset.theme = dark ? "dark" : "light";
+  document.documentElement.dataset.themePreference = preference;
   document.documentElement.style.colorScheme = dark ? "dark" : "light";
 })()`;
 

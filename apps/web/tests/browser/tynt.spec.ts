@@ -105,11 +105,7 @@ test("uses strong hover feedback for every docs control in explicit light and da
   ] as const) {
     await page.emulateMedia({ colorScheme: theme.system });
     await page.goto("http://127.0.0.1:4174/documents/Getting_Started.html");
-    await page.evaluate((name) => {
-      document.documentElement.classList.toggle("dark", name === "dark");
-      document.documentElement.dataset.theme = name;
-      document.documentElement.style.colorScheme = name;
-    }, theme.name);
+    await page.getByRole("radio", { name: `${theme.name === "light" ? "Light" : "Dark"} theme` }).click();
     await expect(page.locator("body")).toHaveCSS("background-color", theme.pageBackground);
 
     const documentation = page.getByRole("navigation", { name: "Documentation" });

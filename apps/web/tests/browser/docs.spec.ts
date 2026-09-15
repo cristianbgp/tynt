@@ -15,8 +15,10 @@ test("custom docs are creator-first and responsive", async ({ page }) => {
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await expect(page.getByRole("button", { name: "Open documentation navigation" })).toBeVisible();
   await page.getByRole("button", { name: "Open documentation navigation" }).click();
-  await expect(page.getByRole("dialog", { name: "Documentation navigation" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Getting started" })).toBeVisible();
+  const navigation = page.getByRole("dialog", { name: "Documentation navigation" });
+  await expect(navigation).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "Getting started" })).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "Open the tynt gallery" })).toBeVisible();
 });
 
 test("mobile header controls stay separate from the brand and page content", async ({ page }) => {
@@ -35,6 +37,24 @@ test("mobile header controls stay separate from the brand and page content", asy
   expect(content).not.toBeNull();
   expect(brandLabel!.x + brandLabel!.width).toBeLessThanOrEqual(search!.x);
   expect(header!.y + header!.height).toBeLessThanOrEqual(content!.y);
+});
+
+test("theme control supports persistent System, Light, and Dark modes", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto(`${docs}/docs`);
+  const themes = page.getByRole("radiogroup", { name: "Theme" });
+
+  await expect(themes.getByRole("radio", { name: "System theme" })).toHaveAttribute("aria-checked", "true");
+  await themes.getByRole("radio", { name: "Dark theme" }).click();
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("tynt-docs-theme"))).toBe("dark");
+
+  await themes.getByRole("radio", { name: "System theme" }).click();
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
+  await page.reload();
+  await expect(themes.getByRole("radio", { name: "System theme" })).toHaveAttribute("aria-checked", "true");
 });
 
 test("search opens from the keyboard and finds API entries", async ({ page }) => {

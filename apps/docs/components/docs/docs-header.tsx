@@ -42,18 +42,18 @@ export function DocsHeader({ onOpenNavigation, onOpenSearch }: DocsHeaderProps) 
           <kbd className="ml-auto hidden border border-current px-1.5 py-0.5 text-[10px] md:inline">⌘ K</kbd>
         </button>
 
-        <div className="ml-2 flex border-y border-r border-border">
+        <div className="ml-2 hidden border-y border-r border-border md:flex">
           <a className={iconLinkClass} href="https://tynt.dev/gallery" aria-label="Open the tynt gallery">
             <Gamepad width={18} height={18} aria-hidden="true" />
           </a>
           <a className={iconLinkClass} href="https://github.com/cristianbgp/tynt" aria-label="View tynt on GitHub">
             <Github width={18} height={18} aria-hidden="true" />
           </a>
-          <a className={`${iconLinkClass} hidden sm:grid`} href="https://tynt.dev" aria-label="Open the tynt editor">
+          <a className={iconLinkClass} href="https://tynt.dev" aria-label="Open the tynt editor">
             <ExternalLink width={18} height={18} aria-hidden="true" />
           </a>
-          <ThemeToggle />
         </div>
+        <div className="ml-2"><ThemeToggle /></div>
       </div>
     </header>
   );

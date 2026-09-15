@@ -1,7 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { Close } from "pixelarticons/react";
+import { Close, ExternalLink, Gamepad, Github } from "pixelarticons/react";
 import type { DocsNavigationItem } from "@/lib/navigation";
 import { DocsSidebar } from "@/components/docs/docs-sidebar";
 
@@ -30,6 +30,17 @@ export function MobileNavigation({ currentPath, items, open, onOpenChange }: Mob
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
             <DocsSidebar items={items} currentPath={currentPath} onNavigate={() => onOpenChange(false)} />
           </div>
+          <nav className="grid shrink-0 border-t border-border p-3" aria-label="tynt project links">
+            <a className="flex min-h-11 items-center gap-3 border border-transparent px-3 text-xs text-muted no-underline hover:border-foreground hover:bg-foreground hover:text-background" href="https://tynt.dev/gallery">
+              <Gamepad width={18} height={18} aria-hidden="true" />Open the tynt gallery
+            </a>
+            <a className="flex min-h-11 items-center gap-3 border border-transparent px-3 text-xs text-muted no-underline hover:border-foreground hover:bg-foreground hover:text-background" href="https://github.com/cristianbgp/tynt">
+              <Github width={18} height={18} aria-hidden="true" />View tynt on GitHub
+            </a>
+            <a className="flex min-h-11 items-center gap-3 border border-transparent px-3 text-xs text-muted no-underline hover:border-foreground hover:bg-foreground hover:text-background" href="https://tynt.dev">
+              <ExternalLink width={18} height={18} aria-hidden="true" />Open the tynt editor
+            </a>
+          </nav>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
