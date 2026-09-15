@@ -84,6 +84,7 @@ test("pauses, resumes, and restarts from explicit controls", async () => {
   await library.save({ draft: { title: "orbit", source: "game source" } });
   renderPage(library);
   await screen.findByRole("heading", { name: "orbit" });
+  await waitFor(() => expect(runtime.run).toHaveBeenCalledWith("game source"));
   runtime.run.mockClear();
 
   await user.click(screen.getByRole("button", { name: "Pause" }));

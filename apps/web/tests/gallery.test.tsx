@@ -15,7 +15,7 @@ describe("cartridge gallery", () => {
     renderGallery();
     expect(screen.getByRole("heading", { name: "Cartridge gallery" })).toBeVisible();
     const previews = screen.getAllByRole("img", { name: /preview$/i });
-    expect(previews).toHaveLength(13);
+    expect(previews).toHaveLength(15);
     expect(previews[0]).toHaveAttribute("width", "320");
     expect(previews[0]).toHaveAttribute("height", "288");
     expect(screen.getByRole("link", { name: "Play snake.tynt" })).toHaveAttribute("href", "/play/public/snake");

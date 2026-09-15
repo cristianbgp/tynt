@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "tiny quest",
+  "author": "tynt",
+  "description": "Explore a scrolling maze, collect three gems, and unlock the exit.",
+  "controls": "Arrows explore · B resets · A or B retries",
+  "source": "type Gem = { x: number; y: number; found: boolean };\ntype Wall = { x: number; y: number; width: number; height: number };\n\nconst WORLD_WIDTH = 320;\nconst WORLD_HEIGHT = 224;\nconst walls: Wall[] = [\n  { x: 64, y: 32, width: 12, height: 112 },\n  { x: 128, y: 80, width: 76, height: 12 },\n  { x: 214, y: 28, width: 12, height: 116 },\n  { x: 92, y: 176, width: 132, height: 12 },\n];\nconst exit = { x: 284, y: 184, width: 24, height: 28 };\nlet gems: Gem[] = [];\nlet x = 20;\nlet y = 20;\nlet won = false;\n\nfunction reset(): void {\n  seed(1986);\n  x = 20;\n  y = 20;\n  won = false;\n  gems = [\n    { x: Math.floor(random(86, 116)), y: Math.floor(random(38, 68)), found: false },\n    { x: Math.floor(random(236, 270)), y: Math.floor(random(42, 80)), found: false },\n    { x: Math.floor(random(238, 274)), y: Math.floor(random(152, 178)), found: false },\n  ];\n}\n\nfunction blocked(nextX: number, nextY: number): boolean {\n  if (nextX < 4 || nextY < 4 || nextX > WORLD_WIDTH - 12 || nextY > WORLD_HEIGHT - 12) return true;\n  return walls.some((wall) => overlap(nextX, nextY, 8, 8, wall.x, wall.y, wall.width, wall.height));\n}\n\nexport function init(): void {\n  reset();\n}\n\nexport function update(): void {\n  if (won) {\n    if (buttonPressed(\"a\") || buttonPressed(\"b\")) reset();\n    return;\n  }\n  let dx = 0;\n  let dy = 0;\n  if (button(\"left\")) dx--;\n  if (button(\"right\")) dx++;\n  if (button(\"up\")) dy--;\n  if (button(\"down\")) dy++;\n  if (!blocked(x + dx, y)) x += dx;\n  if (!blocked(x, y + dy)) y += dy;\n\n  for (const gem of gems) {\n    if (!gem.found && overlap(x, y, 8, 8, gem.x, gem.y, 6, 6)) {\n      gem.found = true;\n      tone(480 + gems.filter((item) => item.found).length * 100, 70, 0.09);\n    }\n  }\n  const allFound = gems.every((gem) => gem.found);\n  if (allFound && pointInRect(x + 4, y + 4, exit.x, exit.y, exit.width, exit.height)) {\n    won = true;\n    sfx([392, 523, 659, 784], 65, 0.1, \"triangle\");\n  }\n  if (buttonPressed(\"b\")) reset();\n}\n\nexport function draw(): void {\n  clear(0);\n  const viewX = Math.max(0, Math.min(WORLD_WIDTH - 160, Math.floor(x - 76)));\n  const viewY = Math.max(0, Math.min(WORLD_HEIGHT - 144, Math.floor(y - 68)));\n  camera(viewX, viewY);\n  rect(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 1, false);\n  for (const wall of walls) rect(wall.x, wall.y, wall.width, wall.height, 1, true);\n  rect(exit.x, exit.y, exit.width, exit.height, gems.every((gem) => gem.found) ? 3 : 1, false);\n  for (const gem of gems) {\n    if (!gem.found) {\n      circle(gem.x + 3, gem.y + 3, every(12) ? 3 : 2, 3, false);\n      pixel(gem.x + 3, gem.y + 3, 3);\n    }\n  }\n  rect(x, y, 8, 8, 3, true);\n  pixel(x + 2, y + 2, 0);\n  pixel(x + 5, y + 2, 0);\n  camera();\n\n  const found = gems.filter((gem) => gem.found).length;\n  rect(0, 0, 160, 14, 0, true);\n  text(\"TINY QUEST\", 5, 5, 3);\n  text(\"GEMS \" + found + \"/3\", 111, 5, 2);\n  if (won) {\n    rect(36, 57, 88, 30, 0, true);\n    rect(36, 57, 88, 30, 3, false);\n    text(\"QUEST CLEAR\", 49, 64, 3);\n    text(\"A/B AGAIN\", 57, 76, 2);\n  }\n}\n",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}

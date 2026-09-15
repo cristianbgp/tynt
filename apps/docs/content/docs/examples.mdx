@@ -13,8 +13,20 @@ Every gallery entry is a complete cartridge under `cartridges/<slug>/`.
 - `shapes.tynt` demonstrates every drawing primitive.
 - `sprites.tynt` draws the tynt mark and a two-frame character.
 - `coin-dash.tynt` combines sprites, tile maps, camera movement, timers, collisions, randomness, and audio.
-- `platformer.tynt` demonstrates gravity and platform collision.
-- `snake.tynt`, `pong.tynt`, and `asteroids.tynt` are compact complete games.
+- `reaction.tynt` turns deterministic frame timers into a complete reaction game.
+- `tiny-quest.tynt` demonstrates two-axis camera movement, world collisions, collectibles, and a goal zone.
+- `platformer.tynt`, `flappy.tynt`, `snake.tynt`, `pong.tynt`, and `asteroids.tynt` are compact complete games.
+
+## Find an API in a game
+
+| API | Good examples |
+| --- | --- |
+| `seed()` and `random()` | reaction, snake, lunar, pong, flappy, asteroids, coin dash, tiny quest |
+| `overlap()` | pong, platformer, flappy, coin dash, tiny quest |
+| `pointInRect()` | snake, tiny quest |
+| `frame()`, `every()`, and `after()` | reaction, sprites, lunar, soundboard, coin dash |
+| `camera()` | coin dash, tiny quest |
+| `tone()` and `sfx()` | reaction, soundboard, snake, asteroids, platformer, flappy, pong, lunar, sokoban, sprites, coin dash, tiny quest |
 
 ## Fixed HUD with a moving camera
 
@@ -31,3 +43,19 @@ text("SCORE " + score, 6, 6, 3);
 if (every(30)) tone(440, 50, 0.08);
 if (after(60 * 10)) text("TIME", 68, 68, 3);
 ```
+
+`frame()` counts fixed updates rather than wall-clock time, so replays remain predictable. At 60 updates per second, divide a frame duration by 60 and multiply by 1,000 to display milliseconds.
+
+## Collision helpers
+
+```ts
+if (overlap(playerX, playerY, 8, 8, coinX, coinY, 5, 5)) {
+  score++;
+}
+
+if (pointInRect(playerX + 4, playerY + 4, exitX, exitY, 24, 28)) {
+  finishLevel();
+}
+```
+
+Use `overlap()` when two rectangular objects interact. Use `pointInRect()` for a center point, cursor, checkpoint, or goal zone.

@@ -165,10 +165,12 @@ The editor dropdown and gallery are generated from the top-level `cartridges/` c
 - `shapes.tynt`: every drawing primitive.
 - `animation.tynt`: fixed-step movement.
 - `snake.tynt`: grid movement, growth, collision, and scoring.
-- `asteroids.tynt`: rotation, velocity, projectiles, and collision.
-- `platformer.tynt`: gravity, jumping, and platforms.
-- `flappy.tynt`: one-button movement and scrolling obstacles.
+- `asteroids.tynt`: a seeded asteroid field with momentum, projectiles, audio, and win/lose states.
+- `platformer.tynt`: gravity, jumping, collision helpers, collectibles, and a finish state.
+- `flappy.tynt`: one-button movement, seeded pipe gaps, collision helpers, and scoring.
 - `coin-dash.tynt`: a timed scrolling game using sprites, maps, camera, seeded randomness, collisions, timers, and synthesized audio.
+- `reaction.tynt`: deterministic random delays, frame timing, early presses, and reaction results.
+- `tiny-quest.tynt`: a scrolling maze with world collisions, collectibles, a goal zone, and synthesized audio.
 - `sprites.tynt`: the 8×8 tynt mark, transparent pixel sprites, and two-frame animation.
 - `soundboard.tynt`: individual tones and short synthesized effects.
 - `pong.tynt`: paddle collision, opponent movement, serving, and scoring.
