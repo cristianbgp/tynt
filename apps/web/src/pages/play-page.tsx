@@ -57,7 +57,7 @@ export function PlayPage({ cartridge, editorHref, soundEnabled, onSoundToggle }:
   };
 
   return (
-    <div className="play-shell grid h-full w-full grid-rows-[41px_minmax(0,1fr)_auto_25px] max-[900px]:h-auto max-[900px]:min-h-full max-[900px]:grid-rows-[auto_minmax(0,1fr)_auto_25px] max-[560px]:h-dvh max-[560px]:min-h-0 max-[560px]:grid-rows-[auto_minmax(0,1fr)_auto_calc(41px+env(safe-area-inset-bottom))]">
+    <div className="play-shell grid h-full w-full grid-rows-[41px_minmax(0,1fr)_auto_25px] max-[900px]:h-auto max-[900px]:min-h-full max-[900px]:grid-rows-[auto_minmax(0,1fr)_auto_25px] max-[560px]:h-dvh max-[560px]:min-h-0 max-[560px]:grid-rows-[auto_minmax(0,1fr)_auto_calc(41px+env(safe-area-inset-bottom))] max-[560px]:[&_.error-console]:row-start-3">
       <header className="play-topbar grid min-w-0 grid-cols-[max-content_minmax(140px,1fr)_max-content] border-b border-border max-[900px]:h-[82px] max-[900px]:grid-cols-[max-content_minmax(0,1fr)] max-[900px]:grid-rows-[41px_41px]">
         <BrandLink />
         <div className="play-identity flex min-w-0 items-baseline gap-[12px] px-[16px]">
@@ -82,7 +82,7 @@ export function PlayPage({ cartridge, editorHref, soundEnabled, onSoundToggle }:
         <Preview interactionRef={previewRef} canvasRef={runtime.canvasRef} onKeyDown={(code) => runtime.setKey(code, true)} onKeyUp={(code) => runtime.setKey(code, false)} onInput={runtime.setInput} onBlur={runtime.resetInput} showError={runtime.showPreviewError} />
       </main>
       <ErrorConsole error={pageError || runtime.error} />
-      <footer className="play-footer flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)]"><span role="status" aria-live="polite">{paused ? "paused" : runtime.status}</span><span className="ml-auto max-[560px]:hidden">{cartridge.controls || "ARROWS · Z / X"}</span><FooterActions soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} /></footer>
+      <footer className="play-footer row-start-4 flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)]"><span role="status" aria-live="polite">{paused ? "paused" : runtime.status}</span><span className="ml-auto max-[560px]:hidden">{cartridge.controls || "ARROWS · Z / X"}</span><FooterActions soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} /></footer>
     </div>
   );
 }

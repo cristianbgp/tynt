@@ -50,9 +50,16 @@ describe("public repository health", () => {
     }
   });
 
-  test("lets the apps/web Vercel root use framework defaults", () => {
+  test("configures the apps/web Vercel root as a Vite SPA", () => {
     expect(existsSync(projectPath("vercel.json"))).toBe(false);
-    expect(existsSync(projectPath("apps/web/vercel.json"))).toBe(false);
+    const configurationPath = "apps/web/vercel.json";
+    expect(existsSync(projectPath(configurationPath))).toBe(true);
+    if (!existsSync(projectPath(configurationPath))) return;
+
+    expect(JSON.parse(readProjectFile(configurationPath))).toEqual({
+      $schema: "https://openapi.vercel.sh/vercel.json",
+      rewrites: [{ source: "/(.*)", destination: "/index.html" }],
+    });
   });
 
   test("deploys the custom Next.js docs with Bun and framework defaults", () => {

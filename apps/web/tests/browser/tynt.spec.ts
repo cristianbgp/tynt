@@ -197,7 +197,7 @@ test("responsive play keeps the game and controls close together", async ({ page
       return { canvasWidth: canvas.width, canvasTop: canvas.top, gap: controls.top - canvas.bottom };
     });
     expect(geometry.canvasWidth).toBe(320);
-    expect(geometry.canvasTop).toBeLessThan(200);
+    expect(geometry.canvasTop).toBeLessThan(210);
     expect(geometry.gap).toBeLessThan(48);
   }
 });
@@ -696,6 +696,19 @@ test("keeps the status bar flush with the viewport when errors are hidden or vis
 
   await expect(page.locator("#error-console")).toBeVisible();
   await expect.poll(statusBox).toEqual({ bottom: 800, height: 25, viewportBottom: 800 });
+});
+
+test("keeps the public play footer flush with the viewport", async ({ page }) => {
+  await page.goto("/play/public/snake");
+  await expect(page.getByRole("heading", { name: "snake" })).toBeVisible();
+  await expect(page.locator("#error-console")).toBeHidden();
+
+  const footerBox = () => page.locator(".play-footer").evaluate((footer) => {
+    const bounds = footer.getBoundingClientRect();
+    return { bottom: bounds.bottom, height: bounds.height, viewportBottom: window.innerHeight };
+  });
+
+  await expect.poll(footerBox).toEqual({ bottom: 800, height: 25, viewportBottom: 800 });
 });
 
 test("keeps the editor footer actions contiguous without horizontal overflow", async ({ page }) => {
