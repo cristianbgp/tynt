@@ -38,11 +38,13 @@ function applyTheme(preference: ThemePreference, systemDark?: boolean) {
 
 export function ThemeToggle() {
   const [preference, setPreference] = useState<ThemePreference>("system");
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const saved = storedPreference();
     setPreference(saved);
     applyTheme(saved);
+    setReady(true);
   }, []);
 
   useEffect(() => {
@@ -74,6 +76,7 @@ export function ThemeToggle() {
                 role="radio"
                 aria-label={label}
                 aria-checked={preference === option}
+                disabled={!ready}
                 onClick={() => selectTheme(option)}
               >
                 <Icon width={18} height={18} aria-hidden="true" />

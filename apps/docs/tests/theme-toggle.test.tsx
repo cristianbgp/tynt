@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { ThemeToggle } from "@/components/docs/theme-toggle";
 
@@ -26,6 +27,15 @@ describe("documentation theme control", () => {
   });
 
   afterEach(() => vi.unstubAllGlobals());
+
+  test("keeps server-rendered theme controls disabled until hydration", () => {
+    const container = document.createElement("div");
+    container.innerHTML = renderToString(<ThemeToggle />);
+    const controls = container.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+
+    expect(controls).toHaveLength(3);
+    for (const control of controls) expect(control).toBeDisabled();
+  });
 
   test("persists all three choices and follows OS changes only in System mode", () => {
     render(<ThemeToggle />);
