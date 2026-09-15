@@ -246,13 +246,11 @@ test("responsive content routes reflow without footer overlap", async ({ page })
   await expect.poll(() => page.locator(".sprite-canvas button").first().evaluate((node) => node.getBoundingClientRect().width)).toBeGreaterThanOrEqual(35);
 });
 
-test("exposes installable tynt metadata and icons", async ({ page }) => {
+test("serves standard browser metadata without installing a PWA", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", /manifest\.webmanifest/);
+  await expect(page.locator('link[rel="manifest"]')).toHaveCount(0);
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/apple-touch-icon.png");
-  const manifest = await page.evaluate(async () => fetch(document.querySelector<HTMLLinkElement>('link[rel="manifest"]')!.href).then((response) => response.json()));
-  expect(manifest).toMatchObject({ short_name: "tynt", display: "standalone", theme_color: "#000000" });
-  expect(manifest.icons).toEqual(expect.arrayContaining([expect.objectContaining({ sizes: "512x512" })]));
+  await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
 });
 
 test("opens a bundled cartridge from the gallery as an editable copy", async ({ page }) => {

@@ -55,7 +55,6 @@
     "tailwindcss": "latest",
     "typescript": "latest",
     "vite": "latest",
-    "vite-plugin-pwa": "1.3.0",
     "vitest": "latest"
   }
 }

@@ -12,8 +12,6 @@ async function render(source: string, output: string, width: number, height: num
   await page.screenshot({ path: resolve(root, output), animations: "disabled" });
 }
 
-await render("public/tynt-mark.svg", "public/icon-512.png", 512, 512);
-await render("public/tynt-mark.svg", "public/icon-192.png", 192, 192);
 await render("public/tynt-mark.svg", "public/apple-touch-icon.png", 180, 180);
 await render("public/tynt-social.svg", "public/tynt-social.png", 1200, 630);
 
