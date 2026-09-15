@@ -12,6 +12,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "./src"),
     },
+    dedupe: ["@codemirror/state"],
   },
   server: {
     host: "127.0.0.1",

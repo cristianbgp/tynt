@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "bun:test";
+import webViteConfig from "../../../apps/web/vite.config";
 
 const root = new URL("../../../", import.meta.url);
 
@@ -60,6 +61,10 @@ describe("public repository health", () => {
       $schema: "https://openapi.vercel.sh/vercel.json",
       rewrites: [{ source: "/(.*)", destination: "/index.html" }],
     });
+  });
+
+  test("deduplicates CodeMirror state in production bundles", () => {
+    expect(webViteConfig.resolve?.dedupe).toContain("@codemirror/state");
   });
 
   test("deploys the custom Next.js docs with Bun and framework defaults", () => {
