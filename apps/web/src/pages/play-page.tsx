@@ -58,7 +58,7 @@ export function PlayPage({ cartridge, editorHref, soundEnabled, onSoundToggle }:
 
   return (
     <div className="play-shell grid h-full w-full grid-rows-[41px_minmax(0,1fr)_auto_25px] max-[900px]:h-auto max-[900px]:min-h-full max-[900px]:grid-rows-[auto_minmax(0,1fr)_auto_25px] max-[560px]:h-dvh max-[560px]:min-h-0 max-[560px]:grid-rows-[auto_minmax(0,1fr)_auto_calc(41px+env(safe-area-inset-bottom))]">
-      <header className="play-topbar grid min-w-0 grid-cols-[max-content_minmax(140px,1fr)_max-content] border-b border-border max-[900px]:grid-cols-[max-content_minmax(0,1fr)]">
+      <header className="play-topbar grid min-w-0 grid-cols-[max-content_minmax(140px,1fr)_max-content] border-b border-border max-[900px]:h-[82px] max-[900px]:grid-cols-[max-content_minmax(0,1fr)] max-[900px]:grid-rows-[41px_41px]">
         <BrandLink />
         <div className="play-identity flex min-w-0 items-baseline gap-[12px] px-[16px]">
           <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13px]">{cartridge.title}</h1>

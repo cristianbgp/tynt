@@ -155,6 +155,31 @@ test("mobile editor keeps both toolbar rows at the site header height", async ({
   });
 });
 
+test("mobile play keeps its identity and controls rows at the site header height", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/play/public/starter");
+
+  const geometry = await page.evaluate(() => {
+    const topbar = document.querySelector(".play-topbar")!.getBoundingClientRect();
+    const brand = document.querySelector(".play-topbar .brand")!.getBoundingClientRect();
+    const identity = document.querySelector(".play-identity")!.getBoundingClientRect();
+    const actions = document.querySelector(".play-actions")!.getBoundingClientRect();
+    return {
+      topbarHeight: topbar.height,
+      brandHeight: brand.height,
+      identityHeight: identity.height,
+      actionsHeight: actions.height,
+    };
+  });
+
+  expect(geometry).toEqual({
+    topbarHeight: 82,
+    brandHeight: 41,
+    identityHeight: 41,
+    actionsHeight: 41,
+  });
+});
+
 test("responsive play keeps the game and controls close together", async ({ page }) => {
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }]) {
     await page.setViewportSize(viewport);
