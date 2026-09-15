@@ -9,6 +9,7 @@ let heartbeatTimer=null;
 let currentPhase="init";
 function send(message){ parent.postMessage(message,"*"); }
 function clearTimers(){ if(phaseTimer!==null)clearTimeout(phaseTimer); if(heartbeatTimer!==null)clearTimeout(heartbeatTimer); phaseTimer=null; heartbeatTimer=null; }
+function clearHeartbeat(){ if(heartbeatTimer!==null)clearTimeout(heartbeatTimer); heartbeatTimer=null; }
 function dispose(){ clearTimers(); if(worker)worker.terminate(); worker=null; if(workerUrl)URL.revokeObjectURL(workerUrl); workerUrl=null; }
 function fail(phase,message){ dispose(); send({kind:"error",token,phase,message}); }
 function heartbeat(){ if(heartbeatTimer!==null)clearTimeout(heartbeatTimer); heartbeatTimer=setTimeout(()=>fail(currentPhase,"Worker stopped responding for 2 seconds"),2000); }
@@ -28,6 +29,7 @@ function start(source){
         phaseTimer=setTimeout(()=>fail(currentPhase,currentPhase+" exceeded 100 ms"),100);
       } else if(message.state==="complete"&&phaseTimer!==null){ clearTimeout(phaseTimer); phaseTimer=null; }
     }
+    if(message.kind==="ready"||message.kind==="frame")clearHeartbeat();
     send(message);
     if(message.kind==="error")dispose();
   };
@@ -37,7 +39,7 @@ window.addEventListener("message",(event)=>{
   const message=event.data;
   if(event.source!==parent||!message||message.token!==token||typeof message.kind!=="string")return;
   if(message.kind==="boot"&&typeof message.workerSource==="string")start(message.workerSource);
-  else if(message.kind==="tick"&&worker)worker.postMessage(message);
+  else if(message.kind==="tick"&&worker){ if(heartbeatTimer===null)heartbeat(); worker.postMessage(message); }
   else if(message.kind==="stop")dispose();
 });`;
 

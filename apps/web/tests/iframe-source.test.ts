@@ -83,4 +83,27 @@ describe("iframe bootstrap", () => {
     expect(heartbeatHarness.relayed).toContainEqual({ kind: "error", token, phase: "init", message: "Worker stopped responding for 2 seconds" });
     expect(heartbeatHarness.workers[0]!.terminated).toBe(true);
   });
+
+  test("does not run the heartbeat watchdog while the ready worker is idle", () => {
+    const harness = iframeHarness(createIframeDocument(token));
+    harness.send(harness.parent, { kind: "boot", token, workerSource: "source" });
+    harness.workers[0]!.onmessage?.({ data: { kind: "ready", token } });
+
+    harness.fire(2000);
+
+    expect(harness.relayed).toEqual([{ kind: "ready", token }]);
+    expect(harness.workers[0]!.terminated).toBe(false);
+  });
+
+  test("runs the heartbeat watchdog while a tick is awaiting a response", () => {
+    const harness = iframeHarness(createIframeDocument(token));
+    harness.send(harness.parent, { kind: "boot", token, workerSource: "source" });
+    harness.workers[0]!.onmessage?.({ data: { kind: "ready", token } });
+    harness.send(harness.parent, { kind: "tick", token, input: { held: [], pressed: [] } });
+
+    harness.fire(2000);
+
+    expect(harness.relayed).toContainEqual({ kind: "error", token, phase: "init", message: "Worker stopped responding for 2 seconds" });
+    expect(harness.workers[0]!.terminated).toBe(true);
+  });
 });

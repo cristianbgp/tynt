@@ -202,6 +202,20 @@ test("responsive play keeps the game and controls close together", async ({ page
   }
 });
 
+test("desktop play keeps the game preview close to the top bar", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/play/public/snake");
+  await expect(page.locator("#preview")).toBeFocused();
+
+  const topGap = await page.evaluate(() => {
+    const stage = document.querySelector(".play-stage")!.getBoundingClientRect();
+    const interaction = document.querySelector(".preview-interaction")!.getBoundingClientRect();
+    return Math.round(interaction.top - stage.top);
+  });
+
+  expect(topGap).toBe(24);
+});
+
 test("mobile play disables page zoom and accidental text selection", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/play/public/coin-dash");
