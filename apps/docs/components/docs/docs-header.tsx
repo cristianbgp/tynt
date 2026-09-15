@@ -25,10 +25,10 @@ export function DocsHeader({ onOpenNavigation, onOpenSearch }: DocsHeaderProps) 
         >
           <Menu width={20} height={20} aria-hidden="true" />
         </button>
-        <Link className="flex min-w-0 items-center gap-2 text-sm font-semibold text-foreground no-underline" href="/docs">
+        <Link className="flex min-w-0 items-center gap-2 text-sm font-semibold text-foreground no-underline" href="/docs" aria-label="tynt docs">
           <img className="size-6 dark:invert" src="/tynt-mark.svg" alt="" width="24" height="24" />
           <span>tynt</span>
-          <span className="text-muted">docs</span>
+          <span className="hidden text-muted min-[360px]:inline">docs</span>
         </Link>
 
         <button

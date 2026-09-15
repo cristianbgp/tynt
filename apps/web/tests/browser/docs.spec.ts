@@ -19,6 +19,24 @@ test("custom docs are creator-first and responsive", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Getting started" })).toBeVisible();
 });
 
+test("mobile header controls stay separate from the brand and page content", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto(`${docs}/docs`);
+
+  const brand = page.getByRole("link", { name: "tynt docs" });
+  const brandLabel = await brand.locator("span:visible").last().boundingBox();
+  const search = await page.getByRole("button", { name: "Search documentation" }).boundingBox();
+  const header = await page.locator("body > div > header").boundingBox();
+  const content = await page.locator("#docs-content").boundingBox();
+
+  expect(brandLabel).not.toBeNull();
+  expect(search).not.toBeNull();
+  expect(header).not.toBeNull();
+  expect(content).not.toBeNull();
+  expect(brandLabel!.x + brandLabel!.width).toBeLessThanOrEqual(search!.x);
+  expect(header!.y + header!.height).toBeLessThanOrEqual(content!.y);
+});
+
 test("search opens from the keyboard and finds API entries", async ({ page }) => {
   await page.goto(`${docs}/docs`);
   await expect(page.locator("html")).toHaveAttribute("data-docs-ready", "true");
