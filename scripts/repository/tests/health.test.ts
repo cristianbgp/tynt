@@ -69,8 +69,8 @@ describe("public repository health", () => {
     expect(configuration).toMatchObject({
       framework: "nextjs",
       bunVersion: "1.4.x",
-      installCommand: "bunx bun@1.4.0 install",
     });
+    expect(configuration).not.toHaveProperty("installCommand");
     expect(configuration).not.toHaveProperty("buildCommand");
     expect(configuration).not.toHaveProperty("outputDirectory");
     expect(packageManifest.dependencies).toMatchObject({

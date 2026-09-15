@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "bunVersion": "1.4.x",
-  "installCommand": "bunx bun@1.4.0 install"
+  "bunVersion": "1.4.x"
 }
