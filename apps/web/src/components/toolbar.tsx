@@ -58,7 +58,7 @@ const galleryLinkClassName = "gallery-link flex h-full items-center gap-[8px] wh
 
 export function Toolbar(props: ToolbarProps) {
   return (
-    <header className="topbar grid grid-cols-[max-content_minmax(0,1fr)_max-content] items-stretch border-b border-border max-[760px]:w-full max-[760px]:grid-cols-[max-content_minmax(0,1fr)]">
+    <header className="topbar grid grid-cols-[max-content_minmax(0,1fr)_max-content] items-stretch border-b border-border max-[760px]:h-[82px] max-[760px]:w-full max-[760px]:grid-cols-[max-content_minmax(0,1fr)] max-[760px]:grid-rows-[41px_41px]">
       <BrandLink />
       <div className="file-controls flex min-w-0 items-center">
         <span id="filename" className="filename min-w-0 flex-1 overflow-hidden px-[16px] text-ellipsis whitespace-nowrap max-[560px]:hidden" aria-label="Current cartridge file">{props.filename}</span>

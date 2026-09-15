@@ -133,6 +133,28 @@ test("responsive editor switches from code to a focused game", async ({ page }) 
   await expectNoHorizontalOverflow(page, 320);
 });
 
+test("mobile editor keeps both toolbar rows at the site header height", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  const geometry = await page.evaluate(() => {
+    const topbar = document.querySelector(".topbar")!.getBoundingClientRect();
+    const fileControls = document.querySelector(".file-controls")!.getBoundingClientRect();
+    const actions = document.querySelector(".actions")!.getBoundingClientRect();
+    return {
+      topbarHeight: topbar.height,
+      fileControlsHeight: fileControls.height,
+      actionsHeight: actions.height,
+    };
+  });
+
+  expect(geometry).toEqual({
+    topbarHeight: 82,
+    fileControlsHeight: 41,
+    actionsHeight: 41,
+  });
+});
+
 test("responsive play keeps the game and controls close together", async ({ page }) => {
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }]) {
     await page.setViewportSize(viewport);
