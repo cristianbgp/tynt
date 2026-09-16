@@ -45,3 +45,44 @@ test("paints, clears, and copies an eight by eight indexed sprite", async () => 
   await user.click(screen.getByRole("button", { name: "Clear sprite" }));
   expect(screen.getByRole("button", { name: "Pixel 1, 1 color 0" })).toBeVisible();
 });
+
+test("imports generated sprite code without executing it", async () => {
+  const user = userEvent.setup();
+  render(
+    <MemoryRouter>
+      <SpritePage soundEnabled onSoundToggle={() => {}} />
+    </MemoryRouter>,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Import sprite code" }));
+  const dialog = screen.getByRole("dialog", { name: "Import sprite code" });
+  const pixels = [1, 2, ...Array<number>(62).fill(0)];
+  fireEvent.change(screen.getByLabelText("Sprite code to import"), {
+    target: { value: `const spritePixels = [${pixels.join(", ")}] as const;` },
+  });
+  await user.click(screen.getByRole("button", { name: "Import sprite" }));
+
+  expect(dialog).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Pixel 1, 1 color 1" })).toBeVisible();
+  expect(screen.getByRole("button", { name: "Pixel 2, 1 color 2" })).toBeVisible();
+  expect(screen.getByRole("status")).toHaveTextContent("sprite imported");
+});
+
+test("keeps the current sprite when imported code is invalid", async () => {
+  const user = userEvent.setup();
+  render(
+    <MemoryRouter>
+      <SpritePage soundEnabled onSoundToggle={() => {}} />
+    </MemoryRouter>,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Import sprite code" }));
+  fireEvent.change(screen.getByLabelText("Sprite code to import"), {
+    target: { value: "const spritePixels = [1, 2] as const;" },
+  });
+  await user.click(screen.getByRole("button", { name: "Import sprite" }));
+
+  expect(screen.getByRole("alert")).toHaveTextContent("exactly 64 pixels");
+  expect(screen.getByRole("dialog", { name: "Import sprite code" })).toBeVisible();
+  expect(screen.getByLabelText<HTMLTextAreaElement>("Sprite code").value).toContain("0, 0, 0, 0");
+});

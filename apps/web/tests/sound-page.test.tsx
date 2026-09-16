@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { expect, test, vi } from "vitest";
 import { SoundPage } from "@/pages/sound-page";
@@ -105,4 +106,52 @@ test("stops an active preview when app sound is disabled", () => {
   );
 
   expect(stopAudio).toHaveBeenCalledOnce();
+});
+
+test("imports generated sound code and its playback settings", async () => {
+  const user = userEvent.setup();
+  render(
+    <MemoryRouter>
+      <SoundPage soundEnabled onSoundToggle={() => {}} />
+    </MemoryRouter>,
+  );
+
+  await user.click(screen.getByRole("button", { name: "Import sound code" }));
+  const dialog = screen.getByRole("dialog", { name: "Import sound code" });
+  fireEvent.change(screen.getByLabelText("Sound code to import"), {
+    target: {
+      value: `const sound = [261.63, 0, 329.63, 0, 392, 0, 523.25, 0, 392, 0, 329.63, 0, 261.63, 0, 0, 0] as const;
+
+// play with:
+sfx(sound, 120, 0.25, "sine");`,
+    },
+  });
+  await user.click(screen.getByRole("button", { name: "Import sound" }));
+
+  expect(dialog).not.toBeInTheDocument();
+  expect(screen.getByLabelText<HTMLTextAreaElement>("Sound code").value).toContain(
+    'sfx(sound, 120, 0.25, "sine")',
+  );
+  expect(screen.getByRole("button", { name: "sine" })).toHaveAttribute("aria-pressed", "true");
+  expect(screen.getByText("sound imported", { selector: "p" })).toBeVisible();
+});
+
+test("rejects executable sound code without changing the current sound", async () => {
+  const user = userEvent.setup();
+  render(
+    <MemoryRouter>
+      <SoundPage soundEnabled onSoundToggle={() => {}} />
+    </MemoryRouter>,
+  );
+  const original = screen.getByLabelText<HTMLTextAreaElement>("Sound code").value;
+
+  await user.click(screen.getByRole("button", { name: "Import sound code" }));
+  fireEvent.change(screen.getByLabelText("Sound code to import"), {
+    target: { value: "globalThis.fetch('https://example.com')" },
+  });
+  await user.click(screen.getByRole("button", { name: "Import sound" }));
+
+  expect(screen.getByRole("alert")).toHaveTextContent("generated sound code");
+  expect(screen.getByRole("dialog", { name: "Import sound code" })).toBeVisible();
+  expect(screen.getByLabelText<HTMLTextAreaElement>("Sound code").value).toBe(original);
 });

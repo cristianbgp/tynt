@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { play } from "cuelume";
 import { Copy, Music, Play, Stop, Trash } from "pixelarticons/react";
+import { CodeImportDialog } from "@/components/code-import-dialog";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 import { usePointerPaint } from "@/hooks/use-pointer-paint";
+import { parseSoundCode } from "@/lib/creative-import";
 import { CartridgeAudioEngine } from "@/runtime/audio";
 import type { AudioWave, CartridgeAudio } from "@/runtime/protocol";
 import { SOUND_NOTES, soundCode } from "@/sound-editor";
@@ -27,6 +29,9 @@ export function SoundPage({ soundEnabled, onSoundToggle, playAudio, stopAudio }:
   const [volume, setVolume] = useState(0.15);
   const [wave, setWave] = useState<AudioWave>("square");
   const [status, setStatus] = useState("16 steps · starter chime loaded");
+  const [importOpen, setImportOpen] = useState(false);
+  const [importSource, setImportSource] = useState("");
+  const [importError, setImportError] = useState("");
   const engineRef = useRef<CartridgeAudioEngine | null>(null);
   const code = useMemo(() => soundCode(notes, step, volume, wave), [notes, step, volume, wave]);
 
@@ -93,6 +98,25 @@ export function SoundPage({ soundEnabled, onSoundToggle, playAudio, stopAudio }:
       play("success");
     } catch {
       setStatus("copy failed");
+      play("error");
+    }
+  };
+
+  const importCode = () => {
+    try {
+      const imported = parseSoundCode(importSource);
+      stop();
+      setNotes(imported.notes);
+      if (imported.step !== undefined) setStep(imported.step);
+      if (imported.volume !== undefined) setVolume(imported.volume);
+      if (imported.wave !== undefined) setWave(imported.wave);
+      setStatus("sound imported");
+      setImportSource("");
+      setImportError("");
+      setImportOpen(false);
+      play("success");
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : "Sound code could not be imported.");
       play("error");
     }
   };
@@ -251,8 +275,31 @@ export function SoundPage({ soundEnabled, onSoundToggle, playAudio, stopAudio }:
                 <Stop width={24} height={24} aria-hidden="true" />
                 Stop
               </Button>
+              <CodeImportDialog
+                description="Paste code copied from this editor, or an array of exactly 16 nonnegative frequencies. Code is parsed, never executed."
+                error={importError}
+                importLabel="Import sound"
+                inputLabel="Sound code to import"
+                open={importOpen}
+                title="Import sound code"
+                triggerClassName="min-h-[41px] justify-center border-t border-l-0"
+                triggerLabel="Import"
+                value={importSource}
+                onImport={importCode}
+                onOpenChange={(open) => {
+                  setImportOpen(open);
+                  if (!open) {
+                    setImportSource("");
+                    setImportError("");
+                  }
+                }}
+                onValueChange={(value) => {
+                  setImportSource(value);
+                  setImportError("");
+                }}
+              />
               <Button
-                className="min-h-[41px] justify-center border-t border-l-0"
+                className="min-h-[41px] justify-center border-t"
                 aria-label="Copy sound code"
                 onClick={() => {
                   void copy();
@@ -262,7 +309,7 @@ export function SoundPage({ soundEnabled, onSoundToggle, playAudio, stopAudio }:
                 Copy code
               </Button>
               <Button
-                className="min-h-[41px] justify-center border-t"
+                className="col-span-2 min-h-[41px] justify-center border-t border-l-0"
                 aria-label="Clear sound"
                 onClick={() => {
                   stop();

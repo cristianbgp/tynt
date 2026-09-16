@@ -62,9 +62,11 @@ Use `overlap()` when two rectangular objects interact. Use `pointInRect()` for a
 
 ## Sound effects and rests
 
-Open the sound editor at [tynt.dev/sounds](https://tynt.dev/sounds) to compose and preview a sixteen-step effect. Copied sequences use `0` for a silent step:
+Open the sound editor at [tynt.dev/sounds](https://tynt.dev/sounds) to compose and preview a sixteen-step effect. You can copy its generated code or import an existing generated snippet to continue editing it. Copied sequences use `0` for a silent step:
 
 ```ts
 const pickup = [261.63, 0, 329.63, 392] as const;
 sfx(pickup, 80, 0.15, "square");
 ```
+
+The [sprite editor](https://tynt.dev/sprites) supports the same copy and import workflow for 8 × 8 sprites. Imports are validated as data and never executed: sprites accept exactly 64 color values from `0` to `3`, while sounds accept exactly 16 nonnegative frequencies plus optional playback settings.

@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { play } from "cuelume";
 import { Copy, Trash } from "pixelarticons/react";
+import { CodeImportDialog } from "@/components/code-import-dialog";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 import { usePointerPaint } from "@/hooks/use-pointer-paint";
+import { parseSpriteCode } from "@/lib/creative-import";
 
 interface SpritePageProps {
   soundEnabled: boolean;
@@ -22,6 +24,9 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
   const [pixels, setPixels] = useState(() => Array<number>(64).fill(0));
   const [color, setColor] = useState(3);
   const [status, setStatus] = useState("8 × 8 · color 3 selected");
+  const [importOpen, setImportOpen] = useState(false);
+  const [importSource, setImportSource] = useState("");
+  const [importError, setImportError] = useState("");
   const code = useMemo(() => spriteCode(pixels), [pixels]);
 
   const paint = (index: number) => {
@@ -38,6 +43,20 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
       play("success");
     } catch {
       setStatus("copy failed");
+      play("error");
+    }
+  };
+
+  const importCode = () => {
+    try {
+      setPixels(parseSpriteCode(importSource));
+      setStatus("sprite imported");
+      setImportSource("");
+      setImportError("");
+      setImportOpen(false);
+      play("success");
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : "Sprite code could not be imported.");
       play("error");
     }
   };
@@ -107,7 +126,30 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
               readOnly
               value={code}
             />
-            <div className="sprite-actions grid grid-cols-2">
+            <div className="sprite-actions grid grid-cols-3">
+              <CodeImportDialog
+                description="Paste code copied from this editor, or an array of exactly 64 color values from 0 to 3. Code is parsed, never executed."
+                error={importError}
+                importLabel="Import sprite"
+                inputLabel="Sprite code to import"
+                open={importOpen}
+                title="Import sprite code"
+                triggerClassName="min-h-[41px] justify-center"
+                triggerLabel="Import"
+                value={importSource}
+                onImport={importCode}
+                onOpenChange={(open) => {
+                  setImportOpen(open);
+                  if (!open) {
+                    setImportSource("");
+                    setImportError("");
+                  }
+                }}
+                onValueChange={(value) => {
+                  setImportSource(value);
+                  setImportError("");
+                }}
+              />
               <Button
                 className="min-h-[41px] justify-center"
                 aria-label="Copy sprite code"
