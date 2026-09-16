@@ -87,16 +87,16 @@ export function SoundPage({ soundEnabled, onSoundToggle, playAudio, stopAudio }:
         <section className="mx-auto grid h-[min(680px,calc(100dvh-220px))] min-h-[480px] w-[min(100%,1120px)] grid-cols-[minmax(0,1fr)_320px] border-b border-l border-border max-[820px]:h-auto max-[820px]:min-h-0 max-[820px]:grid-cols-1">
           <div className="min-h-0 min-w-0 overflow-auto border-r border-border bg-background max-[820px]:max-h-[440px]" aria-label="Sound sequence">
             <div className="grid min-w-[610px] grid-cols-[58px_repeat(16,minmax(34px,1fr))]">
-              <span className="sticky left-0 z-20 border-t border-r border-border bg-muted" aria-hidden="true" />
+              <span className="sticky left-0 z-20 border-r border-border bg-muted" aria-hidden="true" />
               {notes.map((_, index) => (
-                <span className="border-t border-r border-border bg-muted py-[8px] text-center text-[10px] text-muted-foreground" key={index}>{index + 1}</span>
+                <span className={`border-border bg-muted py-[8px] text-center text-[10px] text-muted-foreground ${index === notes.length - 1 ? "border-r-0" : "border-r"}`} key={index}>{index + 1}</span>
               ))}
               {SOUND_NOTES.map((note) => (
                 <div className="contents" key={note.name}>
                   <span className={`sticky left-0 z-10 border-t border-r border-border px-[8px] py-[5px] ${note.accidental ? "bg-foreground text-background" : "bg-background"}`}>{note.name}</span>
                   {notes.map((selected, index) => (
                     <button
-                      className={`min-h-[30px] cursor-crosshair border-0 border-t border-r border-border outline-none hover:bg-[#aaaaaa] focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-3 focus-visible:outline-foreground ${selected === note.frequency ? "bg-foreground hover:bg-[#555555]" : note.accidental ? "bg-muted" : "bg-background"}`}
+                      className={`min-h-[30px] cursor-crosshair border-0 border-t border-border outline-none hover:bg-[#aaaaaa] focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-3 focus-visible:outline-foreground ${index === notes.length - 1 ? "border-r-0" : "border-r"} ${selected === note.frequency ? "bg-foreground hover:bg-[#555555]" : note.accidental ? "bg-muted" : "bg-background"}`}
                       key={index}
                       type="button"
                       aria-label={`Step ${index + 1} ${note.name}`}
@@ -113,7 +113,7 @@ export function SoundPage({ soundEnabled, onSoundToggle, playAudio, stopAudio }:
           </div>
 
           <aside className="grid min-h-0 grid-rows-[auto_auto_minmax(170px,1fr)_auto_32px] border-r border-border">
-            <div className="border-t border-border p-[14px]">
+            <div className="p-[14px]">
               <span className="mb-[8px] block text-[10px] uppercase tracking-[0.08em] text-muted-foreground">Waveform</span>
               <div className="grid grid-cols-2 border-t border-border">
                 {WAVES.map((value) => (

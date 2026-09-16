@@ -41,10 +41,10 @@ test("shows the compact controls and two-pane workspace", async ({ page }) => {
   await expect(page.locator("#run-button")).toHaveCSS("border-left-width", "1px");
 });
 
-test("gives every editor interaction a distinct hover state", async ({ page }) => {
+test("uses intentional hover feedback for editor interactions", async ({ page }) => {
   await page.goto("/");
 
-  await expectHoverColors(page.getByRole("link", { name: "tynt editor" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+  await expectHoverColors(page.getByRole("link", { name: "tynt editor" }), "rgb(0, 0, 0)", "rgb(255, 255, 255)");
   await expectHoverColors(page.getByRole("button", { name: "Run" }), "rgb(0, 0, 0)", "rgb(255, 255, 255)");
   await expectHoverColors(page.getByRole("button", { name: "Direction right" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
 
@@ -234,9 +234,24 @@ test("sound editor keeps its composer controls visible and contained", async ({ 
 
   const desktop = await page.evaluate(() => {
     const play = document.querySelector<HTMLButtonElement>('button[aria-label="Play sound"]')!.getBoundingClientRect();
-    return { playBottom: Math.round(play.bottom), viewportHeight: window.innerHeight };
+    const heading = document.querySelector<HTMLElement>(".sound-main > header")!;
+    const sequence = document.querySelector<HTMLElement>('[aria-label="Sound sequence"]')!;
+    const corner = sequence.querySelector<HTMLElement>(".grid > span:first-child")!;
+    const lastStepHeading = sequence.querySelector<HTMLElement>(".grid > span:nth-child(17)")!;
+    const panel = document.querySelector<HTMLElement>(".sound-main aside > div:first-child")!;
+    const border = (element: HTMLElement, side: "Top" | "Right" | "Bottom") => Number.parseFloat(getComputedStyle(element)[`border${side}Width`]);
+    return {
+      playBottom: Math.round(play.bottom),
+      viewportHeight: window.innerHeight,
+      sequenceTopSeam: border(heading, "Bottom") + border(corner, "Top"),
+      panelTopSeam: border(heading, "Bottom") + border(panel, "Top"),
+      centerSeam: border(sequence, "Right") + border(lastStepHeading, "Right"),
+    };
   });
   expect(desktop.playBottom).toBeLessThan(desktop.viewportHeight);
+  expect(desktop.sequenceTopSeam).toBe(1);
+  expect(desktop.panelTopSeam).toBe(1);
+  expect(desktop.centerSeam).toBe(1);
 
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/sounds");
