@@ -86,6 +86,36 @@ test("gives sprite and recovery controls a distinct hover state", async ({ page 
   await expectHoverColors(puzzle, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
 });
 
+test("paints sprite pixels and sound notes while dragging", async ({ page }) => {
+  await page.goto("/sprites");
+  const firstPixel = page.getByRole("button", { name: "Pixel 1, 1 color 0" });
+  const secondPixel = page.getByRole("button", { name: "Pixel 2, 1 color 0" });
+  const firstPixelBox = await firstPixel.boundingBox();
+  const secondPixelBox = await secondPixel.boundingBox();
+  if (!firstPixelBox || !secondPixelBox) throw new Error("Sprite pixels are not visible");
+  await page.mouse.move(firstPixelBox.x + firstPixelBox.width / 2, firstPixelBox.y + firstPixelBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(secondPixelBox.x + secondPixelBox.width / 2, secondPixelBox.y + secondPixelBox.height / 2);
+  await page.mouse.up();
+  await expect(page.getByRole("button", { name: "Pixel 1, 1 color 3" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Pixel 2, 1 color 3" })).toBeVisible();
+
+  await page.goto("/sounds");
+  const firstNote = page.getByRole("button", { name: "Step 1 C4" });
+  const secondNote = page.getByRole("button", { name: "Step 2 C4" });
+  await firstNote.scrollIntoViewIfNeeded();
+  await secondNote.scrollIntoViewIfNeeded();
+  const firstNoteBox = await firstNote.boundingBox();
+  const secondNoteBox = await secondNote.boundingBox();
+  if (!firstNoteBox || !secondNoteBox) throw new Error("Sound notes are not visible");
+  await page.mouse.move(firstNoteBox.x + firstNoteBox.width / 2, firstNoteBox.y + firstNoteBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(secondNoteBox.x + secondNoteBox.width / 2, secondNoteBox.y + secondNoteBox.height / 2);
+  await page.mouse.up();
+  await expect(firstNote).toHaveAttribute("aria-pressed", "true");
+  await expect(secondNote).toHaveAttribute("aria-pressed", "true");
+});
+
 test("uses strong hover feedback for every docs control in explicit light and dark themes", async ({ page }) => {
   for (const theme of [
     {
@@ -233,25 +263,48 @@ test("sound editor keeps its composer controls visible and contained", async ({ 
   await expect(page.getByRole("heading", { name: "Sound editor" })).toBeVisible();
 
   const desktop = await page.evaluate(() => {
-    const play = document.querySelector<HTMLButtonElement>('button[aria-label="Play sound"]')!.getBoundingClientRect();
     const heading = document.querySelector<HTMLElement>(".sound-main > header")!;
     const sequence = document.querySelector<HTMLElement>('[aria-label="Sound sequence"]')!;
     const corner = sequence.querySelector<HTMLElement>(".grid > span:first-child")!;
     const lastStepHeading = sequence.querySelector<HTMLElement>(".grid > span:nth-child(17)")!;
     const panel = document.querySelector<HTMLElement>(".sound-main aside > div:first-child")!;
-    const border = (element: HTMLElement, side: "Top" | "Right" | "Bottom") => Number.parseFloat(getComputedStyle(element)[`border${side}Width`]);
+    const code = document.querySelector<HTMLTextAreaElement>('textarea[aria-label="Sound code"]')!;
+    const play = document.querySelector<HTMLButtonElement>('button[aria-label="Play sound"]')!;
+    const stop = document.querySelector<HTMLButtonElement>('button[aria-label="Stop sound"]')!;
+    const actions = play.parentElement!;
+    const [square, sine, triangle] = panel.querySelectorAll<HTMLButtonElement>("button");
+    const waveform = square.parentElement!;
+    const border = (element: HTMLElement, side: "Top" | "Right" | "Bottom" | "Left") => Number.parseFloat(getComputedStyle(element)[`border${side}Width`]);
     return {
-      playBottom: Math.round(play.bottom),
+      playBottom: Math.round(play.getBoundingClientRect().bottom),
       viewportHeight: window.innerHeight,
       sequenceTopSeam: border(heading, "Bottom") + border(corner, "Top"),
       panelTopSeam: border(heading, "Bottom") + border(panel, "Top"),
       centerSeam: border(sequence, "Right") + border(lastStepHeading, "Right"),
+      actionsLeftSeam: border(sequence, "Right") + border(play, "Left"),
+      actionsCenterSeam: border(play, "Right") + border(stop, "Left"),
+      codeActionsSeam: border(code, "Bottom") + border(actions, "Top"),
+      waveformTopEdge: border(waveform, "Top") + border(square, "Top"),
+      waveformCenterSeam: border(square, "Right") + border(sine, "Left"),
+      waveformRowSeam: border(square, "Bottom") + border(triangle, "Top"),
+      waveformRightEdge: border(waveform, "Right") + border(sine, "Right"),
+      waveformBottomEdge: border(waveform, "Bottom") + border(triangle, "Bottom"),
     };
   });
   expect(desktop.playBottom).toBeLessThan(desktop.viewportHeight);
   expect(desktop.sequenceTopSeam).toBe(1);
   expect(desktop.panelTopSeam).toBe(1);
   expect(desktop.centerSeam).toBe(1);
+  expect(desktop).toMatchObject({
+    actionsLeftSeam: 1,
+    actionsCenterSeam: 1,
+    codeActionsSeam: 1,
+    waveformTopEdge: 1,
+    waveformCenterSeam: 1,
+    waveformRowSeam: 1,
+    waveformRightEdge: 1,
+    waveformBottomEdge: 1,
+  });
 
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/sounds");

@@ -3,6 +3,7 @@ import { play } from "cuelume";
 import { Copy, Trash } from "pixelarticons/react";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
+import { usePointerPaint } from "@/hooks/use-pointer-paint";
 
 interface SpritePageProps {
   soundEnabled: boolean;
@@ -36,6 +37,11 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
     }
   };
 
+  const pointerPaint = usePointerPaint<HTMLDivElement>({
+    selector: "[data-pixel-index]",
+    paint: (element) => paint(Number(element.dataset.pixelIndex)),
+  });
+
   return (
     <div className="gallery-shell sprite-shell grid h-full w-full grid-rows-[41px_minmax(0,1fr)_25px] bg-background max-[560px]:h-dvh max-[560px]:grid-rows-[41px_minmax(0,1fr)_calc(41px+env(safe-area-inset-bottom))]">
       <SiteHeader active="sprites" />
@@ -45,15 +51,16 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
           <p className="m-0 max-w-[42ch] leading-[1.55] text-[#555555]">Paint an indexed 8×8 sprite, then copy it directly into a cartridge.</p>
         </header>
         <section className="sprite-workspace mx-auto grid w-[min(100%,960px)] grid-cols-[minmax(280px,1fr)_minmax(300px,1fr)] border-b border-l border-border max-[700px]:grid-cols-1">
-          <div className="sprite-canvas grid self-start aspect-square grid-cols-[repeat(8,minmax(28px,1fr))] bg-foreground" aria-label="Eight by eight sprite canvas">
+          <div className="sprite-canvas grid touch-none self-start aspect-square grid-cols-[repeat(8,minmax(28px,1fr))] bg-foreground" aria-label="Eight by eight sprite canvas" {...pointerPaint}>
             {pixels.map((value, index) => (
               <button
                 className={`min-w-0 cursor-crosshair border-0 border-t border-r border-[#777777] hover:outline-2 hover:-outline-offset-4 focus-visible:outline-offset-[-4px] ${value < 2 ? "hover:outline-background" : "hover:outline-foreground"}`}
                 key={index}
                 type="button"
                 aria-label={`Pixel ${index % 8 + 1}, ${Math.floor(index / 8) + 1} color ${value}`}
+                data-pixel-index={index}
                 style={{ background: ["#000", "#555", "#aaa", "#fff"][value] }}
-                onClick={() => paint(index)}
+                onClick={(event) => { if (event.detail === 0) paint(index); }}
                 data-cuelume-hover="tick"
                 data-cuelume-press=""
                 data-cuelume-release=""

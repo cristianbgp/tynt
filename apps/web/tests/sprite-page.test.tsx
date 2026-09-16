@@ -1,10 +1,22 @@
 // @vitest-environment jsdom
 
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { expect, test, vi } from "vitest";
 import { SpritePage } from "@/pages/sprite-page";
+
+test("paints multiple pixels with one touch stroke", () => {
+  render(<MemoryRouter><SpritePage soundEnabled onSoundToggle={() => {}} /></MemoryRouter>);
+
+  const first = screen.getByRole("button", { name: "Pixel 1, 1 color 0" });
+  const second = screen.getByRole("button", { name: "Pixel 2, 1 color 0" });
+  fireEvent.pointerDown(first, { pointerId: 7, pointerType: "touch", buttons: 1 });
+  fireEvent.pointerMove(second, { pointerId: 7, pointerType: "touch", buttons: 1 });
+  fireEvent.pointerUp(second, { pointerId: 7, pointerType: "touch", buttons: 0 });
+
+  expect(screen.getByLabelText<HTMLTextAreaElement>("Sprite code").value).toContain("3, 3, 0, 0");
+});
 
 test("paints, clears, and copies an eight by eight indexed sprite", async () => {
   const writeText = vi.fn().mockResolvedValue(undefined);
