@@ -1,4 +1,4 @@
-import { BookOpen, Github, Volume2, VolumeX } from "pixelarticons/react";
+import { FileText, Github, Volume2, VolumeX } from "pixelarticons/react";
 
 const PROJECT_REPOSITORY = "https://github.com/cristianbgp/tynt";
 const DOCUMENTATION_SOURCE = "https://docs.tynt.dev";
@@ -12,7 +12,7 @@ interface StatusBarProps {
 }
 
 function FooterIconLink({ href, label, icon }: { href: string; label: string; icon: "github" | "docs" }) {
-  const Icon = icon === "github" ? Github : BookOpen;
+  const Icon = icon === "github" ? Github : FileText;
   return (
     <a
       className="footer-icon-link flex w-[36px] items-center justify-center border-l border-border text-[#555555] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background"

@@ -111,6 +111,9 @@ describe("tynt creator shell", () => {
     );
     expect(screen.getByRole("link", { name: "Open tynt on GitHub" }).querySelector('[data-icon="github"]')).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Open tynt documentation" }).querySelector('[data-icon="docs"]')).toBeInTheDocument();
+    const libraryIcon = screen.getByRole("link", { name: "Library" }).querySelector("svg");
+    const docsIcon = screen.getByRole("link", { name: "Open tynt documentation" }).querySelector("svg");
+    expect(docsIcon?.innerHTML).not.toBe(libraryIcon?.innerHTML);
     expect(screen.getByRole("region", { name: "Game preview" })).toBeVisible();
     expect(screen.getByRole("status")).toHaveTextContent("ready");
   });
