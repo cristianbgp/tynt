@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { MemoryRouter } from "react-router";
@@ -76,6 +76,9 @@ describe("tynt creator shell", () => {
     await renderApp();
 
     expect(screen.getByText("tynt")).toBeVisible();
+    const primaryNavigation = screen.getByRole("navigation", { name: "Primary navigation" });
+    expect(within(primaryNavigation).getByRole("link", { name: "Editor" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("navigation", { name: "Cartridge actions" })).toBeVisible();
     const brand = screen.getByRole("link", { name: "tynt editor" });
     expect(brand.querySelector(".brand-mark")).toBeVisible();
     expect(brand.querySelector(".brand-wordmark")).toHaveTextContent("tynt");
@@ -142,6 +145,7 @@ describe("tynt creator shell", () => {
     await renderApp();
 
     expect(screen.getByRole("heading", { name: "Page not found" })).toBeVisible();
+    expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
     expect(document.querySelector(".state-mark .brand-mark")).toBeVisible();
     expect(screen.getByRole("link", { name: "Open editor" })).toHaveAttribute("href", "/");
   });

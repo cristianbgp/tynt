@@ -20,13 +20,16 @@ export function CartridgePage({ soundEnabled, onSoundToggle }: CartridgePageProp
   const cartridge = findPublicCartridge(slug);
   if (!cartridge) {
     return (
-      <main className="grid min-h-full place-content-center justify-items-start gap-[12px] px-[20px]">
-        <span className="state-mark inline-grid size-[42px] place-items-center bg-foreground [&_.brand-mark]:size-[24px]"><TyntMark /></span>
-        <span>404</span>
-        <h1 className="m-0 text-[28px]">Cartridge not found</h1>
-        <p className="m-0 text-muted-foreground">This public cartridge does not exist.</p>
-        <Link className="border-b border-current px-[2px] pb-[2px] hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background" to="/gallery" {...soundLinkProps}>Open gallery</Link>
-      </main>
+      <div className="grid min-h-full grid-rows-[41px_minmax(0,1fr)]">
+        <SiteHeader />
+        <main className="grid place-content-center justify-items-start gap-[12px] px-[20px]">
+          <span className="state-mark inline-grid size-[42px] place-items-center bg-foreground [&_.brand-mark]:size-[24px]"><TyntMark /></span>
+          <span>404</span>
+          <h1 className="m-0 text-[28px]">Cartridge not found</h1>
+          <p className="m-0 text-muted-foreground">This public cartridge does not exist.</p>
+          <Link className="border-b border-current px-[2px] pb-[2px] hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background" to="/gallery" {...soundLinkProps}>Open gallery</Link>
+        </main>
+      </div>
     );
   }
 

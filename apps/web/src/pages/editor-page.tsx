@@ -10,6 +10,7 @@ import { Preview } from "@/components/preview";
 import { MobilePaneSwitch, type MobilePane } from "@/components/mobile-pane-switch";
 import { StatusBar } from "@/components/status-bar";
 import { Toolbar } from "@/components/toolbar";
+import { SiteHeader } from "@/components/site-chrome";
 import { RuntimeDebugger } from "@/components/runtime-debugger";
 import { useAppShortcuts } from "@/hooks/use-app-shortcuts";
 import { useRuntime } from "@/hooks/use-runtime";
@@ -232,9 +233,10 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
 
   return (
     <div
-      className="app-shell grid h-full w-full grid-cols-[minmax(0,1fr)] grid-rows-[41px_minmax(0,1fr)_auto_25px] max-[760px]:h-auto max-[760px]:min-h-full max-[760px]:grid-rows-[auto_minmax(0,1fr)_auto_25px] max-[560px]:h-dvh max-[560px]:min-h-0 max-[560px]:grid-rows-[auto_41px_minmax(0,1fr)_auto_calc(41px+env(safe-area-inset-bottom))]"
+      className="app-shell grid h-full w-full grid-cols-[minmax(0,1fr)] grid-rows-[41px_41px_minmax(0,1fr)_auto_25px] max-[760px]:h-auto max-[760px]:min-h-full max-[760px]:grid-rows-[41px_82px_minmax(0,1fr)_auto_25px] max-[560px]:h-dvh max-[560px]:min-h-0 max-[560px]:grid-rows-[41px_82px_41px_minmax(0,1fr)_auto_calc(41px+env(safe-area-inset-bottom))]"
       data-runtime-state={runtime.status}
     >
+      <SiteHeader active="editor" />
       <Toolbar
         filename={safeFilename(draft.title)}
         examples={listPublicCartridges()
@@ -253,7 +255,7 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
         onFileChange={importCartridge}
       />
       <MobilePaneSwitch value={mobilePane} onChange={setMobilePane} />
-      <main className="workspace grid min-h-0 grid-cols-[minmax(0,13fr)_minmax(340px,7fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[minmax(360px,55vh)_auto] max-[560px]:row-start-3 max-[560px]:h-full max-[560px]:grid-rows-[minmax(0,1fr)]" data-mobile-pane={mobilePane}>
+      <main className="workspace grid min-h-0 grid-cols-[minmax(0,13fr)_minmax(340px,7fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[minmax(360px,55vh)_auto] max-[560px]:h-full max-[560px]:grid-rows-[minmax(0,1fr)]" data-mobile-pane={mobilePane}>
         <Editor source={draft.source} onChange={(source) => setDraft((current) => ({ ...current, source }))} />
         <Preview
           interactionRef={previewRef}
@@ -275,8 +277,9 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
           />}
         />
       </main>
-      <ErrorConsole error={runtime.error} />
+      <ErrorConsole error={runtime.error} className="row-start-4 max-[560px]:row-start-5" />
       <StatusBar
+        className="row-start-5 max-[560px]:row-start-6"
         status={runtime.status}
         draftStatus={draftStatus}
         soundEnabled={soundEnabled}

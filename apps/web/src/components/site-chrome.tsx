@@ -19,13 +19,13 @@ const routes = [
 
 export type SiteRoute = (typeof routes)[number]["id"];
 
-export function SiteHeader({ active }: { active?: SiteRoute }) {
+export function SiteHeader({ active, editorTo = "/" }: { active?: SiteRoute; editorTo?: string }) {
   return (
     <header className="gallery-topbar flex border-b border-border">
       <BrandLink />
       <nav className="site-navigation ml-auto flex [&>a]:flex [&>a]:items-center [&>a]:gap-[7px] [&>a]:border-l [&>a]:border-border [&>a]:px-[16px] [&>a]:no-underline [&>a]:transition-colors [&>a:hover]:bg-foreground [&>a:hover]:text-background [&>a:focus-visible]:bg-foreground [&>a:focus-visible]:text-background [&>a[aria-current=page]]:bg-foreground [&>a[aria-current=page]]:text-background [&>a[aria-current=page]:hover]:bg-[#555555] max-[700px]:[&>a]:px-[10px] max-[700px]:[&>a>span]:hidden max-[560px]:[&>a]:px-[8px] max-[360px]:[&>a]:px-[4px]" aria-label="Primary navigation">
         {routes.map(({ id, label, to, Icon }) => (
-          <Link key={id} to={to} aria-label={label} aria-current={active === id ? "page" : undefined} {...soundLinkProps}>
+          <Link key={id} to={id === "editor" ? editorTo : to} aria-label={label} aria-current={active === id ? "page" : undefined} {...soundLinkProps}>
             <Icon width={24} height={24} aria-hidden="true" />
             <span>{label}</span>
           </Link>

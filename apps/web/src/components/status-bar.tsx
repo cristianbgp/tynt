@@ -7,6 +7,7 @@ interface StatusBarProps {
   status: string;
   draftStatus: string;
   soundEnabled: boolean;
+  className?: string;
   onSoundToggle(): void;
 }
 
@@ -74,9 +75,9 @@ export function FooterActions({ soundEnabled, onSoundToggle }: Pick<StatusBarPro
   );
 }
 
-export function StatusBar({ status, draftStatus, soundEnabled, onSoundToggle }: StatusBarProps) {
+export function StatusBar({ status, draftStatus, soundEnabled, className = "", onSoundToggle }: StatusBarProps) {
   return (
-    <footer className="status-bar row-start-4 flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:row-start-5 max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)]">
+    <footer className={`status-bar flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)] ${className}`}>
       <span id="status" role="status" aria-live="polite">{status}</span>
       <span className="text-border max-[560px]:hidden" id="draft-status">{draftStatus}</span>
       <span className="ml-auto text-border max-[560px]:hidden" id="status-hint">Ctrl Shift Enter run or rerun · preview focuses automatically</span>

@@ -133,50 +133,60 @@ test("responsive editor switches from code to a focused game", async ({ page }) 
   await expectNoHorizontalOverflow(page, 320);
 });
 
-test("mobile editor keeps both toolbar rows at the site header height", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+test("mobile editor keeps the global header above its contextual toolbar", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
   await page.goto("/");
   await expect(page.locator(".topbar")).toBeVisible();
 
   const geometry = await page.evaluate(() => {
+    const siteHeader = document.querySelector(".gallery-topbar")!.getBoundingClientRect();
     const topbar = document.querySelector(".topbar")!.getBoundingClientRect();
     const fileControls = document.querySelector(".file-controls")!.getBoundingClientRect();
     const actions = document.querySelector(".actions")!.getBoundingClientRect();
+    const filename = document.querySelector("#filename")!;
+    const examplesLabel = document.querySelector(".example-trigger span")!;
     return {
+      siteHeaderHeight: siteHeader.height,
       topbarHeight: topbar.height,
       fileControlsHeight: fileControls.height,
       actionsHeight: actions.height,
+      filenameVisible: getComputedStyle(filename).display !== "none",
+      examplesLabelVisible: getComputedStyle(examplesLabel).display !== "none",
     };
   });
 
   expect(geometry).toEqual({
+    siteHeaderHeight: 41,
     topbarHeight: 82,
     fileControlsHeight: 41,
     actionsHeight: 41,
+    filenameVisible: true,
+    examplesLabelVisible: true,
   });
+  await expectNoHorizontalOverflow(page, 320);
 });
 
-test("mobile play keeps its identity and controls rows at the site header height", async ({ page }) => {
+test("mobile play keeps the global header above its contextual toolbar", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/play/public/starter");
   await expect(page.locator(".play-topbar")).toBeVisible();
 
   const geometry = await page.evaluate(() => {
+    const siteHeader = document.querySelector(".gallery-topbar")!.getBoundingClientRect();
     const topbar = document.querySelector(".play-topbar")!.getBoundingClientRect();
-    const brand = document.querySelector(".play-topbar .brand")!.getBoundingClientRect();
     const identity = document.querySelector(".play-identity")!.getBoundingClientRect();
     const actions = document.querySelector(".play-actions")!.getBoundingClientRect();
     return {
+      siteHeaderHeight: siteHeader.height,
       topbarHeight: topbar.height,
-      brandHeight: brand.height,
       identityHeight: identity.height,
       actionsHeight: actions.height,
     };
   });
 
   expect(geometry).toEqual({
+    siteHeaderHeight: 41,
     topbarHeight: 82,
-    brandHeight: 41,
     identityHeight: 41,
     actionsHeight: 41,
   });
@@ -187,18 +197,19 @@ test("responsive play keeps the game and controls close together", async ({ page
     await page.setViewportSize(viewport);
     await page.goto("/play/public/coin-dash");
     await expect(page.locator("#preview")).toBeFocused();
-    await expect(page.getByRole("link", { name: "Open gallery" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open library" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open sprites" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Gallery" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Library" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Sprites" })).toBeVisible();
     await expectNoHorizontalOverflow(page, viewport.width);
     const geometry = await page.evaluate(() => {
+      const toolbar = document.querySelector(".play-topbar")!.getBoundingClientRect();
       const canvas = document.querySelector("canvas")!.getBoundingClientRect();
       const controls = document.querySelector(".emulator-controls")!.getBoundingClientRect();
-      return { canvasWidth: canvas.width, canvasTop: canvas.top, gap: controls.top - canvas.bottom };
+      return { canvasWidth: canvas.width, headerGap: canvas.top - toolbar.bottom, controlsGap: controls.top - canvas.bottom };
     });
     expect(geometry.canvasWidth).toBe(320);
-    expect(geometry.canvasTop).toBeLessThan(210);
-    expect(geometry.gap).toBeLessThan(48);
+    expect(geometry.headerGap).toBeLessThan(110);
+    expect(geometry.controlsGap).toBeLessThan(48);
   }
 });
 
@@ -391,7 +402,7 @@ test("plays a saved cartridge with focused pause, resume, and restart controls",
   await expect(page.getByRole("status")).toHaveText("running");
   await page.getByRole("button", { name: "Restart" }).click();
   await expect(page.locator("#preview")).toBeFocused();
-  await expect(page.getByRole("link", { name: "Edit cartridge" })).toHaveAttribute("href", /\?local=/);
+  await expect(page.getByRole("link", { name: "Editor", exact: true })).toHaveAttribute("href", /\?local=/);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(1280);
   await expect.poll(() => page.evaluate(() => {
     const controls = document.querySelector(".emulator-controls")!.getBoundingClientRect();

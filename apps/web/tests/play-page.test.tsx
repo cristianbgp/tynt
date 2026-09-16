@@ -51,11 +51,11 @@ test("loads, starts, and exposes focused play controls for a local cartridge", a
   expect(await screen.findByRole("heading", { name: "orbit" })).toBeVisible();
   await waitFor(() => expect(runtime.run).toHaveBeenCalledWith(source));
   expect(document.querySelector("#preview")).toHaveFocus();
-  expect(screen.getByRole("link", { name: "Edit cartridge" })).toHaveAttribute("href", "/?local=play-one");
-  expect(screen.getByRole("link", { name: "Open gallery" })).toHaveAttribute("href", "/gallery");
-  expect(screen.getByRole("link", { name: "Open library" })).toHaveAttribute("href", "/library");
-  expect(screen.getByRole("link", { name: "Open sprites" })).toHaveAttribute("href", "/sprites");
-  expect(screen.getByRole("link", { name: "Open sounds" })).toHaveAttribute("href", "/sounds");
+  expect(screen.getByRole("link", { name: "Editor" })).toHaveAttribute("href", "/?local=play-one");
+  expect(screen.getByRole("link", { name: "Gallery" })).toHaveAttribute("href", "/gallery");
+  expect(screen.getByRole("link", { name: "Library" })).toHaveAttribute("href", "/library");
+  expect(screen.getByRole("link", { name: "Sprites" })).toHaveAttribute("href", "/sprites");
+  expect(screen.getByRole("link", { name: "Sounds" })).toHaveAttribute("href", "/sounds");
   expect(screen.getByRole("group", { name: "Play controls" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Pause" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Restart" })).toBeVisible();
@@ -72,11 +72,11 @@ test("loads a repository cartridge at its public route", async () => {
   );
 
   expect(await screen.findByRole("heading", { name: "snake" })).toBeVisible();
-  expect(screen.getByRole("link", { name: "Edit cartridge" })).toHaveAttribute("href", "/?cartridge=snake");
-  expect(screen.getByRole("link", { name: "Open gallery" })).toHaveAttribute("href", "/gallery");
-  expect(screen.getByRole("link", { name: "Open library" })).toHaveAttribute("href", "/library");
-  expect(screen.getByRole("link", { name: "Open sprites" })).toHaveAttribute("href", "/sprites");
-  expect(screen.getByRole("link", { name: "Open sounds" })).toHaveAttribute("href", "/sounds");
+  expect(screen.getByRole("link", { name: "Editor" })).toHaveAttribute("href", "/?cartridge=snake");
+  expect(screen.getByRole("link", { name: "Gallery" })).toHaveAttribute("href", "/gallery");
+  expect(screen.getByRole("link", { name: "Library" })).toHaveAttribute("href", "/library");
+  expect(screen.getByRole("link", { name: "Sprites" })).toHaveAttribute("href", "/sprites");
+  expect(screen.getByRole("link", { name: "Sounds" })).toHaveAttribute("href", "/sounds");
   expect(runtime.run).toHaveBeenCalledWith(expect.stringContaining("segments"));
 });
 
@@ -118,6 +118,6 @@ test("reports unavailable fullscreen without breaking play mode", async () => {
   await userEvent.click(screen.getByRole("button", { name: "Enter fullscreen" }));
 
   expect(screen.getByRole("alert")).toHaveTextContent("Fullscreen is not available in this browser");
-  expect(screen.getByRole("link", { name: "Open library" })).toBeVisible();
+  expect(screen.getByRole("link", { name: "Library" })).toBeVisible();
   expect(sound.play).toHaveBeenCalledWith("error");
 });
