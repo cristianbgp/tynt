@@ -384,6 +384,32 @@ test("sound editor keeps its composer controls visible and contained", async ({ 
   await expectNoHorizontalOverflow(page, 320);
 });
 
+test("shared dialogs become bottom sheets on mobile and stay centered on desktop", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/sprites");
+  await page.getByRole("button", { name: "Import sprite code" }).click();
+
+  const dialog = page.getByRole("dialog", { name: "Import sprite code" });
+  await expect(dialog).toBeVisible();
+  const mobile = await dialog.boundingBox();
+  expect(mobile).not.toBeNull();
+  expect(Math.round(mobile!.x)).toBe(0);
+  expect(Math.round(mobile!.width)).toBe(390);
+  expect(Math.round(mobile!.y + mobile!.height)).toBe(844);
+
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.getByRole("button", { name: "Import sprite code" }).click();
+  await expect(dialog).toBeVisible();
+  const desktop = await dialog.boundingBox();
+  expect(desktop).not.toBeNull();
+  expect(Math.round(desktop!.x + desktop!.width / 2)).toBe(640);
+  expect(Math.round(desktop!.y + desktop!.height / 2)).toBe(400);
+  expect(desktop!.width).toBeLessThanOrEqual(520);
+});
+
 test("mobile play disables page zoom and accidental text selection", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/play/public/coin-dash");
