@@ -237,7 +237,9 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
     >
       <Toolbar
         filename={safeFilename(draft.title)}
-        examples={listPublicCartridges().map(({ slug, filename }) => ({ id: slug, filename }))}
+        examples={listPublicCartridges()
+          .filter(({ author }) => author === "tynt")
+          .map(({ slug, filename }) => ({ id: slug, filename }))}
         running={runtime.isRunning}
         compiling={runtime.isCompiling}
         fileInputRef={fileInputRef}

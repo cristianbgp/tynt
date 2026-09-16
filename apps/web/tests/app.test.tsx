@@ -209,6 +209,7 @@ describe("tynt creator shell", () => {
     await renderApp();
 
     await user.click(screen.getByRole("button", { name: "Examples" }));
+    expect(screen.queryByRole("menuitem", { name: "cube-animation.tynt" })).not.toBeInTheDocument();
     const shapes = await screen.findByRole("menuitem", { name: "shapes.tynt" });
     expect(shapes).toHaveAttribute("data-cuelume-hover", "tick");
     expect(shapes).toHaveAttribute("data-cuelume-toggle", "");
