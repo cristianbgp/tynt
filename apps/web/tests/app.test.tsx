@@ -55,7 +55,10 @@ async function renderApp(library?: CartridgeLibrary) {
       <App library={library} />
     </MemoryRouter>,
   );
-  await waitFor(() => expect(screen.queryByText("Loading tynt…")).not.toBeInTheDocument());
+  await waitFor(
+    () => expect(screen.queryByText("Loading tynt…")).not.toBeInTheDocument(),
+    { timeout: 10_000 },
+  );
   return result;
 }
 

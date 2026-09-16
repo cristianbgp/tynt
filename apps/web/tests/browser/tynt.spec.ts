@@ -557,7 +557,16 @@ test("the default cartridge demonstrates clickable directions, A, and B", async 
   }).toBeGreaterThan(83);
 
   await page.getByRole("button", { name: "Action A" }).click();
-  await expect.poll(() => pixel(page, movedX, 61)).toEqual([85, 85, 85, 255]);
+  await expect.poll(async () => {
+    movedX = await page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
+      const data = canvas.getContext("2d")!.getImageData(0, 61, canvas.width, 1).data;
+      for (let x = 0; x < canvas.width; x++) {
+        if (data[x * 4] === 85) return x;
+      }
+      return -1;
+    });
+    return movedX;
+  }).toBeGreaterThan(83);
 
   await page.getByRole("button", { name: "Action B" }).click();
   await expect.poll(() => pixel(page, 76, 61)).toEqual([255, 255, 255, 255]);

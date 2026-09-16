@@ -21,6 +21,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    maxWorkers: 4,
     setupFiles: ["./tests/setup.ts"],
     exclude: ["tests/browser/**", "node_modules/**"],
   },
