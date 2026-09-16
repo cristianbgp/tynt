@@ -4,7 +4,11 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { MemoryRouter } from "react-router";
-import { createCartridgeLibrary, createMemoryAdapter, type CartridgeLibrary } from "@/library/cartridge-library";
+import {
+  createCartridgeLibrary,
+  createMemoryAdapter,
+  type CartridgeLibrary,
+} from "@/library/cartridge-library";
 
 const sound = vi.hoisted(() => ({
   bind: vi.fn(),
@@ -55,10 +59,9 @@ async function renderApp(library?: CartridgeLibrary) {
       <App library={library} />
     </MemoryRouter>,
   );
-  await waitFor(
-    () => expect(screen.queryByText("Loading tynt…")).not.toBeInTheDocument(),
-    { timeout: 10_000 },
-  );
+  await waitFor(() => expect(screen.queryByText("Loading tynt…")).not.toBeInTheDocument(), {
+    timeout: 10_000,
+  });
   return result;
 }
 
@@ -77,7 +80,10 @@ describe("tynt creator shell", () => {
 
     expect(screen.getByText("tynt")).toBeVisible();
     const primaryNavigation = screen.getByRole("navigation", { name: "Primary navigation" });
-    expect(within(primaryNavigation).getByRole("link", { name: "Editor" })).toHaveAttribute("aria-current", "page");
+    expect(within(primaryNavigation).getByRole("link", { name: "Editor" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
     expect(screen.getByRole("navigation", { name: "Cartridge actions" })).toBeVisible();
     const brand = screen.getByRole("link", { name: "tynt editor" });
     expect(brand.querySelector(".brand-mark")).toBeVisible();
@@ -89,18 +95,47 @@ describe("tynt creator shell", () => {
       "aria-keyshortcuts",
       "Control+Shift+Enter",
     );
-    expect(screen.getByRole("button", { name: /import/i })).toHaveAttribute("aria-keyshortcuts", "Control+O Meta+O");
-    expect(screen.getByRole("button", { name: /export/i })).toHaveAttribute("aria-keyshortcuts", "Control+S Meta+S");
-    expect(screen.getByRole("button", { name: "Run" })).toHaveAttribute("data-cuelume-hover", "tick");
-    expect(screen.getByRole("button", { name: "Run" }).querySelector('[data-icon="play"]')).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Import" }).querySelector('[data-icon="upload"]')).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Export" }).querySelector('[data-icon="download"]')).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /import/i })).toHaveAttribute(
+      "aria-keyshortcuts",
+      "Control+O Meta+O",
+    );
+    expect(screen.getByRole("button", { name: /export/i })).toHaveAttribute(
+      "aria-keyshortcuts",
+      "Control+S Meta+S",
+    );
+    expect(screen.getByRole("button", { name: "Run" })).toHaveAttribute(
+      "data-cuelume-hover",
+      "tick",
+    );
+    expect(
+      screen.getByRole("button", { name: "Run" }).querySelector('[data-icon="play"]'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Import" }).querySelector('[data-icon="upload"]'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Export" }).querySelector('[data-icon="download"]'),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sound on" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Sound on" })).toHaveAttribute("data-cuelume-hover", "tick");
-    expect(screen.getByRole("button", { name: "Sound on" }).querySelector('[data-icon="volume"]')).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute("href", "https://cristianbgp.com");
-    expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute("target", "_blank");
-    expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute("rel", "noreferrer");
+    expect(screen.getByRole("button", { name: "Sound on" })).toHaveAttribute(
+      "data-cuelume-hover",
+      "tick",
+    );
+    expect(
+      screen.getByRole("button", { name: "Sound on" }).querySelector('[data-icon="volume"]'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute(
+      "href",
+      "https://cristianbgp.com",
+    );
+    expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute(
+      "target",
+      "_blank",
+    );
+    expect(screen.getByRole("link", { name: "made by @cristianbgp" })).toHaveAttribute(
+      "rel",
+      "noreferrer",
+    );
     expect(screen.getByRole("link", { name: "Open tynt on GitHub" })).toHaveAttribute(
       "href",
       "https://github.com/cristianbgp/tynt",
@@ -109,10 +144,20 @@ describe("tynt creator shell", () => {
       "href",
       "https://docs.tynt.dev",
     );
-    expect(screen.getByRole("link", { name: "Open tynt on GitHub" }).querySelector('[data-icon="github"]')).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Open tynt documentation" }).querySelector('[data-icon="docs"]')).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("link", { name: "Open tynt on GitHub" })
+        .querySelector('[data-icon="github"]'),
+    ).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("link", { name: "Open tynt documentation" })
+        .querySelector('[data-icon="docs"]'),
+    ).toBeInTheDocument();
     const libraryIcon = screen.getByRole("link", { name: "Library" }).querySelector("svg");
-    const docsIcon = screen.getByRole("link", { name: "Open tynt documentation" }).querySelector("svg");
+    const docsIcon = screen
+      .getByRole("link", { name: "Open tynt documentation" })
+      .querySelector("svg");
     expect(docsIcon?.innerHTML).not.toBe(libraryIcon?.innerHTML);
     expect(screen.getByRole("region", { name: "Game preview" })).toBeVisible();
     expect(screen.getByRole("status")).toHaveTextContent("ready");
@@ -131,8 +176,14 @@ describe("tynt creator shell", () => {
     window.history.replaceState({}, "", "/sprites");
     await renderApp();
     expect(screen.getByRole("heading", { name: "Sprite editor" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Pixel 1, 1 color 0" })).toHaveAttribute("data-cuelume-hover", "tick");
-    expect(screen.getByRole("button", { name: "Color 0" })).toHaveAttribute("data-cuelume-hover", "tick");
+    expect(screen.getByRole("button", { name: "Pixel 1, 1 color 0" })).toHaveAttribute(
+      "data-cuelume-hover",
+      "tick",
+    );
+    expect(screen.getByRole("button", { name: "Color 0" })).toHaveAttribute(
+      "data-cuelume-hover",
+      "tick",
+    );
   });
 
   test("renders the sound editor at its own route", async () => {
@@ -163,7 +214,9 @@ describe("tynt creator shell", () => {
 
     await renderApp(library);
 
-    expect(await screen.findByLabelText("Current cartridge file")).toHaveTextContent("local-game.tynt");
+    expect(await screen.findByLabelText("Current cartridge file")).toHaveTextContent(
+      "local-game.tynt",
+    );
     expect(document.querySelector(".cm-content")).toHaveTextContent("localMarker");
   });
 
@@ -185,7 +238,9 @@ describe("tynt creator shell", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
-    await waitFor(async () => expect((await library.list()).map((record) => record.id)).toEqual(["saved-one"]));
+    await waitFor(async () =>
+      expect((await library.list()).map((record) => record.id)).toEqual(["saved-one"]),
+    );
     expect(screen.getByText("saved to library")).toBeVisible();
   });
 
@@ -195,7 +250,10 @@ describe("tynt creator shell", () => {
     fireEvent.click(screen.getByRole("button", { name: "Run" }));
 
     await waitFor(() => expect(document.querySelector("#preview")).toHaveFocus());
-    expect(screen.getByRole("button", { name: "Show game" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Show game" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   test("offers an accessible mobile workspace switch", async () => {
@@ -218,7 +276,10 @@ describe("tynt creator shell", () => {
     fireEvent.click(screen.getByRole("button", { name: "Run" }));
 
     await waitFor(() => expect(runtime.run).toHaveBeenCalled());
-    expect(screen.getByRole("button", { name: "Show code" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Show code" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   test("loads an editable copy from the examples dropdown", async () => {
@@ -246,18 +307,26 @@ describe("tynt creator shell", () => {
     expect(enabledButton).not.toHaveAttribute("data-cuelume-toggle");
     fireEvent.click(enabledButton);
 
-    expect(screen.getByRole("button", { name: "Sound off" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Sound off" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
     expect(window.localStorage.getItem("tynt:sound-enabled")).toBe("false");
     expect(sound.setEnabled).toHaveBeenLastCalledWith(false);
     expect(sound.play).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Sound off" }));
 
-    expect(screen.getByRole("button", { name: "Sound on" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Sound on" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     expect(window.localStorage.getItem("tynt:sound-enabled")).toBe("true");
     expect(sound.setEnabled).toHaveBeenCalledWith(true);
     expect(sound.play).toHaveBeenCalledWith("toggle");
-    expect(sound.setEnabled.mock.invocationCallOrder.at(-2)).toBeLessThan(sound.play.mock.invocationCallOrder[0]);
+    expect(sound.setEnabled.mock.invocationCallOrder.at(-2)).toBeLessThan(
+      sound.play.mock.invocationCallOrder[0],
+    );
   });
 
   test("plays the error cue when a new user-triggered error is shown", async () => {

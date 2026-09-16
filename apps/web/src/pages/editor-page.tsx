@@ -17,7 +17,11 @@ import { useRuntime } from "@/hooks/use-runtime";
 import type { CartridgeLibrary } from "@/library/cartridge-library";
 import { captureThumbnail } from "@/library/thumbnail";
 import { downloadCanvasPng } from "@/lib/canvas-download";
-import { copyPublicDraft, findPublicCartridge, listPublicCartridges } from "@/cartridges/public-cartridges";
+import {
+  copyPublicDraft,
+  findPublicCartridge,
+  listPublicCartridges,
+} from "@/cartridges/public-cartridges";
 
 function copyDraft(value: Draft): Draft {
   return {
@@ -61,17 +65,24 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
   const runtime = useRuntime(soundEnabled);
   const reportRuntimeError = runtime.reportError;
   const runtimeCanvasRef = runtime.canvasRef;
-  const canvasRef = useCallback((canvas: HTMLCanvasElement | null) => {
-    canvasElementRef.current = canvas;
-    runtimeCanvasRef(canvas);
-  }, [runtimeCanvasRef]);
+  const canvasRef = useCallback(
+    (canvas: HTMLCanvasElement | null) => {
+      canvasElementRef.current = canvas;
+      runtimeCanvasRef(canvas);
+    },
+    [runtimeCanvasRef],
+  );
 
-  const autosaver = useMemo(() => createAutosaver(
-    window.localStorage,
-    250,
-    () => setDraftStatus("save failed"),
-    () => setDraftStatus((current) => current === "saved to library" ? current : "saved"),
-  ), []);
+  const autosaver = useMemo(
+    () =>
+      createAutosaver(
+        window.localStorage,
+        250,
+        () => setDraftStatus("save failed"),
+        () => setDraftStatus((current) => (current === "saved to library" ? current : "saved")),
+      ),
+    [],
+  );
 
   useEffect(() => {
     const serialized = JSON.stringify(draft);
@@ -93,28 +104,33 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
   useEffect(() => {
     if (!selectedLocalId) return;
     let active = true;
-    void library.get(selectedLocalId).then((record) => {
-      if (!active) return;
-      if (!record) throw new Error("Saved cartridge not found");
-      const nextDraft: Draft = {
-        title: record.title,
-        source: record.source,
-        ...(record.author ? { author: record.author } : {}),
-        ...(record.description ? { description: record.description } : {}),
-        ...(record.controls ? { controls: record.controls } : {}),
-      };
-      draftRef.current = nextDraft;
-      setDraft(nextDraft);
-      setLibraryId(record.id);
-      setDraftStatus("saved to library");
-      const next = new URLSearchParams(searchParams);
-      next.delete("local");
-      setSearchParams(next, { replace: true });
-    }).catch((error) => {
-      if (!active) return;
-      reportRuntimeError(error);
-    });
-    return () => { active = false; };
+    void library
+      .get(selectedLocalId)
+      .then((record) => {
+        if (!active) return;
+        if (!record) throw new Error("Saved cartridge not found");
+        const nextDraft: Draft = {
+          title: record.title,
+          source: record.source,
+          ...(record.author ? { author: record.author } : {}),
+          ...(record.description ? { description: record.description } : {}),
+          ...(record.controls ? { controls: record.controls } : {}),
+        };
+        draftRef.current = nextDraft;
+        setDraft(nextDraft);
+        setLibraryId(record.id);
+        setDraftStatus("saved to library");
+        const next = new URLSearchParams(searchParams);
+        next.delete("local");
+        setSearchParams(next, { replace: true });
+      })
+      .catch((error) => {
+        if (!active) return;
+        reportRuntimeError(error);
+      });
+    return () => {
+      active = false;
+    };
   }, [library, reportRuntimeError, searchParams, selectedLocalId, setSearchParams]);
 
   useEffect(() => {
@@ -159,7 +175,9 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
   const exportCartridge = () => {
     try {
       const current = draftRef.current;
-      const blob = new Blob([serializeCartridge(current)], { type: "application/json;charset=utf-8" });
+      const blob = new Blob([serializeCartridge(current)], {
+        type: "application/json;charset=utf-8",
+      });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
@@ -221,7 +239,9 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
   const downloadScreenshot = () => {
     const canvas = canvasElementRef.current;
     if (!canvas) return;
-    void downloadCanvasPng(canvas, safeFilename(draftRef.current.title)).then(() => play("success")).catch(reportRuntimeError);
+    void downloadCanvasPng(canvas, safeFilename(draftRef.current.title))
+      .then(() => play("success"))
+      .catch(reportRuntimeError);
   };
 
   useAppShortcuts({
@@ -247,16 +267,26 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
         fileInputRef={fileInputRef}
         onExampleChange={loadExample}
         onRun={runOrStop}
-        onSave={() => { void saveToLibrary(); }}
-        onPlay={() => { void openPlayMode(); }}
+        onSave={() => {
+          void saveToLibrary();
+        }}
+        onPlay={() => {
+          void openPlayMode();
+        }}
         onDetails={() => setDetailsOpen(true)}
         onImport={openImport}
         onExport={exportCartridge}
         onFileChange={importCartridge}
       />
       <MobilePaneSwitch value={mobilePane} onChange={setMobilePane} />
-      <main className="workspace grid min-h-0 grid-cols-[minmax(0,13fr)_minmax(340px,7fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[minmax(360px,55vh)_auto] max-[560px]:h-full max-[560px]:grid-rows-[minmax(0,1fr)]" data-mobile-pane={mobilePane}>
-        <Editor source={draft.source} onChange={(source) => setDraft((current) => ({ ...current, source }))} />
+      <main
+        className="workspace grid min-h-0 grid-cols-[minmax(0,13fr)_minmax(340px,7fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[minmax(360px,55vh)_auto] max-[560px]:h-full max-[560px]:grid-rows-[minmax(0,1fr)]"
+        data-mobile-pane={mobilePane}
+      >
+        <Editor
+          source={draft.source}
+          onChange={(source) => setDraft((current) => ({ ...current, source }))}
+        />
         <Preview
           interactionRef={previewRef}
           canvasRef={canvasRef}
@@ -265,16 +295,18 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
           onInput={runtime.setInput}
           onBlur={runtime.resetInput}
           showError={runtime.showPreviewError}
-          debuggerPanel={<RuntimeDebugger
-            active={runtime.isRunning}
-            paused={runtime.isPaused}
-            store={runtime.debugStore}
-            onPause={runtime.pause}
-            onResume={runtime.resume}
-            onStep={runtime.step}
-            onRestart={rerun}
-            onScreenshot={downloadScreenshot}
-          />}
+          debuggerPanel={
+            <RuntimeDebugger
+              active={runtime.isRunning}
+              paused={runtime.isPaused}
+              store={runtime.debugStore}
+              onPause={runtime.pause}
+              onResume={runtime.resume}
+              onStep={runtime.step}
+              onRestart={rerun}
+              onScreenshot={downloadScreenshot}
+            />
+          }
         />
       </main>
       <ErrorConsole error={runtime.error} className="row-start-4 max-[560px]:row-start-5" />

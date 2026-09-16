@@ -7,7 +7,11 @@ import { expect, test, vi } from "vitest";
 import { SpritePage } from "@/pages/sprite-page";
 
 test("paints multiple pixels with one touch stroke", () => {
-  render(<MemoryRouter><SpritePage soundEnabled onSoundToggle={() => {}} /></MemoryRouter>);
+  render(
+    <MemoryRouter>
+      <SpritePage soundEnabled onSoundToggle={() => {}} />
+    </MemoryRouter>,
+  );
 
   const first = screen.getByRole("button", { name: "Pixel 1, 1 color 0" });
   const second = screen.getByRole("button", { name: "Pixel 2, 1 color 0" });
@@ -22,7 +26,11 @@ test("paints, clears, and copies an eight by eight indexed sprite", async () => 
   const writeText = vi.fn().mockResolvedValue(undefined);
   const user = userEvent.setup();
   Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
-  render(<MemoryRouter><SpritePage soundEnabled onSoundToggle={() => {}} /></MemoryRouter>);
+  render(
+    <MemoryRouter>
+      <SpritePage soundEnabled onSoundToggle={() => {}} />
+    </MemoryRouter>,
+  );
 
   expect(screen.getByRole("heading", { name: "Sprite editor" })).toBeVisible();
   expect(screen.getAllByRole("button", { name: /^Pixel/ })).toHaveLength(64);

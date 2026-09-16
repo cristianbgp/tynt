@@ -7,10 +7,20 @@ import { beforeEach, expect, test, vi } from "vitest";
 import { createCartridgeLibrary, createMemoryAdapter } from "@/library/cartridge-library";
 
 const runtime = vi.hoisted(() => ({
-  canvasRef: () => {}, status: "ready", error: "", showPreviewError: false,
-  isRunning: true, isCompiling: false, run: vi.fn(), stop: vi.fn(),
-  setKey: vi.fn(() => false), setInput: vi.fn(), resetInput: vi.fn(),
-  clearError: vi.fn(), reportError: vi.fn(), announce: vi.fn(),
+  canvasRef: () => {},
+  status: "ready",
+  error: "",
+  showPreviewError: false,
+  isRunning: true,
+  isCompiling: false,
+  run: vi.fn(),
+  stop: vi.fn(),
+  setKey: vi.fn(() => false),
+  setInput: vi.fn(),
+  resetInput: vi.fn(),
+  clearError: vi.fn(),
+  reportError: vi.fn(),
+  announce: vi.fn(),
 }));
 const sound = vi.hoisted(() => ({ play: vi.fn() }));
 
@@ -31,7 +41,10 @@ function renderPage(library: ReturnType<typeof makeLibrary>, id = "play-one") {
   return render(
     <MemoryRouter initialEntries={[`/play/local/${id}`]}>
       <Routes>
-        <Route path="play/local/:id" element={<LocalPlayPage library={library} soundEnabled onSoundToggle={() => {}} />} />
+        <Route
+          path="play/local/:id"
+          element={<LocalPlayPage library={library} soundEnabled onSoundToggle={() => {}} />}
+        />
       </Routes>
     </MemoryRouter>,
   );
@@ -66,7 +79,10 @@ test("loads a repository cartridge at its public route", async () => {
   render(
     <MemoryRouter initialEntries={["/play/public/snake"]}>
       <Routes>
-        <Route path="play/public/:slug" element={<PublicPlayPage soundEnabled onSoundToggle={() => {}} />} />
+        <Route
+          path="play/public/:slug"
+          element={<PublicPlayPage soundEnabled onSoundToggle={() => {}} />}
+        />
       </Routes>
     </MemoryRouter>,
   );
@@ -117,7 +133,9 @@ test("reports unavailable fullscreen without breaking play mode", async () => {
 
   await userEvent.click(screen.getByRole("button", { name: "Enter fullscreen" }));
 
-  expect(screen.getByRole("alert")).toHaveTextContent("Fullscreen is not available in this browser");
+  expect(screen.getByRole("alert")).toHaveTextContent(
+    "Fullscreen is not available in this browser",
+  );
   expect(screen.getByRole("link", { name: "Library" })).toBeVisible();
   expect(sound.play).toHaveBeenCalledWith("error");
 });

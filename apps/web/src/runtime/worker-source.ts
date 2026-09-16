@@ -87,12 +87,33 @@ __listen("message", (event) => {
 //# sourceURL=cartridge-worker.js`;
   const suffixId = token.slice(0, 24);
   const privateNames = [
-    "__token", "__post", "__listen", "__stringify", "__encoder", "__blocked", "__name", "__commands", "__audioEvents", "__input", "__phase",
-    "__finite", "__color", "__append", "__x", "__y", "__numbers", "__audio", "__location", "__error", "__call", "__cameraX", "__cameraY", "__frame", "__seed",
+    "__token",
+    "__post",
+    "__listen",
+    "__stringify",
+    "__encoder",
+    "__blocked",
+    "__name",
+    "__commands",
+    "__audioEvents",
+    "__input",
+    "__phase",
+    "__finite",
+    "__color",
+    "__append",
+    "__x",
+    "__y",
+    "__numbers",
+    "__audio",
+    "__location",
+    "__error",
+    "__call",
+    "__cameraX",
+    "__cameraY",
+    "__frame",
+    "__seed",
   ];
-  const harden = (trusted: string) => privateNames.reduce(
-    (value, name) => value.replaceAll(name, `${name}_${suffixId}`),
-    trusted,
-  );
+  const harden = (trusted: string) =>
+    privateNames.reduce((value, name) => value.replaceAll(name, `${name}_${suffixId}`), trusted);
   return `${harden(prefix)}${compiledCode}${harden(suffix)}`;
 }

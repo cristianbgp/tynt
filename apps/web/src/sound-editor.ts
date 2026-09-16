@@ -26,7 +26,12 @@ function numberLiteral(value: number): string {
   return Number(value.toFixed(2)).toString();
 }
 
-export function soundCode(notes: readonly number[], step: number, volume: number, wave: AudioWave): string {
+export function soundCode(
+  notes: readonly number[],
+  step: number,
+  volume: number,
+  wave: AudioWave,
+): string {
   const values = notes.map(numberLiteral).join(", ");
   return `const sound = [${values}] as const;\n\n// play with:\nsfx(sound, ${step}, ${numberLiteral(volume)}, "${wave}");`;
 }

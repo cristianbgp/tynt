@@ -20,7 +20,9 @@ test("edits validated cartridge metadata and displays the fixed format version",
     />,
   );
 
-  expect(screen.getByText("tynt cartridge · format v1 · all fields required to export")).toBeVisible();
+  expect(
+    screen.getByText("tynt cartridge · format v1 · all fields required to export"),
+  ).toBeVisible();
   await user.clear(screen.getByRole("textbox", { name: "Title" }));
   await user.type(screen.getByRole("textbox", { name: "Title" }), "orbit");
   await user.type(screen.getByRole("textbox", { name: "Author" }), "cristianbgp");

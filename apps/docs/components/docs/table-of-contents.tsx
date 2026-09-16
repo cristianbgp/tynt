@@ -26,7 +26,9 @@ export function TableOfContents({ items }: { items: TOCItemType[] }) {
 
   return (
     <nav aria-label="On this page">
-      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">On this page</p>
+      <p className="mb-3 text-[10px] font-semibold tracking-[0.14em] text-muted uppercase">
+        On this page
+      </p>
       {items.length ? (
         <ul className="m-0 list-none space-y-1 p-0">
           {items.map((item) => (

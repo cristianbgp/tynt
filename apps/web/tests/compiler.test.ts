@@ -23,7 +23,9 @@ describe("cartridge compiler", () => {
   });
 
   test("reports TypeScript syntax failures", async () => {
-    await expect(compileCartridge(`${VALID}\nexport function broken(: void {}`)).rejects.toThrow(/cartridge\.ts|expected/i);
+    await expect(compileCartridge(`${VALID}\nexport function broken(: void {}`)).rejects.toThrow(
+      /cartridge\.ts|expected/i,
+    );
   });
 
   test.each([

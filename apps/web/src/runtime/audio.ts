@@ -11,7 +11,7 @@ export class CartridgeAudioEngine {
 
   async play(command: CartridgeAudio): Promise<void> {
     if (!this.enabled) return;
-    const context = this.context ??= this.createContext();
+    const context = (this.context ??= this.createContext());
     if (context.state === "suspended") await context.resume();
     const start = context.currentTime + command.delay / 1_000;
     const end = start + command.duration / 1_000;
@@ -24,11 +24,15 @@ export class CartridgeAudioEngine {
     oscillator.connect(gain);
     gain.connect(context.destination);
     this.active.add(oscillator);
-    oscillator.addEventListener("ended", () => {
-      this.active.delete(oscillator);
-      oscillator.disconnect();
-      gain.disconnect();
-    }, { once: true });
+    oscillator.addEventListener(
+      "ended",
+      () => {
+        this.active.delete(oscillator);
+        oscillator.disconnect();
+        gain.disconnect();
+      },
+      { once: true },
+    );
     oscillator.start(start);
     oscillator.stop(end);
   }
@@ -40,7 +44,9 @@ export class CartridgeAudioEngine {
 
   stop(): void {
     for (const oscillator of this.active) {
-      try { oscillator.stop(); } catch {}
+      try {
+        oscillator.stop();
+      } catch {}
       oscillator.disconnect();
     }
     this.active.clear();

@@ -23,7 +23,10 @@ export async function importSource(page: Page, source: string, title?: string): 
 }
 
 export async function pixel(page: Page, x: number, y: number): Promise<number[]> {
-  return page.locator("canvas").evaluate((canvas: HTMLCanvasElement, point) => {
-    return [...canvas.getContext("2d")!.getImageData(point.x, point.y, 1, 1).data];
-  }, { x, y });
+  return page.locator("canvas").evaluate(
+    (canvas: HTMLCanvasElement, point) => {
+      return [...canvas.getContext("2d")!.getImageData(point.x, point.y, 1, 1).data];
+    },
+    { x, y },
+  );
 }

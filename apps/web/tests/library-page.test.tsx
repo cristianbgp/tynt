@@ -39,11 +39,16 @@ describe("local library page", () => {
 
     expect(await screen.findByRole("heading", { name: "Your library is empty" })).toBeVisible();
     expect(screen.getByRole("link", { name: "Create a cartridge" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "Browse examples" })).toHaveAttribute("href", "/gallery");
+    expect(screen.getByRole("link", { name: "Browse examples" })).toHaveAttribute(
+      "href",
+      "/gallery",
+    );
   });
 
   test("shows storage failures without replacing the library shell", async () => {
-    const failure = async () => { throw new Error("Local storage is unavailable"); };
+    const failure = async () => {
+      throw new Error("Local storage is unavailable");
+    };
     const library: CartridgeLibrary = {
       list: failure,
       get: failure,
@@ -55,13 +60,31 @@ describe("local library page", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Local storage is unavailable");
     expect(screen.getByRole("heading", { name: "Your library" })).toBeVisible();
-    expect(screen.queryByRole("heading", { name: "Your library is empty" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Your library is empty" }),
+    ).not.toBeInTheDocument();
   });
 
   test("lists recent cartridges and searches all descriptive metadata", async () => {
     const library = makeLibrary();
-    await library.save({ draft: { title: "snake", source, author: "ana", description: "grid game", controls: "Arrows steer" } });
-    await library.save({ draft: { title: "orbit", source, author: "cris", description: "space game", controls: "A fires" } });
+    await library.save({
+      draft: {
+        title: "snake",
+        source,
+        author: "ana",
+        description: "grid game",
+        controls: "Arrows steer",
+      },
+    });
+    await library.save({
+      draft: {
+        title: "orbit",
+        source,
+        author: "cris",
+        description: "space game",
+        controls: "A fires",
+      },
+    });
     renderPage(library);
 
     expect((await screen.findAllByRole("article")).map((card) => card.textContent)).toEqual([

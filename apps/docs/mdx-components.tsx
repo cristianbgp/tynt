@@ -12,7 +12,12 @@ function Anchor({ href = "", ...props }: AnchorHTMLAttributes<HTMLAnchorElement>
   return (
     <a href={href} target="_blank" rel="noreferrer" {...props}>
       {props.children}
-      <ExternalLink className="ml-1 inline-block" width={14} height={14} aria-label="external link" />
+      <ExternalLink
+        className="ml-1 inline-block"
+        width={14}
+        height={14}
+        aria-label="external link"
+      />
     </a>
   );
 }

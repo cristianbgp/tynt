@@ -11,7 +11,9 @@ async function runWorker(source: string) {
   let listener: ((event: { data: unknown }) => void) | undefined;
   const self: Record<string, unknown> = {
     postMessage: (message: unknown) => messages.push(message),
-    addEventListener: (_type: string, next: (event: { data: unknown }) => void) => { listener = next; },
+    addEventListener: (_type: string, next: (event: { data: unknown }) => void) => {
+      listener = next;
+    },
     fetch: () => "network",
     localStorage: {},
     indexedDB: {},
@@ -28,7 +30,9 @@ async function runWorker(source: string) {
 describe("worker bootstrap", () => {
   test("provides every catalogued cartridge global", () => {
     const source = createWorkerSource("", token);
-    for (const name of CARTRIDGE_API_NAMES.filter((value) => !["init", "update", "draw"].includes(value))) {
+    for (const name of CARTRIDGE_API_NAMES.filter(
+      (value) => !["init", "update", "draw"].includes(value),
+    )) {
       expect(source).toMatch(new RegExp(`(?:const|function) ${name}\\b`));
     }
   });
@@ -41,12 +45,25 @@ describe("worker bootstrap", () => {
     `);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
     worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
-    expect(worker.messages.map((value: any) => `${value.kind}:${value.phase ?? ""}:${value.state ?? ""}`)).toEqual([
-      "phase:init:begin", "phase:init:complete", "heartbeat::", "ready::",
-      "phase:update:begin", "phase:update:complete", "phase:draw:begin", "phase:draw:complete", "frame::", "heartbeat::",
+    expect(
+      worker.messages.map(
+        (value: any) => `${value.kind}:${value.phase ?? ""}:${value.state ?? ""}`,
+      ),
+    ).toEqual([
+      "phase:init:begin",
+      "phase:init:complete",
+      "heartbeat::",
+      "ready::",
+      "phase:update:begin",
+      "phase:update:complete",
+      "phase:draw:begin",
+      "phase:draw:complete",
+      "frame::",
+      "heartbeat::",
     ]);
     expect((worker.messages.find((value: any) => value.kind === "frame") as any).commands).toEqual([
-      { op: "clear", color: 0 }, { op: "pixel", x: 2, y: 1, color: 3 },
+      { op: "clear", color: 0 },
+      { op: "pixel", x: 2, y: 1, color: 3 },
     ]);
   });
 
@@ -60,14 +77,9 @@ describe("worker bootstrap", () => {
     expect(frame.commands).toContainEqual({
       op: "sprite",
       pixels: [
-        0,0,0,0,0,0,0,0,
-        0,3,3,2,2,1,1,0,
-        0,3,3,2,2,1,1,0,
-        0,0,0,3,3,0,0,0,
-        0,0,0,3,3,0,0,0,
-        0,0,0,2,2,0,0,0,
-        0,0,0,2,2,0,0,0,
-        0,0,0,0,0,0,0,0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 2, 2, 1, 1, 0, 0, 3, 3, 2, 2, 1, 1, 0, 0, 0, 0, 3, 3, 0, 0,
+        0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0,
       ],
       width: 8,
       height: 8,
@@ -85,11 +97,13 @@ describe("worker bootstrap", () => {
     worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
     const frame = worker.messages.findLast((value: any) => value.kind === "frame") as any;
 
-    expect(frame.commands).toEqual(expect.arrayContaining([
-      { op: "text", value: "COIN DASH", x: 6, y: 6, color: 3 },
-      { op: "text", value: "COINS 0/5", x: 6, y: 18, color: 2 },
-      { op: "text", value: "TIME 30", x: 116, y: 6, color: 2 },
-    ]));
+    expect(frame.commands).toEqual(
+      expect.arrayContaining([
+        { op: "text", value: "COIN DASH", x: 6, y: 6, color: 3 },
+        { op: "text", value: "COINS 0/5", x: 6, y: 18, color: 2 },
+        { op: "text", value: "TIME 30", x: 116, y: 6, color: 2 },
+      ]),
+    );
   });
 
   test("uses one held and pressed snapshot throughout an update", async () => {
@@ -101,7 +115,9 @@ describe("worker bootstrap", () => {
     `);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
     worker.tick({ kind: "tick", token, input: { held: ["a"], pressed: ["a"] } });
-    expect((worker.messages.findLast((value: any) => value.kind === "frame") as any).commands[0].x).toBe(7);
+    expect(
+      (worker.messages.findLast((value: any) => value.kind === "frame") as any).commands[0].x,
+    ).toBe(7);
   });
 
   test("masks network, storage, messaging, and worker construction globals", async () => {
@@ -113,7 +129,9 @@ describe("worker bootstrap", () => {
     `);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
     worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
-    expect((worker.messages.findLast((value: any) => value.kind === "frame") as any).commands[0].color).toBe(3);
+    expect(
+      (worker.messages.findLast((value: any) => value.kind === "frame") as any).commands[0].color,
+    ).toBe(3);
     expect(worker.globals.fetch).toBeUndefined();
     expect(worker.globals.Worker).toBeUndefined();
   });
@@ -144,14 +162,41 @@ describe("worker bootstrap", () => {
     const frame = worker.messages.findLast((value: any) => value.kind === "frame") as any;
     expect(frame.commands).toEqual([
       { op: "pixel", x: 8, y: 7, color: 3 },
-      { op: "sprite", pixels: [1,0,2,3], width: 2, height: 2, x: 10, y: 10, transparent: 0 },
-      { op: "map", tiles: [0], columns: 1, tileWidth: 2, tileHeight: 2, spritesheet: [1,2,3,0], sheetColumns: 1, x: 12, y: 12, transparent: 0 },
+      { op: "sprite", pixels: [1, 0, 2, 3], width: 2, height: 2, x: 10, y: 10, transparent: 0 },
+      {
+        op: "map",
+        tiles: [0],
+        columns: 1,
+        tileWidth: 2,
+        tileHeight: 2,
+        spritesheet: [1, 2, 3, 0],
+        sheetColumns: 1,
+        x: 12,
+        y: 12,
+        transparent: 0,
+      },
       { op: "pixel", x: 3.3645552527159452, y: 0, color: 2 },
     ]);
     expect(worker.messages.filter((value: any) => value.kind === "audio")).toEqual([
       { kind: "audio", token, frequency: 440, duration: 80, volume: 0.2, wave: "square", delay: 0 },
-      { kind: "audio", token, frequency: 220, duration: 40, volume: 0.15, wave: "square", delay: 0 },
-      { kind: "audio", token, frequency: 330, duration: 40, volume: 0.15, wave: "square", delay: 50 },
+      {
+        kind: "audio",
+        token,
+        frequency: 220,
+        duration: 40,
+        volume: 0.15,
+        wave: "square",
+        delay: 0,
+      },
+      {
+        kind: "audio",
+        token,
+        frequency: 330,
+        duration: 40,
+        volume: 0.15,
+        wave: "square",
+        delay: 50,
+      },
     ]);
   });
 
@@ -164,8 +209,24 @@ describe("worker bootstrap", () => {
     const worker = await runWorker(createWorkerSource(compiled.code, token));
 
     expect(worker.messages.filter((value: any) => value.kind === "audio")).toEqual([
-      { kind: "audio", token, frequency: 220, duration: 40, volume: 0.15, wave: "square", delay: 0 },
-      { kind: "audio", token, frequency: 330, duration: 40, volume: 0.15, wave: "square", delay: 100 },
+      {
+        kind: "audio",
+        token,
+        frequency: 220,
+        duration: 40,
+        volume: 0.15,
+        wave: "square",
+        delay: 0,
+      },
+      {
+        kind: "audio",
+        token,
+        frequency: 330,
+        duration: 40,
+        volume: 0.15,
+        wave: "square",
+        delay: 100,
+      },
     ]);
   });
 

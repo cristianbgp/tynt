@@ -5,8 +5,12 @@ test("replays indexed commands into exact RGBA bytes and persists the framebuffe
   let output = new Uint8ClampedArray();
   const context = {
     imageSmoothingEnabled: true,
-    createImageData: (width: number, height: number) => ({ data: new Uint8ClampedArray(width * height * 4) }),
-    putImageData: (image: { data: Uint8ClampedArray }) => { output = image.data.slice(); },
+    createImageData: (width: number, height: number) => ({
+      data: new Uint8ClampedArray(width * height * 4),
+    }),
+    putImageData: (image: { data: Uint8ClampedArray }) => {
+      output = image.data.slice();
+    },
   };
   const renderer = new CanvasRenderer(context, 2, 2);
   renderer.replay([
@@ -15,9 +19,8 @@ test("replays indexed commands into exact RGBA bytes and persists the framebuffe
   ]);
   expect(context.imageSmoothingEnabled).toBe(false);
   expect([...output]).toEqual([
-    85,85,85,255, 255,255,255,255,
-    85,85,85,255, 85,85,85,255,
+    85, 85, 85, 255, 255, 255, 255, 255, 85, 85, 85, 255, 85, 85, 85, 255,
   ]);
   renderer.replay([{ op: "pixel", x: 0, y: 1, color: 2 }]);
-  expect([...output].slice(8, 16)).toEqual([170,170,170,255, 85,85,85,255]);
+  expect([...output].slice(8, 16)).toEqual([170, 170, 170, 255, 85, 85, 85, 255]);
 });

@@ -44,12 +44,28 @@ test("shows the compact controls and two-pane workspace", async ({ page }) => {
 test("uses intentional hover feedback for editor interactions", async ({ page }) => {
   await page.goto("/");
 
-  await expectHoverColors(page.getByRole("link", { name: "tynt editor" }), "rgb(0, 0, 0)", "rgb(255, 255, 255)");
-  await expectHoverColors(page.getByRole("button", { name: "Run" }), "rgb(0, 0, 0)", "rgb(255, 255, 255)");
-  await expectHoverColors(page.getByRole("button", { name: "Direction right" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+  await expectHoverColors(
+    page.getByRole("link", { name: "tynt editor" }),
+    "rgb(0, 0, 0)",
+    "rgb(255, 255, 255)",
+  );
+  await expectHoverColors(
+    page.getByRole("button", { name: "Run" }),
+    "rgb(0, 0, 0)",
+    "rgb(255, 255, 255)",
+  );
+  await expectHoverColors(
+    page.getByRole("button", { name: "Direction right" }),
+    "rgb(85, 85, 85)",
+    "rgb(255, 255, 255)",
+  );
 
   await page.getByRole("button", { name: "Run" }).click();
-  await expectHoverColors(page.getByRole("button", { name: "Stop" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+  await expectHoverColors(
+    page.getByRole("button", { name: "Stop" }),
+    "rgb(85, 85, 85)",
+    "rgb(255, 255, 255)",
+  );
   await page.getByRole("button", { name: "Stop" }).click();
 
   const disabledRun = page.getByRole("button", { name: "Run" });
@@ -77,10 +93,18 @@ test("gives sprite and recovery controls a distinct hover state", async ({ page 
   await expect(lightColor).toHaveCSS("outline-style", "solid");
 
   await page.goto("/missing");
-  await expectHoverColors(page.getByRole("link", { name: "Open editor" }), "rgb(0, 0, 0)", "rgb(255, 255, 255)");
+  await expectHoverColors(
+    page.getByRole("link", { name: "Open editor" }),
+    "rgb(0, 0, 0)",
+    "rgb(255, 255, 255)",
+  );
 
   await page.goto("/gallery");
-  await expectHoverColors(page.getByRole("link", { name: "Gallery" }), "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+  await expectHoverColors(
+    page.getByRole("link", { name: "Gallery" }),
+    "rgb(85, 85, 85)",
+    "rgb(255, 255, 255)",
+  );
   const puzzle = page.getByRole("button", { name: "puzzle" });
   await puzzle.click();
   await expectHoverColors(puzzle, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
@@ -93,9 +117,15 @@ test("paints sprite pixels and sound notes while dragging", async ({ page }) => 
   const firstPixelBox = await firstPixel.boundingBox();
   const secondPixelBox = await secondPixel.boundingBox();
   if (!firstPixelBox || !secondPixelBox) throw new Error("Sprite pixels are not visible");
-  await page.mouse.move(firstPixelBox.x + firstPixelBox.width / 2, firstPixelBox.y + firstPixelBox.height / 2);
+  await page.mouse.move(
+    firstPixelBox.x + firstPixelBox.width / 2,
+    firstPixelBox.y + firstPixelBox.height / 2,
+  );
   await page.mouse.down();
-  await page.mouse.move(secondPixelBox.x + secondPixelBox.width / 2, secondPixelBox.y + secondPixelBox.height / 2);
+  await page.mouse.move(
+    secondPixelBox.x + secondPixelBox.width / 2,
+    secondPixelBox.y + secondPixelBox.height / 2,
+  );
   await page.mouse.up();
   await expect(page.getByRole("button", { name: "Pixel 1, 1 color 3" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Pixel 2, 1 color 3" })).toBeVisible();
@@ -108,15 +138,23 @@ test("paints sprite pixels and sound notes while dragging", async ({ page }) => 
   const firstNoteBox = await firstNote.boundingBox();
   const secondNoteBox = await secondNote.boundingBox();
   if (!firstNoteBox || !secondNoteBox) throw new Error("Sound notes are not visible");
-  await page.mouse.move(firstNoteBox.x + firstNoteBox.width / 2, firstNoteBox.y + firstNoteBox.height / 2);
+  await page.mouse.move(
+    firstNoteBox.x + firstNoteBox.width / 2,
+    firstNoteBox.y + firstNoteBox.height / 2,
+  );
   await page.mouse.down();
-  await page.mouse.move(secondNoteBox.x + secondNoteBox.width / 2, secondNoteBox.y + secondNoteBox.height / 2);
+  await page.mouse.move(
+    secondNoteBox.x + secondNoteBox.width / 2,
+    secondNoteBox.y + secondNoteBox.height / 2,
+  );
   await page.mouse.up();
   await expect(firstNote).toHaveAttribute("aria-pressed", "true");
   await expect(secondNote).toHaveAttribute("aria-pressed", "true");
 });
 
-test("uses strong hover feedback for every docs control in explicit light and dark themes", async ({ page }) => {
+test("uses strong hover feedback for every docs control in explicit light and dark themes", async ({
+  page,
+}) => {
   for (const theme of [
     {
       name: "light",
@@ -135,16 +173,36 @@ test("uses strong hover feedback for every docs control in explicit light and da
   ] as const) {
     await page.emulateMedia({ colorScheme: theme.system });
     await page.goto("http://127.0.0.1:4174/documents/Getting_Started.html");
-    await page.getByRole("radio", { name: `${theme.name === "light" ? "Light" : "Dark"} theme` }).click();
+    await page
+      .getByRole("radio", { name: `${theme.name === "light" ? "Light" : "Dark"} theme` })
+      .click();
     await expect(page.locator("body")).toHaveCSS("background-color", theme.pageBackground);
 
     const documentation = page.getByRole("navigation", { name: "Documentation" });
-    await expectHoverColors(documentation.getByRole("link", { name: "Examples and recipes", exact: true }), theme.hoverBackground, theme.hoverColor);
-    await expectHoverColors(page.getByRole("button", { name: "Search documentation" }), theme.hoverBackground, theme.hoverColor);
-    await expectHoverColors(page.getByRole("button", { name: "Copy code" }).first(), theme.hoverBackground, theme.hoverColor);
-    await expectHoverColors(page.getByRole("link", { name: "Raw Markdown" }), theme.hoverBackground, theme.hoverColor);
+    await expectHoverColors(
+      documentation.getByRole("link", { name: "Examples and recipes", exact: true }),
+      theme.hoverBackground,
+      theme.hoverColor,
+    );
+    await expectHoverColors(
+      page.getByRole("button", { name: "Search documentation" }),
+      theme.hoverBackground,
+      theme.hoverColor,
+    );
+    await expectHoverColors(
+      page.getByRole("button", { name: "Copy code" }).first(),
+      theme.hoverBackground,
+      theme.hoverColor,
+    );
+    await expectHoverColors(
+      page.getByRole("link", { name: "Raw Markdown" }),
+      theme.hoverBackground,
+      theme.hoverColor,
+    );
 
-    const currentNavigation = page.getByRole("navigation", { name: "Documentation" }).getByRole("link", { name: "Getting started" });
+    const currentNavigation = page
+      .getByRole("navigation", { name: "Documentation" })
+      .getByRole("link", { name: "Getting started" });
     await expectHoverColors(currentNavigation, theme.hoverBackground, theme.hoverColor);
   }
 });
@@ -152,12 +210,18 @@ test("uses strong hover feedback for every docs control in explicit light and da
 test("responsive editor switches from code to a focused game", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "Show code" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Show code" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   await expect(page.locator(".editor-pane")).toBeVisible();
   await expect(page.locator(".workspace > .preview-pane")).toBeHidden();
 
   await page.getByRole("button", { name: "Run" }).click();
-  await expect(page.getByRole("button", { name: "Show game" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Show game" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   await expect(page.locator(".workspace > .preview-pane")).toBeVisible();
   await expect(page.locator("#preview")).toBeFocused();
   await expectNoHorizontalOverflow(page, 320);
@@ -223,7 +287,10 @@ test("mobile play keeps the global header above its contextual toolbar", async (
 });
 
 test("responsive play keeps the game and controls close together", async ({ page }) => {
-  for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }]) {
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+  ]) {
     await page.setViewportSize(viewport);
     await page.goto("/play/public/coin-dash");
     await expect(page.locator("#preview")).toBeFocused();
@@ -235,7 +302,11 @@ test("responsive play keeps the game and controls close together", async ({ page
       const toolbar = document.querySelector(".play-topbar")!.getBoundingClientRect();
       const canvas = document.querySelector("canvas")!.getBoundingClientRect();
       const controls = document.querySelector(".emulator-controls")!.getBoundingClientRect();
-      return { canvasWidth: canvas.width, headerGap: canvas.top - toolbar.bottom, controlsGap: controls.top - canvas.bottom };
+      return {
+        canvasWidth: canvas.width,
+        headerGap: canvas.top - toolbar.bottom,
+        controlsGap: controls.top - canvas.bottom,
+      };
     });
     expect(geometry.canvasWidth).toBe(320);
     expect(geometry.headerGap).toBeLessThan(110);
@@ -274,7 +345,8 @@ test("sound editor keeps its composer controls visible and contained", async ({ 
     const actions = play.parentElement!;
     const [square, sine, triangle] = panel.querySelectorAll<HTMLButtonElement>("button");
     const waveform = square.parentElement!;
-    const border = (element: HTMLElement, side: "Top" | "Right" | "Bottom" | "Left") => Number.parseFloat(getComputedStyle(element)[`border${side}Width`]);
+    const border = (element: HTMLElement, side: "Top" | "Right" | "Bottom" | "Left") =>
+      Number.parseFloat(getComputedStyle(element)[`border${side}Width`]);
     return {
       playBottom: Math.round(play.getBoundingClientRect().bottom),
       viewportHeight: window.innerHeight,
@@ -347,7 +419,11 @@ test("responsive content routes reflow without footer overlap", async ({ page })
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/gallery");
   await expectNoHorizontalOverflow(page, 320);
-  await expect.poll(() => page.locator(".library-search-wrap").evaluate((node) => node.getBoundingClientRect().width)).toBeGreaterThan(280);
+  await expect
+    .poll(() =>
+      page.locator(".library-search-wrap").evaluate((node) => node.getBoundingClientRect().width),
+    )
+    .toBeGreaterThan(280);
   await expect(page.locator(".gallery-tags")).toHaveCSS("overflow-x", "auto");
 
   await page.goto("/library");
@@ -356,12 +432,22 @@ test("responsive content routes reflow without footer overlap", async ({ page })
 
   await page.goto("/sprites");
   await expectNoHorizontalOverflow(page, 320);
-  await expect.poll(() => page.locator(".sprite-canvas button").first().evaluate((node) => node.getBoundingClientRect().width)).toBeGreaterThanOrEqual(35);
+  await expect
+    .poll(() =>
+      page
+        .locator(".sprite-canvas button")
+        .first()
+        .evaluate((node) => node.getBoundingClientRect().width),
+    )
+    .toBeGreaterThanOrEqual(35);
 });
 
 test("serves the browser icon metadata", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/apple-touch-icon.png");
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
+    "href",
+    "/apple-touch-icon.png",
+  );
 });
 
 test("content routes do not load editor or compiler resources", async ({ page }) => {
@@ -375,11 +461,16 @@ test("content routes do not load editor or compiler resources", async ({ page })
     await page.waitForLoadState("networkidle");
     page.off("response", onResponse);
 
-    expect(loaded.filter((url) =>
-      url.includes("/runtime/compiler") ||
-      url.includes("esbuild.wasm") ||
-      url.includes("/@codemirror/") ||
-      url.includes("/components/editor")), path).toEqual([]);
+    expect(
+      loaded.filter(
+        (url) =>
+          url.includes("/runtime/compiler") ||
+          url.includes("esbuild.wasm") ||
+          url.includes("/@codemirror/") ||
+          url.includes("/components/editor"),
+      ),
+      path,
+    ).toEqual([]);
   }
 });
 
@@ -390,13 +481,21 @@ test("opens a responsive cartridge detail page from the gallery", async ({ page 
 
   await expect(page).toHaveURL(/\/cartridges\/starter$/);
   await expect(page.getByRole("heading", { level: 1, name: "starter" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Play starter" })).toHaveAttribute("data-cuelume-hover", "tick");
-  await expect(page.getByRole("link", { name: "Remix starter" })).toHaveAttribute("href", "/?cartridge=starter");
+  await expect(page.getByRole("link", { name: "Play starter" })).toHaveAttribute(
+    "data-cuelume-hover",
+    "tick",
+  );
+  await expect(page.getByRole("link", { name: "Remix starter" })).toHaveAttribute(
+    "href",
+    "/?cartridge=starter",
+  );
   await expect(page.getByRole("heading", { name: "About this cartridge" })).toBeVisible();
   await expectNoHorizontalOverflow(page, 320);
 });
 
-test("pauses, steps, restarts, and captures a cartridge in the editor debugger", async ({ page }) => {
+test("pauses, steps, restarts, and captures a cartridge in the editor debugger", async ({
+  page,
+}) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#status")).toHaveText("running");
@@ -405,7 +504,9 @@ test("pauses, steps, restarts, and captures a cartridge in the editor debugger",
 
   await debuggerPanel.getByRole("button", { name: "Pause" }).click();
   await expect(page.locator("#status")).toHaveText("paused");
-  const pausedFrame = Number((await debuggerPanel.getByText(/frame \d+/).textContent())?.match(/\d+/)?.[0]);
+  const pausedFrame = Number(
+    (await debuggerPanel.getByText(/frame \d+/).textContent())?.match(/\d+/)?.[0],
+  );
   await page.locator("#preview").dispatchEvent("keydown", { code: "KeyZ", key: "z" });
   await expect(debuggerPanel.locator('[data-held="true"]')).toContainText("a");
   await debuggerPanel.getByRole("button", { name: "Step frame" }).click();
@@ -418,7 +519,11 @@ test("pauses, steps, restarts, and captures a cartridge in the editor debugger",
 
   await debuggerPanel.getByRole("button", { name: "Restart" }).click();
   await expect(page.locator("#status")).toHaveText("running");
-  await expect.poll(async () => Number((await debuggerPanel.getByText(/frame \d+/).textContent())?.match(/\d+/)?.[0])).toBeGreaterThan(0);
+  await expect
+    .poll(async () =>
+      Number((await debuggerPanel.getByText(/frame \d+/).textContent())?.match(/\d+/)?.[0]),
+    )
+    .toBeGreaterThan(0);
 });
 
 test("opens a bundled cartridge from the gallery as an editable copy", async ({ page }) => {
@@ -456,7 +561,9 @@ test("saves metadata to the local library and manages a persistent copy", async 
   await expect(page.getByRole("heading", { name: "local-demo-copy.tynt" })).toHaveCount(0);
 });
 
-test("plays a saved cartridge with focused pause, resume, and restart controls", async ({ page }) => {
+test("plays a saved cartridge with focused pause, resume, and restart controls", async ({
+  page,
+}) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Play" }).click();
   await expect(page).toHaveURL(/\/play\/local\/[^/]+$/);
@@ -470,13 +577,20 @@ test("plays a saved cartridge with focused pause, resume, and restart controls",
   await expect(page.getByRole("status")).toHaveText("running");
   await page.getByRole("button", { name: "Restart" }).click();
   await expect(page.locator("#preview")).toBeFocused();
-  await expect(page.getByRole("link", { name: "Editor", exact: true })).toHaveAttribute("href", /\?local=/);
+  await expect(page.getByRole("link", { name: "Editor", exact: true })).toHaveAttribute(
+    "href",
+    /\?local=/,
+  );
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(1280);
-  await expect.poll(() => page.evaluate(() => {
-    const controls = document.querySelector(".emulator-controls")!.getBoundingClientRect();
-    const footer = document.querySelector(".play-footer")!.getBoundingClientRect();
-    return controls.bottom <= footer.top;
-  })).toBe(true);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const controls = document.querySelector(".emulator-controls")!.getBoundingClientRect();
+        const footer = document.querySelector(".play-footer")!.getBoundingClientRect();
+        return controls.bottom <= footer.top;
+      }),
+    )
+    .toBe(true);
 
   await page.setViewportSize({ width: 320, height: 800 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
@@ -561,10 +675,12 @@ test("highlights TypeScript with the tynt monochrome token palette", async ({ pa
     const keyword = spans.find((span) => span.textContent === "export");
     const string = spans.find((span) => span.textContent === '"left"');
     return {
-      keyword: keyword ? {
-        color: getComputedStyle(keyword).color,
-        weight: getComputedStyle(keyword).fontWeight,
-      } : null,
+      keyword: keyword
+        ? {
+            color: getComputedStyle(keyword).color,
+            weight: getComputedStyle(keyword).fontWeight,
+          }
+        : null,
       string: string ? { color: getComputedStyle(string).color } : null,
     };
   });
@@ -577,7 +693,11 @@ test("highlights TypeScript with the tynt monochrome token palette", async ({ pa
 
 test("failed import leaves the current editor intact", async ({ page }) => {
   await page.goto("/");
-  await importSource(page, "export function init(){}\nexport function update(){}\nexport function draw(){ text(\"KEEP ME\",0,0,3); }", "keep me");
+  await importSource(
+    page,
+    'export function init(){}\nexport function update(){}\nexport function draw(){ text("KEEP ME",0,0,3); }',
+    "keep me",
+  );
   await page.locator("#file-input").setInputFiles({
     name: "broken.tynt",
     mimeType: "application/json",
@@ -596,30 +716,40 @@ test("compiles and runs the centered default cartridge, then stops", async ({ pa
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.getByRole("button", { name: "Stop" })).toBeVisible();
   await expect(page.locator("#status")).toHaveText("running");
-  await expect.poll(() => page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
-    const data = canvas.getContext("2d")!.getImageData(76, 61, 1, 1).data;
-    return [...data];
-  })).toEqual([255, 255, 255, 255]);
-  await expect.poll(() => page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
-    const { data, width, height } = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height);
-    let minX = width;
-    let maxX = -1;
-    let minY = height;
-    let maxY = -1;
+  await expect
+    .poll(() =>
+      page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
+        const data = canvas.getContext("2d")!.getImageData(76, 61, 1, 1).data;
+        return [...data];
+      }),
+    )
+    .toEqual([255, 255, 255, 255]);
+  await expect
+    .poll(() =>
+      page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
+        const { data, width, height } = canvas
+          .getContext("2d")!
+          .getImageData(0, 0, canvas.width, canvas.height);
+        let minX = width;
+        let maxX = -1;
+        let minY = height;
+        let maxY = -1;
 
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const offset = (y * width + x) * 4;
-        if (data[offset] === 0 && data[offset + 1] === 0 && data[offset + 2] === 0) continue;
-        minX = Math.min(minX, x);
-        maxX = Math.max(maxX, x);
-        minY = Math.min(minY, y);
-        maxY = Math.max(maxY, y);
-      }
-    }
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const offset = (y * width + x) * 4;
+            if (data[offset] === 0 && data[offset + 1] === 0 && data[offset + 2] === 0) continue;
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+          }
+        }
 
-    return { minX, maxX, minY, maxY };
-  })).toEqual({ minX: 8, maxX: 86, minY: 10, maxY: 81 });
+        return { minX, maxX, minY, maxY };
+      }),
+    )
+    .toEqual({ minX: 8, maxX: 86, minY: 10, maxY: 81 });
   await page.getByRole("button", { name: "Stop" }).click();
   await expect(page.getByRole("button", { name: "Run" })).toBeVisible();
   await expect(page.locator("#status")).toHaveText("stopped");
@@ -641,28 +771,32 @@ test("the default cartridge demonstrates clickable directions, A, and B", async 
   await page.mouse.up();
 
   let movedX = -1;
-  await expect.poll(async () => {
-    movedX = await page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
-      const data = canvas.getContext("2d")!.getImageData(0, 61, canvas.width, 1).data;
-      for (let x = 0; x < canvas.width; x++) {
-        if (data[x * 4] > 0) return x;
-      }
-      return -1;
-    });
-    return movedX;
-  }).toBeGreaterThan(83);
+  await expect
+    .poll(async () => {
+      movedX = await page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
+        const data = canvas.getContext("2d")!.getImageData(0, 61, canvas.width, 1).data;
+        for (let x = 0; x < canvas.width; x++) {
+          if (data[x * 4] > 0) return x;
+        }
+        return -1;
+      });
+      return movedX;
+    })
+    .toBeGreaterThan(83);
 
   await page.getByRole("button", { name: "Action A" }).click();
-  await expect.poll(async () => {
-    movedX = await page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
-      const data = canvas.getContext("2d")!.getImageData(0, 61, canvas.width, 1).data;
-      for (let x = 0; x < canvas.width; x++) {
-        if (data[x * 4] === 85) return x;
-      }
-      return -1;
-    });
-    return movedX;
-  }).toBeGreaterThan(83);
+  await expect
+    .poll(async () => {
+      movedX = await page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
+        const data = canvas.getContext("2d")!.getImageData(0, 61, canvas.width, 1).data;
+        for (let x = 0; x < canvas.width; x++) {
+          if (data[x * 4] === 85) return x;
+        }
+        return -1;
+      });
+      return movedX;
+    })
+    .toBeGreaterThan(83);
 
   await page.getByRole("button", { name: "Action B" }).click();
   await expect.poll(() => pixel(page, 76, 61)).toEqual([255, 255, 255, 255]);
@@ -671,10 +805,16 @@ test("the default cartridge demonstrates clickable directions, A, and B", async 
 
 test("reruns successfully and preserves the old run after a compile error", async ({ page }) => {
   await page.goto("/");
-  await importSource(page, `export function init(){}\nexport function update(){}\nexport function draw(){ clear(0); pixel(0,0,1); }`);
+  await importSource(
+    page,
+    `export function init(){}\nexport function update(){}\nexport function draw(){ clear(0); pixel(0,0,1); }`,
+  );
   await page.getByRole("button", { name: "Run" }).click();
   await expect.poll(() => pixel(page, 0, 0)).toEqual([85, 85, 85, 255]);
-  await importSource(page, `export function init(){}\nexport function update(){}\nexport function draw(){ clear(0); pixel(0,0,3); }`);
+  await importSource(
+    page,
+    `export function init(){}\nexport function update(){}\nexport function draw(){ clear(0); pixel(0,0,3); }`,
+  );
   await page.locator(".cm-content").press("Control+Shift+Enter");
   await expect.poll(() => pixel(page, 0, 0)).toEqual([255, 255, 255, 255]);
   await expect(page.locator("iframe.runtime-sandbox")).toHaveCount(1);
@@ -688,14 +828,19 @@ test("reruns successfully and preserves the old run after a compile error", asyn
   await expect(page.locator(".preview-error")).toHaveCount(0);
 });
 
-test("delivers held and pressed keyboard transitions while preview is focused", async ({ page }) => {
+test("delivers held and pressed keyboard transitions while preview is focused", async ({
+  page,
+}) => {
   await page.goto("/");
-  await importSource(page, `
+  await importSource(
+    page,
+    `
     let pressed = 0;
     export function init(){}
     export function update(){ if(buttonPressed("a")) pressed++; }
     export function draw(){ clear(0); pixel(button("a") ? 0 : 1, pressed, 3); }
-  `);
+  `,
+  );
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#status")).toHaveText("running");
   const preview = page.locator("#preview");
@@ -713,11 +858,16 @@ test("delivers held and pressed keyboard transitions while preview is focused", 
 
 test("maps runtime errors to cartridge source and tears down the sandbox", async ({ page }) => {
   await page.goto("/");
-  await importSource(page, `export function init(){}\nexport function update(){\n  throw new Error("player boom");\n}\nexport function draw(){}`);
+  await importSource(
+    page,
+    `export function init(){}\nexport function update(){\n  throw new Error("player boom");\n}\nexport function draw(){}`,
+  );
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#error-console")).toContainText("update: player boom");
   await expect(page.locator("#error-console")).toContainText(/cartridge\.ts:3:\d+/);
-  await expect(page.locator("#error-console")).not.toContainText(/worker-source|iframe-source|sandbox\.ts/);
+  await expect(page.locator("#error-console")).not.toContainText(
+    /worker-source|iframe-source|sandbox\.ts/,
+  );
   await expect(page.locator("iframe.runtime-sandbox")).toHaveCount(0);
   await expect(page.locator(".preview-error")).toContainText("Run error");
   await expect(page.locator(".preview-error")).toContainText("Check details below");
@@ -725,9 +875,14 @@ test("maps runtime errors to cartridge source and tears down the sandbox", async
 
 test("watchdog stops an infinite update without freezing the editor", async ({ page }) => {
   await page.goto("/");
-  await importSource(page, `export function init(){}\nexport function update(){ while(true){} }\nexport function draw(){}`);
+  await importSource(
+    page,
+    `export function init(){}\nexport function update(){ while(true){} }\nexport function draw(){}`,
+  );
   await page.getByRole("button", { name: "Run" }).click();
-  await expect(page.locator("#error-console")).toContainText("update exceeded 100 ms", { timeout: 3_000 });
+  await expect(page.locator("#error-console")).toContainText("update exceeded 100 ms", {
+    timeout: 3_000,
+  });
   await expect(page.locator("iframe.runtime-sandbox")).toHaveCount(0);
   await page.locator(".cm-content").click();
   await page.keyboard.press("Control+End");
@@ -759,10 +914,16 @@ test("cartridges cannot reach host, storage, cookies, workers, or network", asyn
   const escaped: string[] = [];
   page.on("request", (request) => {
     const url = new URL(request.url());
-    if ((url.protocol === "http:" || url.protocol === "https:") && url.origin !== "http://127.0.0.1:4173") escaped.push(request.url());
+    if (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      url.origin !== "http://127.0.0.1:4173"
+    )
+      escaped.push(request.url());
   });
   await page.goto("/");
-  await importSource(page, `
+  await importSource(
+    page,
+    `
     let denied = false;
     export function init(){
       denied = typeof document === "undefined" && typeof parent === "undefined" &&
@@ -773,7 +934,8 @@ test("cartridges cannot reach host, storage, cookies, workers, or network", asyn
     }
     export function update(){}
     export function draw(){ clear(0); pixel(0,0,denied ? 3 : 1); }
-  `);
+  `,
+  );
   await page.getByRole("button", { name: "Run" }).click();
   await expect.poll(() => pixel(page, 0, 0)).toEqual([255, 255, 255, 255]);
   expect(escaped).toEqual([]);
@@ -781,23 +943,29 @@ test("cartridges cannot reach host, storage, cookies, workers, or network", asyn
   await expect(sandbox).toHaveAttribute("sandbox", "allow-scripts");
 });
 
-test("keeps the workspace accessible and fits the preview frame to an integer-scaled canvas", async ({ page }) => {
+test("keeps the workspace accessible and fits the preview frame to an integer-scaled canvas", async ({
+  page,
+}) => {
   await page.goto("/");
   await expect(page.getByLabel("Current cartridge file")).toHaveText("starter.tynt");
-  await expect(page.getByRole("button", { name: "Examples" })).toHaveAttribute("aria-haspopup", "menu");
+  await expect(page.getByRole("button", { name: "Examples" })).toHaveAttribute(
+    "aria-haspopup",
+    "menu",
+  );
   await expect(page.locator("#preview")).toHaveAttribute("tabindex", "0");
   await expect(page.locator("#status")).toHaveAttribute("role", "status");
   await expect(page.locator("#error-console")).toHaveAttribute("role", "alert");
   await expect(page.locator("#file-input")).toHaveAttribute("aria-hidden", "true");
   await expect(page.locator("#status-hint")).toContainText(/run/i);
-  const previewSize = async () => page.locator(".preview-interaction").evaluate((preview) => {
-    const canvas = preview.querySelector("canvas")!.getBoundingClientRect();
-    const frame = preview.querySelector(".preview-frame")!.getBoundingClientRect();
-    return {
-      canvas: { width: canvas.width, height: canvas.height },
-      frame: { width: frame.width, height: frame.height },
-    };
-  });
+  const previewSize = async () =>
+    page.locator(".preview-interaction").evaluate((preview) => {
+      const canvas = preview.querySelector("canvas")!.getBoundingClientRect();
+      const frame = preview.querySelector(".preview-frame")!.getBoundingClientRect();
+      return {
+        canvas: { width: canvas.width, height: canvas.height },
+        frame: { width: frame.width, height: frame.height },
+      };
+    });
   await expect.poll(previewSize).toEqual({
     canvas: { width: 320, height: 288 },
     frame: { width: 322, height: 290 },
@@ -816,12 +984,15 @@ test("keeps the workspace accessible and fits the preview frame to an integer-sc
   });
 });
 
-test("keeps the status bar flush with the viewport when errors are hidden or visible", async ({ page }) => {
+test("keeps the status bar flush with the viewport when errors are hidden or visible", async ({
+  page,
+}) => {
   await page.goto("/");
-  const statusBox = () => page.locator(".status-bar").evaluate((status) => {
-    const bounds = status.getBoundingClientRect();
-    return { bottom: bounds.bottom, height: bounds.height, viewportBottom: window.innerHeight };
-  });
+  const statusBox = () =>
+    page.locator(".status-bar").evaluate((status) => {
+      const bounds = status.getBoundingClientRect();
+      return { bottom: bounds.bottom, height: bounds.height, viewportBottom: window.innerHeight };
+    });
 
   await expect.poll(statusBox).toEqual({ bottom: 800, height: 25, viewportBottom: 800 });
   await expect(page.locator("#error-console")).toBeHidden();
@@ -841,10 +1012,11 @@ test("keeps the public play footer flush with the viewport", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "snake" })).toBeVisible();
   await expect(page.locator("#error-console")).toBeHidden();
 
-  const footerBox = () => page.locator(".play-footer").evaluate((footer) => {
-    const bounds = footer.getBoundingClientRect();
-    return { bottom: bounds.bottom, height: bounds.height, viewportBottom: window.innerHeight };
-  });
+  const footerBox = () =>
+    page.locator(".play-footer").evaluate((footer) => {
+      const bounds = footer.getBoundingClientRect();
+      return { bottom: bounds.bottom, height: bounds.height, viewportBottom: window.innerHeight };
+    });
 
   await expect.poll(footerBox).toEqual({ bottom: 800, height: 25, viewportBottom: 800 });
 });
@@ -854,13 +1026,17 @@ test("keeps the editor footer actions contiguous without horizontal overflow", a
 
   const footerActions = page.locator(".status-bar .footer-actions");
   await expect(footerActions).toBeVisible();
-  await expect.poll(() => footerActions.evaluate((actions) => {
-    const items = [...actions.children].map((item) => item.getBoundingClientRect());
-    return {
-      gaps: items.slice(1).map((item, index) => Math.round(item.left - items[index].right)),
-      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    };
-  })).toEqual({ gaps: [0, 0, 0], pageOverflow: 0 });
+  await expect
+    .poll(() =>
+      footerActions.evaluate((actions) => {
+        const items = [...actions.children].map((item) => item.getBoundingClientRect());
+        return {
+          gaps: items.slice(1).map((item, index) => Math.round(item.left - items[index].right)),
+          pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        };
+      }),
+    )
+    .toEqual({ gaps: [0, 0, 0], pageOverflow: 0 });
 });
 
 test("keeps keyboard focus on the screen and renders the D-pad as one cross", async ({ page }) => {
@@ -893,10 +1069,12 @@ test("keeps keyboard focus on the screen and renders the D-pad as one cross", as
 test("uses matching 48 pixel touch targets for every part of the D-pad", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".dpad button, .dpad-center")).toHaveCount(5);
-  const cells = await page.locator(".dpad button, .dpad-center").evaluateAll((elements) => elements.map((element) => {
-    const rect = element.getBoundingClientRect();
-    return { width: rect.width, height: rect.height };
-  }));
+  const cells = await page.locator(".dpad button, .dpad-center").evaluateAll((elements) =>
+    elements.map((element) => {
+      const rect = element.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    }),
+  );
 
   expect(cells).toEqual(Array.from({ length: 5 }, () => ({ width: 48, height: 48 })));
 });

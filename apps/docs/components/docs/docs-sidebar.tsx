@@ -8,7 +8,12 @@ interface DocsSidebarProps {
   onNavigate?(): void;
 }
 
-function NavigationItems({ items, currentPath, onNavigate, depth = 0 }: DocsSidebarProps & { depth?: number }) {
+function NavigationItems({
+  items,
+  currentPath,
+  onNavigate,
+  depth = 0,
+}: DocsSidebarProps & { depth?: number }) {
   return (
     <ul className={cn("m-0 list-none p-0", depth > 0 && "mt-1 border-l border-border pl-3")}>
       {items.map((item) => (
@@ -23,9 +28,18 @@ function NavigationItems({ items, currentPath, onNavigate, depth = 0 }: DocsSide
               {item.title}
             </Link>
           ) : (
-            <div className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">{item.title}</div>
+            <div className="px-3 pt-4 pb-1 text-[10px] font-semibold tracking-[0.14em] text-muted uppercase">
+              {item.title}
+            </div>
           )}
-          {item.children?.length ? <NavigationItems items={item.children} currentPath={currentPath} onNavigate={onNavigate} depth={depth + 1} /> : null}
+          {item.children?.length ? (
+            <NavigationItems
+              items={item.children}
+              currentPath={currentPath}
+              onNavigate={onNavigate}
+              depth={depth + 1}
+            />
+          ) : null}
         </li>
       ))}
     </ul>

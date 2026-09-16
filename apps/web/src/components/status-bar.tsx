@@ -11,7 +11,15 @@ interface StatusBarProps {
   onSoundToggle(): void;
 }
 
-function FooterIconLink({ href, label, icon }: { href: string; label: string; icon: "github" | "docs" }) {
+function FooterIconLink({
+  href,
+  label,
+  icon,
+}: {
+  href: string;
+  label: string;
+  icon: "github" | "docs";
+}) {
   const Icon = icon === "github" ? Github : FileText;
   return (
     <a
@@ -33,7 +41,7 @@ function FooterIconLink({ href, label, icon }: { href: string; label: string; ic
 export function Attribution() {
   return (
     <a
-      className="attribution flex items-center self-stretch whitespace-nowrap border-l border-border px-[10px] text-[#555555] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background"
+      className="attribution flex items-center self-stretch border-l border-border px-[10px] whitespace-nowrap text-[#555555] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background"
       href="https://cristianbgp.com"
       target="_blank"
       rel="noreferrer"
@@ -47,7 +55,10 @@ export function Attribution() {
   );
 }
 
-export function SoundToggle({ soundEnabled, onSoundToggle }: Pick<StatusBarProps, "soundEnabled" | "onSoundToggle">) {
+export function SoundToggle({
+  soundEnabled,
+  onSoundToggle,
+}: Pick<StatusBarProps, "soundEnabled" | "onSoundToggle">) {
   const Icon = soundEnabled ? Volume2 : VolumeX;
   return (
     <button
@@ -58,13 +69,21 @@ export function SoundToggle({ soundEnabled, onSoundToggle }: Pick<StatusBarProps
       data-cuelume-hover="tick"
       onClick={onSoundToggle}
     >
-      <Icon width={24} height={24} data-icon={soundEnabled ? "volume" : "volume-x"} aria-hidden="true" />
+      <Icon
+        width={24}
+        height={24}
+        data-icon={soundEnabled ? "volume" : "volume-x"}
+        aria-hidden="true"
+      />
       <span>sound {soundEnabled ? "on" : "off"}</span>
     </button>
   );
 }
 
-export function FooterActions({ soundEnabled, onSoundToggle }: Pick<StatusBarProps, "soundEnabled" | "onSoundToggle">) {
+export function FooterActions({
+  soundEnabled,
+  onSoundToggle,
+}: Pick<StatusBarProps, "soundEnabled" | "onSoundToggle">) {
   return (
     <div className="footer-actions flex items-stretch self-stretch">
       <Attribution />
@@ -75,12 +94,26 @@ export function FooterActions({ soundEnabled, onSoundToggle }: Pick<StatusBarPro
   );
 }
 
-export function StatusBar({ status, draftStatus, soundEnabled, className = "", onSoundToggle }: StatusBarProps) {
+export function StatusBar({
+  status,
+  draftStatus,
+  soundEnabled,
+  className = "",
+  onSoundToggle,
+}: StatusBarProps) {
   return (
-    <footer className={`status-bar flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)] ${className}`}>
-      <span id="status" role="status" aria-live="polite">{status}</span>
-      <span className="text-border max-[560px]:hidden" id="draft-status">{draftStatus}</span>
-      <span className="ml-auto text-border max-[560px]:hidden" id="status-hint">Ctrl Shift Enter run or rerun · preview focuses automatically</span>
+    <footer
+      className={`status-bar flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)] ${className}`}
+    >
+      <span id="status" role="status" aria-live="polite">
+        {status}
+      </span>
+      <span className="text-border max-[560px]:hidden" id="draft-status">
+        {draftStatus}
+      </span>
+      <span className="ml-auto text-border max-[560px]:hidden" id="status-hint">
+        Ctrl Shift Enter run or rerun · preview focuses automatically
+      </span>
       <FooterActions soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />
     </footer>
   );

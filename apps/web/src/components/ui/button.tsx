@@ -3,13 +3,14 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-10 items-center justify-center gap-2 border-l border-border px-4 font-mono text-[13px] outline-none transition-colors focus-visible:bg-foreground focus-visible:text-background disabled:cursor-wait disabled:text-muted-foreground",
+  "inline-flex min-h-10 items-center justify-center gap-2 border-l border-border px-4 font-mono text-[13px] transition-colors outline-none focus-visible:bg-foreground focus-visible:text-background disabled:cursor-wait disabled:text-muted-foreground",
   {
     variants: {
       variant: {
         default: "enabled:hover:bg-foreground enabled:hover:text-background",
         active: "bg-foreground text-background enabled:hover:bg-[#555555]",
-        control: "size-10 border border-foreground p-0 enabled:hover:bg-[#555555] enabled:hover:text-background data-[pressed=true]:bg-foreground data-[pressed=true]:text-background data-[pressed=true]:hover:bg-foreground data-[pressed=true]:hover:text-background",
+        control:
+          "size-10 border border-foreground p-0 enabled:hover:bg-[#555555] enabled:hover:text-background data-[pressed=true]:bg-foreground data-[pressed=true]:text-background data-[pressed=true]:hover:bg-foreground data-[pressed=true]:hover:text-background",
       },
     },
     defaultVariants: {

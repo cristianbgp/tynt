@@ -1,7 +1,21 @@
 import type { ChangeEventHandler, ReactNode, RefObject } from "react";
-import { ChevronDown, Download, Gamepad, InfoBox, Play, Save, Stop, Upload } from "pixelarticons/react";
+import {
+  ChevronDown,
+  Download,
+  Gamepad,
+  InfoBox,
+  Play,
+  Save,
+  Stop,
+  Upload,
+} from "pixelarticons/react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ActionProps {
@@ -56,7 +70,13 @@ export function Toolbar(props: ToolbarProps) {
   return (
     <header className="topbar grid grid-cols-[minmax(0,1fr)_max-content] items-stretch border-b border-border max-[760px]:h-[82px] max-[760px]:w-full max-[760px]:grid-cols-1 max-[760px]:grid-rows-[41px_41px]">
       <div className="file-controls flex min-w-0 items-center">
-        <span id="filename" className="filename min-w-0 flex-1 overflow-hidden px-[16px] text-ellipsis whitespace-nowrap" aria-label="Current cartridge file">{props.filename}</span>
+        <span
+          id="filename"
+          className="filename min-w-0 flex-1 overflow-hidden px-[16px] text-ellipsis whitespace-nowrap"
+          aria-label="Current cartridge file"
+        >
+          {props.filename}
+        </span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -74,17 +94,17 @@ export function Toolbar(props: ToolbarProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {props.examples.map((example) => (
-              <DropdownMenuItem
-                key={example.id}
-                onSelect={() => props.onExampleChange(example.id)}
-              >
+              <DropdownMenuItem key={example.id} onSelect={() => props.onExampleChange(example.id)}>
                 {example.filename}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <nav className="actions flex max-[900px]:[&>*]:px-[8px] max-[900px]:[&_*span]:hidden max-[760px]:grid max-[760px]:grid-cols-6 max-[760px]:border-t max-[760px]:border-border max-[760px]:[&>*]:w-full max-[760px]:[&>*]:min-w-0 max-[760px]:[&>*]:px-[8px]" aria-label="Cartridge actions">
+      <nav
+        className="actions flex max-[760px]:grid max-[760px]:grid-cols-6 max-[760px]:border-t max-[760px]:border-border max-[900px]:[&_*span]:hidden max-[900px]:[&>*]:px-[8px] max-[760px]:[&>*]:w-full max-[760px]:[&>*]:min-w-0 max-[760px]:[&>*]:px-[8px]"
+        aria-label="Cartridge actions"
+      >
         <Action
           id="run-button"
           label={props.running ? "Stop" : "Run"}
@@ -92,9 +112,13 @@ export function Toolbar(props: ToolbarProps) {
           hint="Run or rerun · Ctrl Shift Enter"
           active={props.running}
           disabled={props.compiling}
-          icon={props.running
-            ? <Stop width={24} height={24} data-icon="stop" aria-hidden="true" />
-            : <Play width={24} height={24} data-icon="play" aria-hidden="true" />}
+          icon={
+            props.running ? (
+              <Stop width={24} height={24} data-icon="stop" aria-hidden="true" />
+            ) : (
+              <Play width={24} height={24} data-icon="play" aria-hidden="true" />
+            )
+          }
           onClick={props.onRun}
         />
         <Action

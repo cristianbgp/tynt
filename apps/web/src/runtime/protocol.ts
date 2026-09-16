@@ -27,7 +27,14 @@ export type IframeMessage =
   | { kind: "heartbeat"; token: string }
   | { kind: "frame"; token: string; commands: DrawCommand[] }
   | ({ kind: "audio"; token: string } & CartridgeAudio)
-  | { kind: "error"; token: string; phase: ErrorPhase; message: string; line?: number; column?: number };
+  | {
+      kind: "error";
+      token: string;
+      phase: ErrorPhase;
+      message: string;
+      line?: number;
+      column?: number;
+    };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -59,7 +66,8 @@ export function encodedBytes(value: unknown): number {
 }
 
 function parseCommand(value: unknown): DrawCommand {
-  if (!isRecord(value) || typeof value.op !== "string") throw new Error("Drawing command is invalid");
+  if (!isRecord(value) || typeof value.op !== "string")
+    throw new Error("Drawing command is invalid");
   const number = (key: string): number => {
     if (!finite(value[key])) throw new Error("Drawing command is invalid");
     return value[key];
@@ -67,50 +75,102 @@ function parseCommand(value: unknown): DrawCommand {
   const color = () => number("color");
   const numbers = (key: string, maximum: number): number[] => {
     const list = value[key];
-    if (!Array.isArray(list) || list.length > maximum || list.some((item) => !finite(item))) throw new Error("Drawing command is invalid");
+    if (!Array.isArray(list) || list.length > maximum || list.some((item) => !finite(item)))
+      throw new Error("Drawing command is invalid");
     return list;
   };
   const positiveInteger = (key: string, maximum: number): number => {
     const result = number(key);
-    if (!Number.isInteger(result) || result < 1 || result > maximum) throw new Error("Drawing command is invalid");
+    if (!Number.isInteger(result) || result < 1 || result > maximum)
+      throw new Error("Drawing command is invalid");
     return result;
   };
   switch (value.op) {
-    case "clear": return { op: "clear", color: color() };
-    case "pixel": return { op: "pixel", x: number("x"), y: number("y"), color: color() };
-    case "line": return { op: "line", x0: number("x0"), y0: number("y0"), x1: number("x1"), y1: number("y1"), color: color() };
+    case "clear":
+      return { op: "clear", color: color() };
+    case "pixel":
+      return { op: "pixel", x: number("x"), y: number("y"), color: color() };
+    case "line":
+      return {
+        op: "line",
+        x0: number("x0"),
+        y0: number("y0"),
+        x1: number("x1"),
+        y1: number("y1"),
+        color: color(),
+      };
     case "rect":
       if (typeof value.fill !== "boolean") throw new Error("Drawing command is invalid");
-      return { op: "rect", x: number("x"), y: number("y"), width: number("width"), height: number("height"), color: color(), fill: value.fill };
+      return {
+        op: "rect",
+        x: number("x"),
+        y: number("y"),
+        width: number("width"),
+        height: number("height"),
+        color: color(),
+        fill: value.fill,
+      };
     case "circle":
       if (typeof value.fill !== "boolean") throw new Error("Drawing command is invalid");
-      return { op: "circle", x: number("x"), y: number("y"), radius: number("radius"), color: color(), fill: value.fill };
+      return {
+        op: "circle",
+        x: number("x"),
+        y: number("y"),
+        radius: number("radius"),
+        color: color(),
+        fill: value.fill,
+      };
     case "text":
       if (typeof value.value !== "string") throw new Error("Drawing command is invalid");
-      if ([...value.value].length > MAX_TEXT_CODE_POINTS) throw new Error("text() accepts at most 1,024 characters");
+      if ([...value.value].length > MAX_TEXT_CODE_POINTS)
+        throw new Error("text() accepts at most 1,024 characters");
       return { op: "text", value: value.value, x: number("x"), y: number("y"), color: color() };
-    case "sprite": { 
+    case "sprite": {
       const pixels = numbers("pixels", 65_536);
       const width = positiveInteger("width", 160);
       const height = positiveInteger("height", 144);
-      if (pixels.length !== width * height) throw new Error("Sprite pixels must match its width and height");
-      return { op: "sprite", pixels, width, height, x: number("x"), y: number("y"), transparent: number("transparent") };
+      if (pixels.length !== width * height)
+        throw new Error("Sprite pixels must match its width and height");
+      return {
+        op: "sprite",
+        pixels,
+        width,
+        height,
+        x: number("x"),
+        y: number("y"),
+        transparent: number("transparent"),
+      };
     }
-    case "map": { 
+    case "map": {
       const tiles = numbers("tiles", 16_384);
       const columns = positiveInteger("columns", 16_384);
       const tileWidth = positiveInteger("tileWidth", 160);
       const tileHeight = positiveInteger("tileHeight", 144);
       const spritesheet = numbers("spritesheet", 65_536);
       const sheetColumns = positiveInteger("sheetColumns", 8_192);
-      if (tiles.length * tileWidth * tileHeight > 65_536) throw new Error("Map draws more than 65,536 pixels");
+      if (tiles.length * tileWidth * tileHeight > 65_536)
+        throw new Error("Map draws more than 65,536 pixels");
       const sheetRowWidth = sheetColumns * tileWidth;
-      if (spritesheet.length === 0 || spritesheet.length % (sheetRowWidth * tileHeight) !== 0) throw new Error("Map spritesheet dimensions are invalid");
+      if (spritesheet.length === 0 || spritesheet.length % (sheetRowWidth * tileHeight) !== 0)
+        throw new Error("Map spritesheet dimensions are invalid");
       const tileCount = spritesheet.length / (tileWidth * tileHeight);
-      if (tiles.some((tile) => !Number.isInteger(tile) || tile < 0 || tile >= tileCount)) throw new Error("Map tile index is invalid");
-      return { op: "map", tiles, columns, tileWidth, tileHeight, spritesheet, sheetColumns, x: number("x"), y: number("y"), transparent: number("transparent") };
+      if (tiles.some((tile) => !Number.isInteger(tile) || tile < 0 || tile >= tileCount))
+        throw new Error("Map tile index is invalid");
+      return {
+        op: "map",
+        tiles,
+        columns,
+        tileWidth,
+        tileHeight,
+        spritesheet,
+        sheetColumns,
+        x: number("x"),
+        y: number("y"),
+        transparent: number("transparent"),
+      };
     }
-    default: throw new Error("Drawing command is invalid");
+    default:
+      throw new Error("Drawing command is invalid");
   }
 }
 
@@ -125,7 +185,8 @@ export function validateFrame(commands: unknown): DrawCommand[] {
 }
 
 function phase(value: unknown): LifecyclePhase {
-  if (value !== "init" && value !== "update" && value !== "draw") throw new Error("Lifecycle phase is invalid");
+  if (value !== "init" && value !== "update" && value !== "draw")
+    throw new Error("Lifecycle phase is invalid");
   return value;
 }
 
@@ -136,14 +197,16 @@ function errorPhase(value: unknown): ErrorPhase {
 
 function optionalPosition(value: unknown): number | undefined {
   if (value === undefined) return undefined;
-  if (!Number.isInteger(value) || (value as number) < 0) throw new Error("Error source position is invalid");
+  if (!Number.isInteger(value) || (value as number) < 0)
+    throw new Error("Error source position is invalid");
   return value as number;
 }
 
 export function parseHostMessage(value: unknown, expectedToken: string): HostMessage {
   if (!isRecord(value)) throw new Error("Host message is invalid");
   const token = readToken(value, expectedToken);
-  if (value.kind === "boot" && typeof value.workerSource === "string") return { kind: "boot", token, workerSource: value.workerSource };
+  if (value.kind === "boot" && typeof value.workerSource === "string")
+    return { kind: "boot", token, workerSource: value.workerSource };
   if (value.kind === "tick") return { kind: "tick", token, input: parseInput(value.input) };
   if (value.kind === "stop") return { kind: "stop", token };
   throw new Error("Host message is invalid");
@@ -167,9 +230,21 @@ export function parseIframeMessage(value: unknown, expectedToken: string): Ifram
     const volume = value.volume;
     const delay = value.delay;
     const wave = value.wave;
-    if (!finite(frequency) || frequency < 20 || frequency > 20_000 || !finite(duration) || duration < 1 || duration > 5_000 ||
-      !finite(volume) || volume < 0 || volume > 1 || !finite(delay) || delay < 0 || delay > 10_000 ||
-      (wave !== "square" && wave !== "sine" && wave !== "triangle" && wave !== "sawtooth")) {
+    if (
+      !finite(frequency) ||
+      frequency < 20 ||
+      frequency > 20_000 ||
+      !finite(duration) ||
+      duration < 1 ||
+      duration > 5_000 ||
+      !finite(volume) ||
+      volume < 0 ||
+      volume > 1 ||
+      !finite(delay) ||
+      delay < 0 ||
+      delay > 10_000 ||
+      (wave !== "square" && wave !== "sine" && wave !== "triangle" && wave !== "sawtooth")
+    ) {
       throw new Error("Cartridge audio message is invalid");
     }
     return { kind: "audio", token, frequency, duration, volume, wave, delay };

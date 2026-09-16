@@ -40,8 +40,14 @@ export default async function DocsPage({ params }: DocsPageProps) {
         <div className="mx-auto max-w-3xl">
           <Breadcrumbs title={page.data.title} url={page.url} />
           <header className="border-b border-border pb-7">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">tynt documentation</p>
-            {page.data.description ? <p className="max-w-2xl text-sm leading-7 text-muted sm:text-base">{page.data.description}</p> : null}
+            <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-muted uppercase">
+              tynt documentation
+            </p>
+            {page.data.description ? (
+              <p className="max-w-2xl text-sm leading-7 text-muted sm:text-base">
+                {page.data.description}
+              </p>
+            ) : null}
             <PageActions rawUrl={rawUrl} sourcePath={`content/docs/${page.data.info.path}`} />
           </header>
           <div className="mt-8 border-y border-border py-5 xl:hidden">
@@ -52,7 +58,14 @@ export default async function DocsPage({ params }: DocsPageProps) {
           </article>
           <DocsPagination previous={neighbors.previous} next={neighbors.next} />
           <footer className="mt-12 border-t border-border pt-5 text-xs text-muted">
-            Made by <a className="underline underline-offset-4 hover:bg-foreground hover:text-background" href="https://cristianbgp.com">@cristianbgp</a>. tynt is MIT licensed.
+            Made by{" "}
+            <a
+              className="underline underline-offset-4 hover:bg-foreground hover:text-background"
+              href="https://cristianbgp.com"
+            >
+              @cristianbgp
+            </a>
+            . tynt is MIT licensed.
           </footer>
         </div>
       </main>

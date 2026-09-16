@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { copyPublicDraft, findPublicCartridge, listPublicCartridges } from "@/cartridges/public-cartridges";
+import {
+  copyPublicDraft,
+  findPublicCartridge,
+  listPublicCartridges,
+} from "@/cartridges/public-cartridges";
 import { compileCartridge } from "@/runtime/compiler";
 
 describe("public cartridge catalog", () => {

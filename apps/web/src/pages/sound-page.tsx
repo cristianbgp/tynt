@@ -11,8 +11,7 @@ import { SOUND_NOTES, soundCode } from "@/sound-editor";
 const STEP_COUNT = 16;
 const WAVES: readonly AudioWave[] = ["square", "sine", "triangle", "sawtooth"];
 const STARTER_SOUND = [
-  523.25, 0, 659.25, 0, 783.99, 0, 1046.5, 0, 783.99, 0, 659.25, 0, 523.25, 0,
-  0, 0,
+  523.25, 0, 659.25, 0, 783.99, 0, 1046.5, 0, 783.99, 0, 659.25, 0, 523.25, 0, 0, 0,
 ] as const;
 
 interface SoundPageProps {
@@ -22,22 +21,14 @@ interface SoundPageProps {
   stopAudio?(): void;
 }
 
-export function SoundPage({
-  soundEnabled,
-  onSoundToggle,
-  playAudio,
-  stopAudio,
-}: SoundPageProps) {
+export function SoundPage({ soundEnabled, onSoundToggle, playAudio, stopAudio }: SoundPageProps) {
   const [notes, setNotes] = useState<number[]>(() => [...STARTER_SOUND]);
   const [step, setStep] = useState(80);
   const [volume, setVolume] = useState(0.15);
   const [wave, setWave] = useState<AudioWave>("square");
   const [status, setStatus] = useState("16 steps · starter chime loaded");
   const engineRef = useRef<CartridgeAudioEngine | null>(null);
-  const code = useMemo(
-    () => soundCode(notes, step, volume, wave),
-    [notes, step, volume, wave],
-  );
+  const code = useMemo(() => soundCode(notes, step, volume, wave), [notes, step, volume, wave]);
 
   const stop = () => {
     stopAudio?.();
@@ -62,9 +53,7 @@ export function SoundPage({
         stepIndex === index ? (value === frequency ? 0 : frequency) : value,
       ),
     );
-    setStatus(
-      `step ${index + 1} · ${notes[index] === frequency ? "rest" : name}`,
-    );
+    setStatus(`step ${index + 1} · ${notes[index] === frequency ? "rest" : name}`);
   };
 
   const preview = () => {
@@ -127,14 +116,13 @@ export function SoundPage({
             Sound editor
           </h1>
           <p className="m-0 max-w-[46ch] leading-[1.55] text-[#555555]">
-            Compose a sixteen-step effect, preview it, then copy it directly
-            into a cartridge.
+            Compose a sixteen-step effect, preview it, then copy it directly into a cartridge.
           </p>
         </header>
 
         <section className="mx-auto grid h-[min(680px,calc(100dvh-220px))] min-h-[480px] w-[min(100%,1120px)] grid-cols-[minmax(0,1fr)_320px] border-b border-l border-border max-[820px]:h-auto max-[820px]:min-h-0 max-[820px]:grid-cols-1">
           <div
-            className="min-h-0 min-w-0 overflow-auto border-r border-b md:border-b-0 border-border bg-background max-[820px]:max-h-[440px]"
+            className="min-h-0 min-w-0 overflow-auto border-r border-b border-border bg-background max-[820px]:max-h-[440px] md:border-b-0"
             aria-label="Sound sequence"
           >
             <div
@@ -162,7 +150,7 @@ export function SoundPage({
                   </span>
                   {notes.map((selected, index) => (
                     <button
-                      className={`min-h-[30px] touch-none cursor-crosshair border-0 border-t border-border outline-none hover:bg-[#aaaaaa] focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-3 focus-visible:outline-foreground ${index === notes.length - 1 ? "border-r-0" : "border-r"} ${selected === note.frequency ? "bg-foreground hover:bg-[#555555]" : note.accidental ? "bg-muted" : "bg-background"}`}
+                      className={`min-h-[30px] cursor-crosshair touch-none border-0 border-t border-border outline-none hover:bg-[#aaaaaa] focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-3 focus-visible:outline-foreground ${index === notes.length - 1 ? "border-r-0" : "border-r"} ${selected === note.frequency ? "bg-foreground hover:bg-[#555555]" : note.accidental ? "bg-muted" : "bg-background"}`}
                       key={index}
                       type="button"
                       aria-label={`Step ${index + 1} ${note.name}`}
@@ -172,8 +160,7 @@ export function SoundPage({
                       data-note-frequency={note.frequency}
                       data-note-name={note.name}
                       onClick={(event) => {
-                        if (event.detail === 0)
-                          setNote(index, note.frequency, note.name);
+                        if (event.detail === 0) setNote(index, note.frequency, note.name);
                       }}
                       data-cuelume-hover="tick"
                       data-cuelume-toggle=""
@@ -186,7 +173,7 @@ export function SoundPage({
 
           <aside className="grid min-h-0 grid-rows-[auto_auto_minmax(170px,1fr)_auto_32px] border-r border-border">
             <div className="p-[14px]">
-              <span className="mb-[8px] block text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+              <span className="mb-[8px] block text-[10px] tracking-[0.08em] text-muted-foreground uppercase">
                 Waveform
               </span>
               <div className="grid grid-cols-2 border-t border-border">
@@ -292,10 +279,7 @@ export function SoundPage({
               role="status"
               aria-live="polite"
             >
-              <Music
-                className="mr-[6px] inline size-[14px]"
-                aria-hidden="true"
-              />
+              <Music className="mr-[6px] inline size-[14px]" aria-hidden="true" />
               {status}
             </p>
           </aside>

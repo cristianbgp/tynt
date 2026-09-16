@@ -43,12 +43,27 @@ export function Editor({ source, onChange }: EditorProps) {
             ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: "#f4f4f4" },
             "&.cm-focused": { outline: "none" },
             ".cm-cursor": { borderLeftColor: "#000" },
-            ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": { backgroundColor: "#d8d8d8" },
-            ".cm-tooltip": { border: "1px solid #000", borderRadius: "0", boxShadow: "none", backgroundColor: "#fff" },
+            ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": {
+              backgroundColor: "#d8d8d8",
+            },
+            ".cm-tooltip": {
+              border: "1px solid #000",
+              borderRadius: "0",
+              boxShadow: "none",
+              backgroundColor: "#fff",
+            },
             ".cm-tooltip-autocomplete > ul": { fontFamily: "inherit" },
             ".cm-tooltip-autocomplete > ul > li": { padding: "3px 7px" },
-            ".cm-tooltip-autocomplete > ul > li[aria-selected]": { backgroundColor: "#000", color: "#fff" },
-            ".cm-completionInfo": { border: "1px solid #000", borderRadius: "0", boxShadow: "none", padding: "7px" },
+            ".cm-tooltip-autocomplete > ul > li[aria-selected]": {
+              backgroundColor: "#000",
+              color: "#fff",
+            },
+            ".cm-completionInfo": {
+              border: "1px solid #000",
+              borderRadius: "0",
+              boxShadow: "none",
+              padding: "7px",
+            },
           }),
         ],
       }),
@@ -67,7 +82,10 @@ export function Editor({ source, onChange }: EditorProps) {
   }, [source]);
 
   return (
-    <section className="editor-pane h-full min-h-0 overflow-hidden border-r border-border max-[760px]:border-r-0 max-[760px]:border-b" aria-label="TypeScript editor">
+    <section
+      className="editor-pane h-full min-h-0 overflow-hidden border-r border-border max-[760px]:border-r-0 max-[760px]:border-b"
+      aria-label="TypeScript editor"
+    >
       <div className="h-full min-h-0" id="editor" ref={hostRef} />
     </section>
   );

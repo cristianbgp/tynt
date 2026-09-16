@@ -8,7 +8,11 @@ describe("cartridge thumbnails", () => {
   });
 
   test("returns undefined when a browser cannot serialize the canvas", () => {
-    const canvas = { toDataURL: () => { throw new Error("unsupported"); } } as unknown as HTMLCanvasElement;
+    const canvas = {
+      toDataURL: () => {
+        throw new Error("unsupported");
+      },
+    } as unknown as HTMLCanvasElement;
     expect(captureThumbnail(canvas)).toBeUndefined();
     expect(captureThumbnail(null)).toBeUndefined();
   });

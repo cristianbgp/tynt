@@ -14,16 +14,21 @@ describe("documentation theme control", () => {
     document.documentElement.className = "";
     delete document.documentElement.dataset.theme;
     delete document.documentElement.dataset.themePreference;
-    vi.stubGlobal("matchMedia", vi.fn().mockImplementation((media: string) => ({
-      matches: systemDark,
-      media,
-      onchange: null,
-      addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => listeners.add(listener),
-      removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => listeners.delete(listener),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })));
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((media: string) => ({
+        matches: systemDark,
+        media,
+        onchange: null,
+        addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) =>
+          listeners.add(listener),
+        removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) =>
+          listeners.delete(listener),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
   });
 
   afterEach(() => vi.unstubAllGlobals());
@@ -41,7 +46,10 @@ describe("documentation theme control", () => {
     render(<ThemeToggle />);
 
     expect(screen.getByRole("radiogroup", { name: "Theme" })).toBeVisible();
-    expect(screen.getByRole("radio", { name: "System theme" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("radio", { name: "System theme" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
 
     fireEvent.click(screen.getByRole("radio", { name: "Dark theme" }));
     expect(document.documentElement).toHaveClass("dark");

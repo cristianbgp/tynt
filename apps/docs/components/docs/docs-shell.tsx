@@ -37,14 +37,22 @@ export function DocsShell({ children, navigation }: DocsShellProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <DocsHeader onOpenNavigation={() => setNavigationOpen(true)} onOpenSearch={() => setSearchOpen(true)} />
+      <DocsHeader
+        onOpenNavigation={() => setNavigationOpen(true)}
+        onOpenSearch={() => setSearchOpen(true)}
+      />
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 lg:grid-cols-[248px_minmax(0,1fr)] xl:grid-cols-[248px_minmax(0,1fr)_232px]">
         <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-border p-4 lg:block">
           <DocsSidebar items={navigation} currentPath={path} />
         </aside>
         {children}
       </div>
-      <MobileNavigation currentPath={path} items={navigation} open={navigationOpen} onOpenChange={setNavigationOpen} />
+      <MobileNavigation
+        currentPath={path}
+        items={navigation}
+        open={navigationOpen}
+        onOpenChange={setNavigationOpen}
+      />
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );

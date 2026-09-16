@@ -19,11 +19,14 @@ async function textPoint(line: Locator, text: string): Promise<{ x: number; y: n
 
 test("Ctrl-click jumps from a local function call to its declaration", async ({ page }) => {
   await page.goto("/");
-  await importSource(page, `function helper() { return 1; }
+  await importSource(
+    page,
+    `function helper() { return 1; }
 
 export function init() {}
 export function update() { helper(); }
-export function draw() {}`);
+export function draw() {}`,
+  );
 
   const callLine = page.locator(".cm-line").filter({ hasText: "update() { helper(); }" });
   const point = await textPoint(callLine, "helper");
@@ -31,22 +34,30 @@ export function draw() {}`);
   await page.mouse.click(point.x, point.y);
   await page.keyboard.up("Control");
 
-  await expect.poll(() => page.evaluate(() => {
-    const selection = window.getSelection();
-    const element = selection?.anchorNode instanceof Element
-      ? selection.anchorNode
-      : selection?.anchorNode?.parentElement;
-    return element?.closest(".cm-line")?.textContent ?? "";
-  })).toContain("function helper");
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const selection = window.getSelection();
+        const element =
+          selection?.anchorNode instanceof Element
+            ? selection.anchorNode
+            : selection?.anchorNode?.parentElement;
+        return element?.closest(".cm-line")?.textContent ?? "";
+      }),
+    )
+    .toContain("function helper");
 });
 
 test("modifier hover marks only navigable identifiers as links", async ({ page }) => {
   await page.goto("/");
-  await importSource(page, `function helper() { return 1; }
+  await importSource(
+    page,
+    `function helper() { return 1; }
 
 export function init() {}
 export function update() { helper(); }
-export function draw() {}`);
+export function draw() {}`,
+  );
 
   const callLine = page.locator(".cm-line").filter({ hasText: "update() { helper(); }" });
   const point = await textPoint(callLine, "helper");
@@ -64,11 +75,14 @@ export function draw() {}`);
 
 test("F12 briefly highlights the local definition after jumping", async ({ page }) => {
   await page.goto("/");
-  await importSource(page, `function helper() { return 1; }
+  await importSource(
+    page,
+    `function helper() { return 1; }
 
 export function init() {}
 export function update() { helper(); }
-export function draw() {}`);
+export function draw() {}`,
+  );
 
   const callLine = page.locator(".cm-line").filter({ hasText: "update() { helper(); }" });
   const point = await textPoint(callLine, "helper");
@@ -78,11 +92,16 @@ export function draw() {}`);
   await expect(page.locator(".cm-definition-target")).toContainText("function helper");
 });
 
-test("Ctrl-click on an exported lifecycle declaration opens its documentation", async ({ page }) => {
+test("Ctrl-click on an exported lifecycle declaration opens its documentation", async ({
+  page,
+}) => {
   await page.goto("/");
-  await importSource(page, `export function init() {}
+  await importSource(
+    page,
+    `export function init() {}
 export function update() {}
-export function draw() {}`);
+export function draw() {}`,
+  );
 
   const declarationLine = page.locator(".cm-line").filter({ hasText: "function update" });
   const declarationToken = declarationLine.locator("span").filter({ hasText: "update" });

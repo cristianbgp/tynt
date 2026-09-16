@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2023",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -23,16 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@tynt/core": [
-        "../../packages/core/src/index.ts"
-      ]
+      "@/*": ["./*"],
+      "@tynt/core": ["../../packages/core/src/index.ts"]
     },
-    "types": [
-      "bun"
-    ]
+    "types": ["bun"]
   },
   "include": [
     "next-env.d.ts",
@@ -41,7 +31,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

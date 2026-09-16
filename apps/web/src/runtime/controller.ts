@@ -1,4 +1,10 @@
-import { FixedClock, INPUT_NAMES, InputState, type InputName, type InputSnapshot } from "@tynt/core";
+import {
+  FixedClock,
+  INPUT_NAMES,
+  InputState,
+  type InputName,
+  type InputSnapshot,
+} from "@tynt/core";
 import { compileCartridge, type CompiledCartridge } from "./compiler";
 import { SandboxRun, type SandboxCallbacks, type SandboxError, type SandboxFrame } from "./sandbox";
 import { CartridgeAudioEngine } from "./audio";
@@ -38,7 +44,12 @@ const KEY_TO_INPUT: Readonly<Record<string, InputName>> = {
   KeyX: "b",
 };
 
-function browserDependencies(onStatus: RuntimeDependencies["onStatus"], onError: RuntimeDependencies["onError"], onFrame: NonNullable<RuntimeDependencies["onFrame"]>, onDebugState?: RuntimeDependencies["onDebugState"]): RuntimeDependencies {
+function browserDependencies(
+  onStatus: RuntimeDependencies["onStatus"],
+  onError: RuntimeDependencies["onError"],
+  onFrame: NonNullable<RuntimeDependencies["onFrame"]>,
+  onDebugState?: RuntimeDependencies["onDebugState"],
+): RuntimeDependencies {
   const audio = new CartridgeAudioEngine();
   return {
     compile: compileCartridge,
@@ -50,7 +61,9 @@ function browserDependencies(onStatus: RuntimeDependencies["onStatus"], onError:
     onError,
     onFrame,
     onDebugState,
-    onAudio: (command) => { void audio.play(command); },
+    onAudio: (command) => {
+      void audio.play(command);
+    },
     onAudioStop: () => audio.stop(),
     onAudioEnabled: (enabled) => audio.setEnabled(enabled),
   };
@@ -78,8 +91,12 @@ export class RuntimeController {
 
   constructor(private readonly dependencies: RuntimeDependencies) {}
 
-  get isRunning(): boolean { return this.runInstance?.isActive ?? false; }
-  get isPaused(): boolean { return this.paused && this.isRunning; }
+  get isRunning(): boolean {
+    return this.runInstance?.isActive ?? false;
+  }
+  get isPaused(): boolean {
+    return this.paused && this.isRunning;
+  }
 
   private inspectedInput(): InputSnapshot {
     return {
@@ -98,7 +115,11 @@ export class RuntimeController {
   }
 
   private publishDebugState(input: InputSnapshot = this.inspectedInput()): void {
-    this.dependencies.onDebugState?.({ frame: this.frameCount, held: input.held, pressed: input.pressed });
+    this.dependencies.onDebugState?.({
+      frame: this.frameCount,
+      held: input.held,
+      pressed: input.pressed,
+    });
   }
 
   private resetDebugState(): void {
@@ -184,7 +205,8 @@ export class RuntimeController {
     if (!active?.isActive) return;
     const steps = this.clock.advance(time);
     for (let index = 0; index < steps && active.isActive; index++) this.tick(active);
-    if (active.isActive) this.animationFrame = this.dependencies.requestFrame(this.onAnimationFrame);
+    if (active.isActive)
+      this.animationFrame = this.dependencies.requestFrame(this.onAnimationFrame);
   };
 
   setKey(code: string, down: boolean): boolean {
@@ -211,7 +233,9 @@ export class RuntimeController {
     this.publishDebugState();
   }
 
-  setAudioEnabled(enabled: boolean): void { this.dependencies.onAudioEnabled?.(enabled); }
+  setAudioEnabled(enabled: boolean): void {
+    this.dependencies.onAudioEnabled?.(enabled);
+  }
 
   private stopLoop(): void {
     if (this.animationFrame !== null) this.dependencies.cancelFrame(this.animationFrame);

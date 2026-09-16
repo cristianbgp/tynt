@@ -10,8 +10,12 @@ function memoryAdapter(): LibraryAdapter {
   return {
     list: async () => [...records.values()],
     get: async (id) => records.get(id),
-    put: async (record) => { records.set(record.id, structuredClone(record)); },
-    remove: async (id) => { records.delete(id); },
+    put: async (record) => {
+      records.set(record.id, structuredClone(record));
+    },
+    remove: async (id) => {
+      records.delete(id);
+    },
   };
 }
 
@@ -30,19 +34,31 @@ describe("local cartridge library", () => {
   test("creates, updates, and lists records most recently updated first", async () => {
     const library = createCartridgeLibrary(memoryAdapter(), dependencies());
     const first = await library.save({ draft: { title: "first", source } });
-    const second = await library.save({ draft: { title: "second", source, author: "me" }, thumbnail: "data:image/png;base64,AA==" });
+    const second = await library.save({
+      draft: { title: "second", source, author: "me" },
+      thumbnail: "data:image/png;base64,AA==",
+    });
     const updated = await library.save({ id: first.id, draft: { title: "first renamed", source } });
 
     expect(updated.id).toBe(first.id);
     expect(updated.createdAt).toBe(first.createdAt);
     expect(updated.updatedAt).not.toBe(first.updatedAt);
-    expect((await library.list()).map((record) => record.title)).toEqual(["first renamed", "second"]);
-    expect(second).toMatchObject({ formatVersion: 1, author: "me", thumbnail: "data:image/png;base64,AA==" });
+    expect((await library.list()).map((record) => record.title)).toEqual([
+      "first renamed",
+      "second",
+    ]);
+    expect(second).toMatchObject({
+      formatVersion: 1,
+      author: "me",
+      thumbnail: "data:image/png;base64,AA==",
+    });
   });
 
   test("duplicates an existing record as an independent recent copy", async () => {
     const library = createCartridgeLibrary(memoryAdapter(), dependencies());
-    const original = await library.save({ draft: { title: "orbit", source, description: "small" } });
+    const original = await library.save({
+      draft: { title: "orbit", source, description: "small" },
+    });
     const copy = await library.duplicate(original.id);
 
     expect(copy).toMatchObject({ title: "orbit copy", source, description: "small" });

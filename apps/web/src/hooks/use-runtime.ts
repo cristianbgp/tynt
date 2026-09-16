@@ -4,7 +4,16 @@ import { RuntimeController } from "@/runtime/controller";
 import { createRuntimeDebugStore } from "@/runtime/debug-store";
 import { CanvasRenderer, type CanvasTarget } from "@/runtime/renderer";
 
-type RuntimeStatus = "ready" | "compiling" | "starting" | "running" | "paused" | "stopped" | "imported" | "exported" | "error";
+type RuntimeStatus =
+  | "ready"
+  | "compiling"
+  | "starting"
+  | "running"
+  | "paused"
+  | "stopped"
+  | "imported"
+  | "exported"
+  | "error";
 
 function messageFrom(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -22,7 +31,10 @@ interface VisibilityRuntime {
   resetInput(): void;
 }
 
-export function observeRuntimeVisibility(source: VisibilitySource, runtime: VisibilityRuntime): () => void {
+export function observeRuntimeVisibility(
+  source: VisibilitySource,
+  runtime: VisibilityRuntime,
+): () => void {
   let automaticallyPaused = false;
   const syncVisibility = () => {
     if (source.visibilityState === "hidden") {
@@ -53,7 +65,11 @@ export function useRuntime(soundEnabled = true) {
     if (!canvas || typeof CanvasRenderingContext2D === "undefined") return;
     const context = canvas.getContext("2d");
     if (!context) return;
-    const renderer = new CanvasRenderer(context as unknown as CanvasTarget, canvas.width, canvas.height);
+    const renderer = new CanvasRenderer(
+      context as unknown as CanvasTarget,
+      canvas.width,
+      canvas.height,
+    );
     renderer.replay([{ op: "clear", color: 0 }]);
     controllerRef.current = RuntimeController.forBrowser(
       (nextStatus) => {
@@ -61,7 +77,10 @@ export function useRuntime(soundEnabled = true) {
       },
       (runtimeError, previewAvailable) => {
         if (!mountedRef.current) return;
-        const location = runtimeError.line === undefined ? "" : ` · cartridge.ts:${runtimeError.line}:${runtimeError.column ?? 1}`;
+        const location =
+          runtimeError.line === undefined
+            ? ""
+            : ` · cartridge.ts:${runtimeError.line}:${runtimeError.column ?? 1}`;
         setError(`${runtimeError.phase}: ${runtimeError.message}${location}`);
         setShowPreviewError(!previewAvailable);
       },
@@ -80,24 +99,34 @@ export function useRuntime(soundEnabled = true) {
 
   useEffect(() => controllerRef.current?.setAudioEnabled(soundEnabled), [soundEnabled]);
 
-  useEffect(() => observeRuntimeVisibility(document, {
-    pause: () => controllerRef.current?.pause() ?? false,
-    resume: () => controllerRef.current?.resume() ?? false,
-    resetInput: () => controllerRef.current?.resetInput(),
-  }), []);
+  useEffect(
+    () =>
+      observeRuntimeVisibility(document, {
+        pause: () => controllerRef.current?.pause() ?? false,
+        resume: () => controllerRef.current?.resume() ?? false,
+        resetInput: () => controllerRef.current?.resetInput(),
+      }),
+    [],
+  );
 
   const run = useCallback(async (source: string) => {
     setError("");
     setShowPreviewError(false);
-    return await controllerRef.current?.run(source) ?? false;
+    return (await controllerRef.current?.run(source)) ?? false;
   }, []);
 
   const stop = useCallback(() => controllerRef.current?.stop(), []);
   const pause = useCallback(() => controllerRef.current?.pause() ?? false, []);
   const resume = useCallback(() => controllerRef.current?.resume() ?? false, []);
   const step = useCallback(() => controllerRef.current?.step() ?? false, []);
-  const setKey = useCallback((code: string, down: boolean) => controllerRef.current?.setKey(code, down) ?? false, []);
-  const setInput = useCallback((input: InputName, down: boolean) => controllerRef.current?.setInput(input, down), []);
+  const setKey = useCallback(
+    (code: string, down: boolean) => controllerRef.current?.setKey(code, down) ?? false,
+    [],
+  );
+  const setInput = useCallback(
+    (input: InputName, down: boolean) => controllerRef.current?.setInput(input, down),
+    [],
+  );
   const resetInput = useCallback(() => controllerRef.current?.resetInput(), []);
   const clearError = useCallback(() => {
     setError("");
@@ -109,7 +138,8 @@ export function useRuntime(soundEnabled = true) {
     setStatus("error");
   }, []);
   const announce = useCallback((nextStatus: "imported" | "exported") => setStatus(nextStatus), []);
-  const isRunning = status === "starting" || status === "running" || (controllerRef.current?.isRunning ?? false);
+  const isRunning =
+    status === "starting" || status === "running" || (controllerRef.current?.isRunning ?? false);
 
   return {
     canvasRef,

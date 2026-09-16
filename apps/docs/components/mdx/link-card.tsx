@@ -15,11 +15,23 @@ export function LinkCard({ children, href, title }: LinkCardProps) {
         {title}
         <ExternalLink width={18} height={18} aria-hidden="true" />
       </span>
-      <span className="mt-2 block text-sm leading-6 text-muted group-hover:text-inherit">{children}</span>
+      <span className="mt-2 block text-sm leading-6 text-muted group-hover:text-inherit">
+        {children}
+      </span>
     </>
   );
-  const className = "group my-7 block border border-border p-4 no-underline hover:border-foreground hover:bg-foreground hover:text-background focus-visible:border-foreground";
+  const className =
+    "group my-7 block border border-border p-4 no-underline hover:border-foreground hover:bg-foreground hover:text-background focus-visible:border-foreground";
 
-  if (href.startsWith("/")) return <Link className={className} href={href}>{content}</Link>;
-  return <a className={className} href={href} target="_blank" rel="noreferrer">{content}</a>;
+  if (href.startsWith("/"))
+    return (
+      <Link className={className} href={href}>
+        {content}
+      </Link>
+    );
+  return (
+    <a className={className} href={href} target="_blank" rel="noreferrer">
+      {content}
+    </a>
+  );
 }

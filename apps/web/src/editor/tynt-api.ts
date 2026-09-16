@@ -1,4 +1,8 @@
-import { snippetCompletion, type CompletionContext, type CompletionResult } from "@codemirror/autocomplete";
+import {
+  snippetCompletion,
+  type CompletionContext,
+  type CompletionResult,
+} from "@codemirror/autocomplete";
 import { CARTRIDGE_API } from "@tynt/core";
 
 export interface TyntApiCompletion {
@@ -12,10 +16,9 @@ export const TYNT_API_COMPLETIONS: readonly TyntApiCompletion[] = CARTRIDGE_API.
   ({ name, signature, description, snippet }) => ({ label: name, signature, description, snippet }),
 );
 
-const options = TYNT_API_COMPLETIONS.map(({ label, signature, description, snippet }) => snippetCompletion(
-  snippet,
-  { label, detail: signature, info: description, type: "function" },
-));
+const options = TYNT_API_COMPLETIONS.map(({ label, signature, description, snippet }) =>
+  snippetCompletion(snippet, { label, detail: signature, info: description, type: "function" }),
+);
 
 export function tyntCompletionSource(context: CompletionContext): CompletionResult | null {
   const word = context.matchBefore(/\w*/);

@@ -1,35 +1,78 @@
 import { expect, test } from "vitest";
-import { RuntimeController, type RuntimeDependencies, type RuntimeRun } from "../src/runtime/controller";
+import {
+  RuntimeController,
+  type RuntimeDependencies,
+  type RuntimeRun,
+} from "../src/runtime/controller";
 
 const compiled = { code: "compiled", map: "{}" };
 
 function harness() {
   const events: string[] = [];
-  const debugStates: Array<{ frame: number; held: readonly string[]; pressed: readonly string[] }> = [];
-  const runs: Array<RuntimeRun & { ready(): void; fail(): void; suspend(): void; resume(): void; ticks: unknown[]; stopped: boolean }> = [];
+  const debugStates: Array<{ frame: number; held: readonly string[]; pressed: readonly string[] }> =
+    [];
+  const runs: Array<
+    RuntimeRun & {
+      ready(): void;
+      fail(): void;
+      suspend(): void;
+      resume(): void;
+      ticks: unknown[];
+      stopped: boolean;
+    }
+  > = [];
   let frame: ((time: number) => void) | undefined;
   let compileFails = false;
   let now = 0;
   const dependencies: RuntimeDependencies = {
-    compile: async () => { events.push("compile"); if (compileFails) throw new Error("bad source"); return compiled; },
+    compile: async () => {
+      events.push("compile");
+      if (compileFails) throw new Error("bad source");
+      return compiled;
+    },
     createRun: (_compiled, callbacks) => {
       const run = {
         isActive: true,
         ticks: [] as unknown[],
         stopped: false,
-        start() { events.push("start"); },
-        tick(input: unknown) { this.ticks.push(input); },
-        stop() { if (!this.stopped) { this.stopped = true; this.isActive = false; events.push("stop"); callbacks.onStop?.(); } },
-        suspend() { events.push("run:suspend"); },
-        resume() { events.push("run:resume"); },
-        ready() { callbacks.onReady?.(); },
-        fail() { callbacks.onError?.({ phase: "update", message: "boom" }); callbacks.onStop?.(); },
+        start() {
+          events.push("start");
+        },
+        tick(input: unknown) {
+          this.ticks.push(input);
+        },
+        stop() {
+          if (!this.stopped) {
+            this.stopped = true;
+            this.isActive = false;
+            events.push("stop");
+            callbacks.onStop?.();
+          }
+        },
+        suspend() {
+          events.push("run:suspend");
+        },
+        resume() {
+          events.push("run:resume");
+        },
+        ready() {
+          callbacks.onReady?.();
+        },
+        fail() {
+          callbacks.onError?.({ phase: "update", message: "boom" });
+          callbacks.onStop?.();
+        },
       };
       runs.push(run);
       return run;
     },
-    requestFrame: (callback) => { frame = callback; return 1; },
-    cancelFrame: () => { frame = undefined; },
+    requestFrame: (callback) => {
+      frame = callback;
+      return 1;
+    },
+    cancelFrame: () => {
+      frame = undefined;
+    },
     now: () => now,
     onStatus: (status) => events.push(status),
     onError: (error) => events.push(`error:${error.message}`),
@@ -37,7 +80,19 @@ function harness() {
     onAudioStop: () => events.push("audio:stop"),
     onDebugState: (state) => debugStates.push(state),
   };
-  return { dependencies, debugStates, events, runs, frame: (time: number) => frame?.(time), setNow: (value: number) => { now = value; }, failCompile: () => { compileFails = true; } };
+  return {
+    dependencies,
+    debugStates,
+    events,
+    runs,
+    frame: (time: number) => frame?.(time),
+    setNow: (value: number) => {
+      now = value;
+    },
+    failCompile: () => {
+      compileFails = true;
+    },
+  };
 }
 
 test("compiles successfully before replacing an active run", async () => {

@@ -21,8 +21,17 @@ function Harness({
   return null;
 }
 
-function press(key: string, modifiers: KeyboardEventInit, target: EventTarget = document): KeyboardEvent {
-  const event = new KeyboardEvent("keydown", { key, cancelable: true, bubbles: true, ...modifiers });
+function press(
+  key: string,
+  modifiers: KeyboardEventInit,
+  target: EventTarget = document,
+): KeyboardEvent {
+  const event = new KeyboardEvent("keydown", {
+    key,
+    cancelable: true,
+    bubbles: true,
+    ...modifiers,
+  });
   target.dispatchEvent(event);
   return event;
 }

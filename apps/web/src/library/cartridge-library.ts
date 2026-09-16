@@ -41,7 +41,13 @@ const defaultDependencies: LibraryDependencies = {
 
 function toDraft(record: LibraryCartridge): Draft {
   const { title, source, author, description, controls } = record;
-  return { title, source, ...(author ? { author } : {}), ...(description ? { description } : {}), ...(controls ? { controls } : {}) };
+  return {
+    title,
+    source,
+    ...(author ? { author } : {}),
+    ...(description ? { description } : {}),
+    ...(controls ? { controls } : {}),
+  };
 }
 
 export function createCartridgeLibrary(
@@ -58,7 +64,9 @@ export function createCartridgeLibrary(
       createdAt: existing?.createdAt ?? timestamp,
       updatedAt: timestamp,
       ...validDraft,
-      ...(thumbnail ?? existing?.thumbnail ? { thumbnail: thumbnail ?? existing?.thumbnail } : {}),
+      ...((thumbnail ?? existing?.thumbnail)
+        ? { thumbnail: thumbnail ?? existing?.thumbnail }
+        : {}),
     };
     await adapter.put(record);
     return record;
@@ -66,7 +74,9 @@ export function createCartridgeLibrary(
 
   return {
     async list() {
-      return (await adapter.list()).sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+      return (await adapter.list()).sort((left, right) =>
+        right.updatedAt.localeCompare(left.updatedAt),
+      );
     },
     get: (id) => adapter.get(id),
     save,
@@ -85,9 +95,17 @@ export function createCartridgeLibrary(
 export function createMemoryAdapter(): LibraryAdapter {
   const records = new Map<string, LibraryCartridge>();
   return {
-    async list() { return [...records.values()]; },
-    async get(id) { return records.get(id); },
-    async put(record) { records.set(record.id, record); },
-    async remove(id) { records.delete(id); },
+    async list() {
+      return [...records.values()];
+    },
+    async get(id) {
+      return records.get(id);
+    },
+    async put(record) {
+      records.set(record.id, record);
+    },
+    async remove(id) {
+      records.delete(id);
+    },
   };
 }

@@ -8,7 +8,9 @@ const page = await browser.newPage();
 async function render(source: string, output: string, width: number, height: number) {
   const svg = await Bun.file(resolve(root, source)).text();
   await page.setViewportSize({ width, height });
-  await page.setContent(`<style>html,body{margin:0;width:100%;height:100%;overflow:hidden}svg{display:block;width:100%;height:100%}</style>${svg}`);
+  await page.setContent(
+    `<style>html,body{margin:0;width:100%;height:100%;overflow:hidden}svg{display:block;width:100%;height:100%}</style>${svg}`,
+  );
   await page.screenshot({ path: resolve(root, output), animations: "disabled" });
 }
 

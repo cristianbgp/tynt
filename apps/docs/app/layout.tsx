@@ -18,7 +18,11 @@ export const metadata: Metadata = {
     description: "Build and publish tiny monochrome browser games.",
     url: "https://docs.tynt.dev/docs",
   },
-  twitter: { card: "summary", title: "tynt docs", description: "Build and publish tiny monochrome browser games." },
+  twitter: {
+    card: "summary",
+    title: "tynt docs",
+    description: "Build and publish tiny monochrome browser games.",
+  },
   icons: { icon: "/tynt-mark.svg" },
 };
 
@@ -35,7 +39,9 @@ const themeScript = `(() => {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );

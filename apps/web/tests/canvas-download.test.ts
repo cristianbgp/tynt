@@ -18,9 +18,14 @@ test("downloads a nearest-neighbor two-times PNG and revokes its URL", async () 
     toBlob: (callback: BlobCallback) => callback(new Blob(["png"], { type: "image/png" })),
   };
   const createElement = document.createElement.bind(document);
-  vi.spyOn(document, "createElement").mockImplementation(((tag: string) => tag === "canvas" ? output : createElement(tag)) as typeof document.createElement);
+  vi.spyOn(document, "createElement").mockImplementation(((tag: string) =>
+    tag === "canvas" ? output : createElement(tag)) as typeof document.createElement);
   let downloaded = "";
-  const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) { downloaded = this.download; });
+  const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
+    this: HTMLAnchorElement,
+  ) {
+    downloaded = this.download;
+  });
   vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:screenshot");
   const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
 

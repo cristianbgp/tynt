@@ -9,30 +9,65 @@ function iframeHarness(document: string) {
   let listener: ((event: { source: unknown; data: unknown }) => void) | undefined;
   const relayed: unknown[] = [];
   const parent = { postMessage: (value: unknown) => relayed.push(value) };
-  const window = { addEventListener: (_: string, callback: typeof listener) => { listener = callback; } };
+  const window = {
+    addEventListener: (_: string, callback: typeof listener) => {
+      listener = callback;
+    },
+  };
   const workers: FakeWorker[] = [];
   class FakeWorker {
     onmessage?: (event: { data: unknown }) => void;
     onerror?: (event: { message: string }) => void;
     messages: unknown[] = [];
     terminated = false;
-    constructor(_url: string) { workers.push(this); }
-    postMessage(value: unknown) { this.messages.push(value); }
-    terminate() { this.terminated = true; }
+    constructor(_url: string) {
+      workers.push(this);
+    }
+    postMessage(value: unknown) {
+      this.messages.push(value);
+    }
+    terminate() {
+      this.terminated = true;
+    }
   }
   let revoked = false;
   let timerId = 0;
   const timers = new Map<number, { callback: () => void; delay: number }>();
-  const URL = { createObjectURL: () => "blob:worker", revokeObjectURL: () => { revoked = true; } };
-  Function("window", "parent", "Worker", "Blob", "URL", "setTimeout", "clearTimeout", script)(
-    window, parent, FakeWorker, class {}, URL,
-    (callback: () => void, delay: number) => { const id = ++timerId; timers.set(id, { callback, delay }); return id; },
+  const URL = {
+    createObjectURL: () => "blob:worker",
+    revokeObjectURL: () => {
+      revoked = true;
+    },
+  };
+  Function(
+    "window",
+    "parent",
+    "Worker",
+    "Blob",
+    "URL",
+    "setTimeout",
+    "clearTimeout",
+    script,
+  )(
+    window,
+    parent,
+    FakeWorker,
+    class {},
+    URL,
+    (callback: () => void, delay: number) => {
+      const id = ++timerId;
+      timers.set(id, { callback, delay });
+      return id;
+    },
     (id: number) => timers.delete(id),
   );
   return {
     send: (source: unknown, data: unknown) => listener?.({ source, data }),
-    parent, workers, relayed,
-    fire: (delay: number) => [...timers.values()].find((timer) => timer.delay === delay)?.callback(),
+    parent,
+    workers,
+    relayed,
+    fire: (delay: number) =>
+      [...timers.values()].find((timer) => timer.delay === delay)?.callback(),
     revoked: () => revoked,
   };
 }
@@ -72,15 +107,27 @@ describe("iframe bootstrap", () => {
   test("terminates on lifecycle and heartbeat watchdog deadlines", () => {
     const phaseHarness = iframeHarness(createIframeDocument(token));
     phaseHarness.send(phaseHarness.parent, { kind: "boot", token, workerSource: "source" });
-    phaseHarness.workers[0]!.onmessage?.({ data: { kind: "phase", token, phase: "draw", state: "begin" } });
+    phaseHarness.workers[0]!.onmessage?.({
+      data: { kind: "phase", token, phase: "draw", state: "begin" },
+    });
     phaseHarness.fire(100);
-    expect(phaseHarness.relayed).toContainEqual({ kind: "error", token, phase: "draw", message: "draw exceeded 100 ms" });
+    expect(phaseHarness.relayed).toContainEqual({
+      kind: "error",
+      token,
+      phase: "draw",
+      message: "draw exceeded 100 ms",
+    });
     expect(phaseHarness.workers[0]!.terminated).toBe(true);
 
     const heartbeatHarness = iframeHarness(createIframeDocument(token));
     heartbeatHarness.send(heartbeatHarness.parent, { kind: "boot", token, workerSource: "source" });
     heartbeatHarness.fire(2000);
-    expect(heartbeatHarness.relayed).toContainEqual({ kind: "error", token, phase: "init", message: "Worker stopped responding for 2 seconds" });
+    expect(heartbeatHarness.relayed).toContainEqual({
+      kind: "error",
+      token,
+      phase: "init",
+      message: "Worker stopped responding for 2 seconds",
+    });
     expect(heartbeatHarness.workers[0]!.terminated).toBe(true);
   });
 
@@ -103,7 +150,12 @@ describe("iframe bootstrap", () => {
 
     harness.fire(2000);
 
-    expect(harness.relayed).toContainEqual({ kind: "error", token, phase: "init", message: "Worker stopped responding for 2 seconds" });
+    expect(harness.relayed).toContainEqual({
+      kind: "error",
+      token,
+      phase: "init",
+      message: "Worker stopped responding for 2 seconds",
+    });
     expect(harness.workers[0]!.terminated).toBe(true);
   });
 
@@ -119,7 +171,12 @@ describe("iframe bootstrap", () => {
 
     harness.send(harness.parent, { kind: "resume", token });
     harness.fire(2000);
-    expect(harness.relayed).toContainEqual({ kind: "error", token, phase: "init", message: "Worker stopped responding for 2 seconds" });
+    expect(harness.relayed).toContainEqual({
+      kind: "error",
+      token,
+      phase: "init",
+      message: "Worker stopped responding for 2 seconds",
+    });
     expect(harness.workers[0]!.terminated).toBe(true);
   });
 });

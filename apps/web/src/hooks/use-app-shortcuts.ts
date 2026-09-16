@@ -14,7 +14,9 @@ export function useAppShortcuts(actions: ShortcutActions): void {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (matchesShortcut(event, { key: "Enter", code: "Enter", modifier: "control", shift: true })) {
+      if (
+        matchesShortcut(event, { key: "Enter", code: "Enter", modifier: "control", shift: true })
+      ) {
         if (actionsRef.current.runDisabled) return;
         event.preventDefault();
         actionsRef.current.onRun();

@@ -4,10 +4,19 @@ import { createIframeDocument } from "./iframe-source";
 import { newRunToken, parseIframeMessage, type CartridgeAudio, type ErrorPhase } from "./protocol";
 import { createWorkerSource } from "./worker-source";
 
-export interface SandboxFrame { commands: DrawCommand[] }
-export interface SandboxError { phase: ErrorPhase; message: string; line?: number; column?: number }
+export interface SandboxFrame {
+  commands: DrawCommand[];
+}
+export interface SandboxError {
+  phase: ErrorPhase;
+  message: string;
+  line?: number;
+  column?: number;
+}
 
-interface MessageTarget { postMessage(message: unknown, targetOrigin: string): void }
+interface MessageTarget {
+  postMessage(message: unknown, targetOrigin: string): void;
+}
 export interface SandboxIframe {
   contentWindow: MessageTarget | null;
   srcdoc: string;
@@ -30,7 +39,9 @@ function createDomEnvironment(): SandboxEnvironment {
       const element = document.createElement("iframe");
       element.className = "runtime-sandbox";
       element.hidden = true;
-      return Object.assign(element, { setSandbox: (value: string) => element.setAttribute("sandbox", value) }) as unknown as SandboxIframe;
+      return Object.assign(element, {
+        setSandbox: (value: string) => element.setAttribute("sandbox", value),
+      }) as unknown as SandboxIframe;
     },
     appendIframe: (iframe) => document.body.appendChild(iframe as unknown as Node),
     addMessageListener: (callback) => window.addEventListener("message", callback),
@@ -66,12 +77,15 @@ export class SandboxRun {
     token = newRunToken(),
     private readonly now: () => number = () => performance.now(),
   ) {
-    if (!environment && typeof document === "undefined") throw new Error("A sandbox environment is required outside the browser");
+    if (!environment && typeof document === "undefined")
+      throw new Error("A sandbox environment is required outside the browser");
     this.environment = environment ?? createDomEnvironment();
     this.token = token;
   }
 
-  get isActive(): boolean { return this.active; }
+  get isActive(): boolean {
+    return this.active;
+  }
 
   private acceptAudio(): void {
     const now = this.now();
@@ -99,9 +113,11 @@ export class SandboxRun {
         this.acceptAudio();
         const { frequency, duration, volume, wave, delay } = message;
         this.callbacks.onAudio?.({ frequency, duration, volume, wave, delay });
-      }
-      else if (message.kind === "error") {
-        const mapped = message.line === undefined ? null : mapGeneratedPosition(this.compiled.map, message.line, message.column ?? 0);
+      } else if (message.kind === "error") {
+        const mapped =
+          message.line === undefined
+            ? null
+            : mapGeneratedPosition(this.compiled.map, message.line, message.column ?? 0);
         this.callbacks.onError?.({
           phase: message.phase,
           message: message.message,
@@ -111,7 +127,10 @@ export class SandboxRun {
         this.stop();
       }
     } catch (error) {
-      this.callbacks.onError?.({ phase: "protocol", message: error instanceof Error ? error.message : "Invalid sandbox message" });
+      this.callbacks.onError?.({
+        phase: "protocol",
+        message: error instanceof Error ? error.message : "Invalid sandbox message",
+      });
       this.stop();
     }
   };
@@ -126,12 +145,16 @@ export class SandboxRun {
     iframe.srcdoc = createIframeDocument(this.token);
     iframe.addEventListener("load", () => {
       if (!this.active) return;
-      iframe.contentWindow?.postMessage({
-        kind: "boot",
-        token: this.token,
-        workerSource: createWorkerSource(this.compiled.code, this.token),
-      }, "*");
-      if (this.suspended) iframe.contentWindow?.postMessage({ kind: "suspend", token: this.token }, "*");
+      iframe.contentWindow?.postMessage(
+        {
+          kind: "boot",
+          token: this.token,
+          workerSource: createWorkerSource(this.compiled.code, this.token),
+        },
+        "*",
+      );
+      if (this.suspended)
+        iframe.contentWindow?.postMessage({ kind: "suspend", token: this.token }, "*");
     });
     this.environment.addMessageListener(this.onMessage);
     this.environment.appendIframe(iframe);
@@ -158,7 +181,9 @@ export class SandboxRun {
     if (!this.active) return;
     this.active = false;
     this.suspended = false;
-    try { this.iframe?.contentWindow?.postMessage({ kind: "stop", token: this.token }, "*"); } catch {}
+    try {
+      this.iframe?.contentWindow?.postMessage({ kind: "stop", token: this.token }, "*");
+    } catch {}
     this.environment.removeMessageListener(this.onMessage);
     this.iframe?.remove();
     this.iframe = null;

@@ -45,17 +45,25 @@ test("theme control supports persistent System, Light, and Dark modes", async ({
   await page.goto(`${docs}/docs`);
   const themes = page.getByRole("radiogroup", { name: "Theme" });
 
-  await expect(themes.getByRole("radio", { name: "System theme" })).toHaveAttribute("aria-checked", "true");
+  await expect(themes.getByRole("radio", { name: "System theme" })).toHaveAttribute(
+    "aria-checked",
+    "true",
+  );
   await themes.getByRole("radio", { name: "Dark theme" }).click();
   await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
-  await expect.poll(() => page.evaluate(() => localStorage.getItem("tynt-docs-theme"))).toBe("dark");
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("tynt-docs-theme")))
+    .toBe("dark");
 
   await themes.getByRole("radio", { name: "System theme" }).click();
   await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await page.emulateMedia({ colorScheme: "dark" });
   await expect(page.locator("body")).toHaveCSS("background-color", "rgb(0, 0, 0)");
   await page.reload();
-  await expect(themes.getByRole("radio", { name: "System theme" })).toHaveAttribute("aria-checked", "true");
+  await expect(themes.getByRole("radio", { name: "System theme" })).toHaveAttribute(
+    "aria-checked",
+    "true",
+  );
 });
 
 test("search opens from the keyboard and finds API entries", async ({ page }) => {
@@ -74,7 +82,10 @@ test("API reference and old TypeDoc routes remain useful on a phone", async ({ p
   await expect(page.locator("h1").filter({ hasText: "Cartridge API" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Drawing" })).toBeVisible();
   await expect(page.getByText("clear(color = 0)", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Raw Markdown" })).toHaveAttribute("href", "/docs/reference/cartridge-api.md");
+  await expect(page.getByRole("link", { name: "Raw Markdown" })).toHaveAttribute(
+    "href",
+    "/docs/reference/cartridge-api.md",
+  );
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
 
   await page.goto(`${docs}/documents/Getting_Started.html`);

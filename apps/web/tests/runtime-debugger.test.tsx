@@ -12,7 +12,18 @@ test("stays compact until opened and exposes accessible runtime controls", async
   const step = vi.fn();
   const store = createRuntimeDebugStore();
   store.update({ frame: 12, held: ["left"], pressed: ["a"] });
-  render(<RuntimeDebugger active paused={false} store={store} onPause={pause} onResume={() => {}} onStep={step} onRestart={() => {}} onScreenshot={() => {}} />);
+  render(
+    <RuntimeDebugger
+      active
+      paused={false}
+      store={store}
+      onPause={pause}
+      onResume={() => {}}
+      onStep={step}
+      onRestart={() => {}}
+      onScreenshot={() => {}}
+    />,
+  );
 
   const toggle = screen.getByRole("button", { name: "Open debugger" });
   expect(toggle).toHaveAttribute("data-cuelume-hover", "tick");
@@ -34,7 +45,18 @@ test("enables single stepping only for an active paused cartridge", async () => 
   const step = vi.fn();
   const store = createRuntimeDebugStore();
   store.update({ frame: 3, held: [], pressed: [] });
-  render(<RuntimeDebugger active paused store={store} onPause={() => {}} onResume={() => {}} onStep={step} onRestart={() => {}} onScreenshot={() => {}} />);
+  render(
+    <RuntimeDebugger
+      active
+      paused
+      store={store}
+      onPause={() => {}}
+      onResume={() => {}}
+      onStep={step}
+      onRestart={() => {}}
+      onScreenshot={() => {}}
+    />,
+  );
   await user.click(screen.getByRole("button", { name: "Open debugger" }));
 
   expect(screen.getByRole("button", { name: "Resume" })).toBeEnabled();

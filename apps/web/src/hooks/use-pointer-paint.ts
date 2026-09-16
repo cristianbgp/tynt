@@ -12,7 +12,8 @@ export function usePointerPaint<T extends HTMLElement>({ selector, paint }: Poin
   const cellAtPointer = (root: T, target: EventTarget | null, clientX: number, clientY: number) => {
     const direct = target instanceof Element ? target.closest<HTMLElement>(selector) : null;
     if (direct && root.contains(direct)) return direct;
-    const hit = document.elementFromPoint?.(clientX, clientY)?.closest<HTMLElement>(selector) ?? null;
+    const hit =
+      document.elementFromPoint?.(clientX, clientY)?.closest<HTMLElement>(selector) ?? null;
     return hit && root.contains(hit) ? hit : null;
   };
 

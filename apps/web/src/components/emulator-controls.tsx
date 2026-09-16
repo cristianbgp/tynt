@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type ComponentType, type PointerEvent, type ReactNode, type SVGProps } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type PointerEvent,
+  type ReactNode,
+  type SVGProps,
+} from "react";
 import type { InputName } from "@tynt/core";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "pixelarticons/react";
 import { Button } from "@/components/ui/button";
@@ -8,16 +16,50 @@ interface EmulatorControlsProps {
 }
 
 const directionInputs = ["up", "left", "right", "down"] as const satisfies readonly InputName[];
-type DirectionInput = typeof directionInputs[number];
+type DirectionInput = (typeof directionInputs)[number];
 
-const controls: Array<{ input: DirectionInput; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>>; iconName: string; className: string }> = [
-  { input: "up", label: "Direction up", Icon: ArrowUp, iconName: "arrow-up", className: "dpad-up col-start-2 row-start-1" },
-  { input: "left", label: "Direction left", Icon: ArrowLeft, iconName: "arrow-left", className: "dpad-left col-start-1 row-start-2" },
-  { input: "right", label: "Direction right", Icon: ArrowRight, iconName: "arrow-right", className: "dpad-right col-start-3 row-start-2" },
-  { input: "down", label: "Direction down", Icon: ArrowDown, iconName: "arrow-down", className: "dpad-down col-start-2 row-start-3" },
+const controls: Array<{
+  input: DirectionInput;
+  label: string;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  iconName: string;
+  className: string;
+}> = [
+  {
+    input: "up",
+    label: "Direction up",
+    Icon: ArrowUp,
+    iconName: "arrow-up",
+    className: "dpad-up col-start-2 row-start-1",
+  },
+  {
+    input: "left",
+    label: "Direction left",
+    Icon: ArrowLeft,
+    iconName: "arrow-left",
+    className: "dpad-left col-start-1 row-start-2",
+  },
+  {
+    input: "right",
+    label: "Direction right",
+    Icon: ArrowRight,
+    iconName: "arrow-right",
+    className: "dpad-right col-start-3 row-start-2",
+  },
+  {
+    input: "down",
+    label: "Direction down",
+    Icon: ArrowDown,
+    iconName: "arrow-down",
+    className: "dpad-down col-start-2 row-start-3",
+  },
 ];
 
-function directionsAtPoint(element: HTMLElement, clientX: number, clientY: number): DirectionInput[] {
+function directionsAtPoint(
+  element: HTMLElement,
+  clientX: number,
+  clientY: number,
+): DirectionInput[] {
   const bounds = element.getBoundingClientRect();
   const x = (clientX - bounds.left - bounds.width / 2) / (bounds.width / 2);
   const y = (clientY - bounds.top - bounds.height / 2) / (bounds.height / 2);
@@ -79,12 +121,18 @@ export function EmulatorControls({ onInput }: EmulatorControlsProps) {
     if (directionPointer.current !== null) return;
     directionPointer.current = event.pointerId;
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    updateDirections(event.pointerId, directionsAtPoint(event.currentTarget, event.clientX, event.clientY));
+    updateDirections(
+      event.pointerId,
+      directionsAtPoint(event.currentTarget, event.clientX, event.clientY),
+    );
   };
 
   const moveDirections = (event: PointerEvent<HTMLDivElement>) => {
     if (directionPointer.current !== event.pointerId) return;
-    updateDirections(event.pointerId, directionsAtPoint(event.currentTarget, event.clientX, event.clientY));
+    updateDirections(
+      event.pointerId,
+      directionsAtPoint(event.currentTarget, event.clientX, event.clientY),
+    );
   };
 
   const endDirections = (pointerId: number) => {
@@ -93,10 +141,13 @@ export function EmulatorControls({ onInput }: EmulatorControlsProps) {
     updateDirections(pointerId, []);
   };
 
-  useEffect(() => () => {
-    for (const input of active.current.keys()) onInputRef.current(input, false);
-    active.current.clear();
-  }, []);
+  useEffect(
+    () => () => {
+      for (const input of active.current.keys()) onInputRef.current(input, false);
+      active.current.clear();
+    },
+    [],
+  );
 
   const control = (input: InputName, label: string, content: ReactNode, className?: string) => {
     const isAction = input === "a" || input === "b";
@@ -120,7 +171,10 @@ export function EmulatorControls({ onInput }: EmulatorControlsProps) {
   };
 
   return (
-    <div className="emulator-controls mt-[18px] flex touch-none select-none items-end justify-between" aria-label="Emulator controls">
+    <div
+      className="emulator-controls mt-[18px] flex touch-none items-end justify-between select-none"
+      aria-label="Emulator controls"
+    >
       <div
         className="dpad grid touch-none grid-cols-[repeat(3,48px)] grid-rows-[repeat(3,48px)]"
         aria-label="Direction pad"
@@ -131,13 +185,18 @@ export function EmulatorControls({ onInput }: EmulatorControlsProps) {
         onLostPointerCapture={(event) => endDirections(event.pointerId)}
         onContextMenu={(event) => event.preventDefault()}
       >
-        {controls.map(({ input, label, Icon, iconName, className }) => control(
-          input,
-          label,
-          <Icon width={24} height={24} data-icon={iconName} aria-hidden="true" />,
-          className,
-        ))}
-        <span className="dpad-center col-start-2 row-start-2 border border-foreground bg-foreground" aria-hidden="true" />
+        {controls.map(({ input, label, Icon, iconName, className }) =>
+          control(
+            input,
+            label,
+            <Icon width={24} height={24} data-icon={iconName} aria-hidden="true" />,
+            className,
+          ),
+        )}
+        <span
+          className="dpad-center col-start-2 row-start-2 border border-foreground bg-foreground"
+          aria-hidden="true"
+        />
       </div>
       <div className="action-buttons flex items-end gap-[12px] pb-[10px]">
         <div className="translate-y-[8px]">{control("b", "Action B", "B")}</div>

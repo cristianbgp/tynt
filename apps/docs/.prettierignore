@@ -1,0 +1,6 @@
+.next
+.source
+generated
+node_modules
+content/docs/reference/cartridge-api.mdx
+next-env.d.ts

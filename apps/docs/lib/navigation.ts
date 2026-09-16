@@ -13,7 +13,8 @@ function titleForNode(node: Node): string {
 }
 
 function transformNode(node: Node): DocsNavigationItem | undefined {
-  if (node.type === "separator") return node.name ? { title: String(node.name), children: [] } : undefined;
+  if (node.type === "separator")
+    return node.name ? { title: String(node.name), children: [] } : undefined;
   if (node.type === "page") return { title: titleForNode(node), url: node.url };
 
   const children = [node.index, ...node.children]

@@ -13,8 +13,10 @@ function requestResult<T>(request: IDBRequest<T>): Promise<T> {
 function transactionDone(transaction: IDBTransaction): Promise<void> {
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve();
-    transaction.onerror = () => reject(transaction.error ?? new Error("Local library transaction failed"));
-    transaction.onabort = () => reject(transaction.error ?? new Error("Local library transaction was cancelled"));
+    transaction.onerror = () =>
+      reject(transaction.error ?? new Error("Local library transaction failed"));
+    transaction.onabort = () =>
+      reject(transaction.error ?? new Error("Local library transaction was cancelled"));
   });
 }
 
@@ -27,17 +29,22 @@ export function createIndexedDbAdapter(factory: IDBFactory = indexedDB): Library
       }
     };
     request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error ?? new Error("Could not open the local cartridge library"));
+    request.onerror = () =>
+      reject(request.error ?? new Error("Could not open the local cartridge library"));
   });
 
   return {
     async list() {
       const db = await database;
-      return requestResult(db.transaction(STORE_NAME).objectStore(STORE_NAME).getAll()) as Promise<LibraryCartridge[]>;
+      return requestResult(db.transaction(STORE_NAME).objectStore(STORE_NAME).getAll()) as Promise<
+        LibraryCartridge[]
+      >;
     },
     async get(id) {
       const db = await database;
-      return requestResult(db.transaction(STORE_NAME).objectStore(STORE_NAME).get(id)) as Promise<LibraryCartridge | undefined>;
+      return requestResult(db.transaction(STORE_NAME).objectStore(STORE_NAME).get(id)) as Promise<
+        LibraryCartridge | undefined
+      >;
     },
     async put(record) {
       const db = await database;

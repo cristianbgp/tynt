@@ -23,8 +23,7 @@ const soundLinkProps = {
   "data-cuelume-press": "",
   "data-cuelume-release": "",
 } as const;
-const playButtonClassName =
-  "max-[900px]:w-full max-[900px]:min-w-0 max-[900px]:px-[8px]";
+const playButtonClassName = "max-[900px]:w-full max-[900px]:min-w-0 max-[900px]:px-[8px]";
 
 export function CartridgeNotFound({ local = false }: { local?: boolean }) {
   return (
@@ -53,12 +52,7 @@ export function CartridgeNotFound({ local = false }: { local?: boolean }) {
   );
 }
 
-export function PlayPage({
-  cartridge,
-  editorHref,
-  soundEnabled,
-  onSoundToggle,
-}: PlayPageProps) {
+export function PlayPage({ cartridge, editorHref, soundEnabled, onSoundToggle }: PlayPageProps) {
   const [paused, setPaused] = useState(false);
   const [pageError, setPageError] = useState("");
   const stageRef = useRef<HTMLElement>(null);
@@ -111,10 +105,10 @@ export function PlayPage({
       <SiteHeader editorTo={editorHref} />
       <header className="play-topbar grid min-w-0 grid-cols-[minmax(140px,1fr)_max-content] border-b border-border max-[900px]:h-[82px] max-[900px]:grid-cols-1 max-[900px]:grid-rows-[41px_41px]">
         <div className="play-identity flex min-w-0 items-center gap-[12px] px-[16px]">
-          <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13px]">
+          <h1 className="m-0 overflow-hidden text-[13px] text-ellipsis whitespace-nowrap">
             {cartridge.title}
           </h1>
-          <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[10px] text-muted-foreground">
+          <span className="overflow-hidden text-[10px] text-ellipsis whitespace-nowrap text-muted-foreground">
             {cartridge.author ? `by ${cartridge.author}` : "local cartridge"}
           </span>
         </div>
@@ -123,11 +117,7 @@ export function PlayPage({
           role="group"
           aria-label="Play controls"
         >
-          <Button
-            className={playButtonClassName}
-            aria-label="Restart"
-            onClick={restart}
-          >
+          <Button className={playButtonClassName} aria-label="Restart" onClick={restart}>
             <Refresh width={24} height={24} aria-hidden="true" />
             <span className="max-[560px]:hidden">Restart</span>
           </Button>
@@ -142,9 +132,7 @@ export function PlayPage({
             ) : (
               <Pause width={24} height={24} aria-hidden="true" />
             )}
-            <span className="max-[560px]:hidden">
-              {paused ? "Resume" : "Pause"}
-            </span>
+            <span className="max-[560px]:hidden">{paused ? "Resume" : "Pause"}</span>
           </Button>
           <Button
             className={playButtonClassName}
@@ -160,7 +148,7 @@ export function PlayPage({
       </header>
       <main
         ref={stageRef}
-        className="play-stage min-h-0 min-w-0 bg-background fullscreen:bg-muted [&_.preview-pane]:h-full [&_.preview-pane]:w-full [&_.preview-pane]:min-h-0 [&_.preview-pane]:min-w-0 min-[901px]:[&_.preview-pane]:[align-content:start] max-[900px]:min-h-[680px] max-[560px]:min-h-0 max-[560px]:select-none max-[560px]:overflow-auto max-[560px]:[-webkit-touch-callout:none] max-[560px]:[&_.preview-pane]:h-auto max-[560px]:[&_.preview-pane]:min-h-full max-[560px]:[&_.preview-pane]:[align-content:safe_center] max-[560px]:[&_.preview-pane]:items-start max-[560px]:[&_.preview-pane]:p-0 max-[560px]:[&_.preview-frame]:border-0 max-[560px]:[&_.preview-frame]:outline max-[560px]:[&_.preview-frame]:-outline-offset-1 max-[560px]:[&_.preview-frame]:outline-foreground max-[560px]:[&_canvas]:w-[min(320px,100vw)] max-[560px]:[&_.preview-hints]:px-[8px] max-[560px]:[&_.emulator-controls]:mx-[16px] max-[560px]:[&_.emulator-controls]:mt-[10px] max-[560px]:[&_.emulator-controls]:mb-[8px]"
+        className="play-stage fullscreen:bg-muted min-h-0 min-w-0 bg-background max-[900px]:min-h-[680px] max-[560px]:min-h-0 max-[560px]:overflow-auto max-[560px]:select-none max-[560px]:[-webkit-touch-callout:none] max-[560px]:[&_.emulator-controls]:mx-[16px] max-[560px]:[&_.emulator-controls]:mt-[10px] max-[560px]:[&_.emulator-controls]:mb-[8px] max-[560px]:[&_.preview-frame]:border-0 max-[560px]:[&_.preview-frame]:outline max-[560px]:[&_.preview-frame]:-outline-offset-1 max-[560px]:[&_.preview-frame]:outline-foreground max-[560px]:[&_.preview-hints]:px-[8px] [&_.preview-pane]:h-full [&_.preview-pane]:min-h-0 [&_.preview-pane]:w-full [&_.preview-pane]:min-w-0 max-[560px]:[&_.preview-pane]:h-auto max-[560px]:[&_.preview-pane]:min-h-full max-[560px]:[&_.preview-pane]:[align-content:safe_center] max-[560px]:[&_.preview-pane]:items-start max-[560px]:[&_.preview-pane]:p-0 min-[901px]:[&_.preview-pane]:[align-content:start] max-[560px]:[&_canvas]:w-[min(320px,100vw)]"
       >
         <Preview
           interactionRef={previewRef}
@@ -172,21 +160,13 @@ export function PlayPage({
           showError={runtime.showPreviewError}
         />
       </main>
-      <ErrorConsole
-        error={pageError || runtime.error}
-        className="row-start-4"
-      />
+      <ErrorConsole error={pageError || runtime.error} className="row-start-4" />
       <footer className="play-footer row-start-5 flex items-center gap-[14px] border-t border-border px-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)]">
         <span role="status" aria-live="polite">
           {paused ? "paused" : runtime.status}
         </span>
-        <span className="ml-auto max-[560px]:hidden">
-          {cartridge.controls || "ARROWS · Z / X"}
-        </span>
-        <FooterActions
-          soundEnabled={soundEnabled}
-          onSoundToggle={onSoundToggle}
-        />
+        <span className="ml-auto max-[560px]:hidden">{cartridge.controls || "ARROWS · Z / X"}</span>
+        <FooterActions soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />
       </footer>
     </div>
   );

@@ -13,7 +13,11 @@ export function readAutosave(storage: StorageLike): Draft | null {
     const saved = storage.getItem(AUTOSAVE_KEY);
     if (saved === null) return null;
     const value: unknown = JSON.parse(saved);
-    if (typeof value !== "object" || value === null || (value as Record<string, unknown>).version !== 1) {
+    if (
+      typeof value !== "object" ||
+      value === null ||
+      (value as Record<string, unknown>).version !== 1
+    ) {
       throw new Error("Incompatible autosave");
     }
     return validateDraft(value);

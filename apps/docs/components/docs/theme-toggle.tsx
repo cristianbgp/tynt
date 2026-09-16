@@ -23,7 +23,10 @@ function storedPreference(): ThemePreference {
   return saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
 }
 
-function resolveTheme(preference: ThemePreference, systemDark = matchMedia("(prefers-color-scheme: dark)").matches): ResolvedTheme {
+function resolveTheme(
+  preference: ThemePreference,
+  systemDark = matchMedia("(prefers-color-scheme: dark)").matches,
+): ResolvedTheme {
   if (preference === "system") return systemDark ? "dark" : "light";
   return preference;
 }
@@ -83,7 +86,10 @@ export function ThemeToggle() {
               </button>
             </Tooltip.Trigger>
             <Tooltip.Portal>
-              <Tooltip.Content className="z-[80] border border-foreground bg-foreground px-2 py-1 text-[10px] text-background" sideOffset={6}>
+              <Tooltip.Content
+                className="z-[80] border border-foreground bg-foreground px-2 py-1 text-[10px] text-background"
+                sideOffset={6}
+              >
                 {label.replace(" theme", "")}
               </Tooltip.Content>
             </Tooltip.Portal>

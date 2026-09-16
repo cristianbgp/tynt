@@ -11,7 +11,10 @@ interface SpritePageProps {
 }
 
 function spriteCode(pixels: readonly number[]): string {
-  const rows = Array.from({ length: 8 }, (_, row) => `  ${pixels.slice(row * 8, row * 8 + 8).join(", ")},`);
+  const rows = Array.from(
+    { length: 8 },
+    (_, row) => `  ${pixels.slice(row * 8, row * 8 + 8).join(", ")},`,
+  );
   return `const spritePixels = [\n${rows.join("\n")}\n] as const;\n\n// draw with: sprite(spritePixels, 8, 8, x, y);`;
 }
 
@@ -22,8 +25,10 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
   const code = useMemo(() => spriteCode(pixels), [pixels]);
 
   const paint = (index: number) => {
-    setPixels((current) => current.map((value, pixelIndex) => pixelIndex === index ? color : value));
-    setStatus(`pixel ${index % 8 + 1}, ${Math.floor(index / 8) + 1} painted`);
+    setPixels((current) =>
+      current.map((value, pixelIndex) => (pixelIndex === index ? color : value)),
+    );
+    setStatus(`pixel ${(index % 8) + 1}, ${Math.floor(index / 8) + 1} painted`);
   };
 
   const copy = async () => {
@@ -47,20 +52,30 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
       <SiteHeader active="sprites" />
       <main className="sprite-main overflow-auto px-[clamp(18px,5vw,72px)] pt-[42px] pb-[72px] max-[560px]:pb-[28px]">
         <header className="sprite-heading mx-auto flex w-[min(100%,960px)] items-end justify-between gap-[32px] border-b border-foreground pb-[24px] max-[700px]:grid max-[560px]:gap-[12px] max-[560px]:pb-[16px]">
-          <h1 className="m-0 text-[clamp(30px,5vw,58px)] leading-[0.95] font-[580] tracking-[-0.065em]">Sprite editor</h1>
-          <p className="m-0 max-w-[42ch] leading-[1.55] text-[#555555]">Paint an indexed 8×8 sprite, then copy it directly into a cartridge.</p>
+          <h1 className="m-0 text-[clamp(30px,5vw,58px)] leading-[0.95] font-[580] tracking-[-0.065em]">
+            Sprite editor
+          </h1>
+          <p className="m-0 max-w-[42ch] leading-[1.55] text-[#555555]">
+            Paint an indexed 8×8 sprite, then copy it directly into a cartridge.
+          </p>
         </header>
         <section className="sprite-workspace mx-auto grid w-[min(100%,960px)] grid-cols-[minmax(280px,1fr)_minmax(300px,1fr)] border-b border-l border-border max-[700px]:grid-cols-1">
-          <div className="sprite-canvas grid touch-none self-start aspect-square grid-cols-[repeat(8,minmax(28px,1fr))] bg-foreground" aria-label="Eight by eight sprite canvas" {...pointerPaint}>
+          <div
+            className="sprite-canvas grid aspect-square touch-none grid-cols-[repeat(8,minmax(28px,1fr))] self-start bg-foreground"
+            aria-label="Eight by eight sprite canvas"
+            {...pointerPaint}
+          >
             {pixels.map((value, index) => (
               <button
                 className={`min-w-0 cursor-crosshair border-0 border-t border-r border-[#777777] hover:outline-2 hover:-outline-offset-4 focus-visible:outline-offset-[-4px] ${value < 2 ? "hover:outline-background" : "hover:outline-foreground"}`}
                 key={index}
                 type="button"
-                aria-label={`Pixel ${index % 8 + 1}, ${Math.floor(index / 8) + 1} color ${value}`}
+                aria-label={`Pixel ${(index % 8) + 1}, ${Math.floor(index / 8) + 1} color ${value}`}
                 data-pixel-index={index}
                 style={{ background: ["#000", "#555", "#aaa", "#fff"][value] }}
-                onClick={(event) => { if (event.detail === 0) paint(index); }}
+                onClick={(event) => {
+                  if (event.detail === 0) paint(index);
+                }}
                 data-cuelume-hover="tick"
                 data-cuelume-press=""
                 data-cuelume-release=""
@@ -77,22 +92,59 @@ export function SpritePage({ soundEnabled, onSoundToggle }: SpritePageProps) {
                   aria-label={`Color ${value}`}
                   aria-pressed={color === value}
                   style={{ background: ["#000", "#555", "#aaa", "#fff"][value] }}
-                  onClick={() => { setColor(value); setStatus(`8 × 8 · color ${value} selected`); }}
+                  onClick={() => {
+                    setColor(value);
+                    setStatus(`8 × 8 · color ${value} selected`);
+                  }}
                   data-cuelume-hover="tick"
                   data-cuelume-toggle=""
                 />
               ))}
             </div>
-            <textarea className="min-h-0 w-full resize-none border-0 border-t border-border bg-muted p-[16px] font-[inherit] leading-normal max-[560px]:min-h-[190px]" aria-label="Sprite code" readOnly value={code} />
+            <textarea
+              className="min-h-0 w-full resize-none border-0 border-t border-border bg-muted p-[16px] font-[inherit] leading-normal max-[560px]:min-h-[190px]"
+              aria-label="Sprite code"
+              readOnly
+              value={code}
+            />
             <div className="sprite-actions grid grid-cols-2">
-              <Button className="min-h-[41px] justify-center" aria-label="Copy sprite code" onClick={() => { void copy(); }}><Copy width={24} height={24} aria-hidden="true" />Copy code</Button>
-              <Button className="min-h-[41px] justify-center" aria-label="Clear sprite" onClick={() => { setPixels(Array(64).fill(0)); setStatus("cleared"); }}><Trash width={24} height={24} aria-hidden="true" />Clear</Button>
+              <Button
+                className="min-h-[41px] justify-center"
+                aria-label="Copy sprite code"
+                onClick={() => {
+                  void copy();
+                }}
+              >
+                <Copy width={24} height={24} aria-hidden="true" />
+                Copy code
+              </Button>
+              <Button
+                className="min-h-[41px] justify-center"
+                aria-label="Clear sprite"
+                onClick={() => {
+                  setPixels(Array(64).fill(0));
+                  setStatus("cleared");
+                }}
+              >
+                <Trash width={24} height={24} aria-hidden="true" />
+                Clear
+              </Button>
             </div>
-            <p className="sprite-status m-0 min-h-[32px] border-t border-border px-[12px] py-[8px] text-[#555555]" role="status" aria-live="polite">{status}</p>
+            <p
+              className="sprite-status m-0 min-h-[32px] border-t border-border px-[12px] py-[8px] text-[#555555]"
+              role="status"
+              aria-live="polite"
+            >
+              {status}
+            </p>
           </aside>
         </section>
       </main>
-      <SiteFooter summary="four indexed colors" soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />
+      <SiteFooter
+        summary="four indexed colors"
+        soundEnabled={soundEnabled}
+        onSoundToggle={onSoundToggle}
+      />
     </div>
   );
 }

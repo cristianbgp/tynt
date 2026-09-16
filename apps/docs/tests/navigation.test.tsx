@@ -17,7 +17,13 @@ describe("documentation navigation", () => {
     render(<DocsSidebar items={navigation} currentPath="/docs/getting-started" />);
 
     expect(screen.getByRole("navigation", { name: "Documentation" })).toBeVisible();
-    expect(screen.getByRole("link", { name: "Getting started" })).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("link", { name: "Cartridge API" })).toHaveAttribute("href", "/docs/reference/cartridge-api");
+    expect(screen.getByRole("link", { name: "Getting started" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: "Cartridge API" })).toHaveAttribute(
+      "href",
+      "/docs/reference/cartridge-api",
+    );
   });
 });

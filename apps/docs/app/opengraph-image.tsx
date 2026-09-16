@@ -23,13 +23,24 @@ export default function OpenGraphImage() {
           {[0, 1, 2, 3].map((shade) => (
             <div
               key={shade}
-              style={{ background: ["#000000", "#555555", "#aaaaaa", "#ffffff"][shade], border: "2px solid #000000", height: 56, width: 56 }}
+              style={{
+                background: ["#000000", "#555555", "#aaaaaa", "#ffffff"][shade],
+                border: "2px solid #000000",
+                height: 56,
+                width: 56,
+              }}
             />
           ))}
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontFamily: "monospace", fontSize: 76, fontWeight: 700, letterSpacing: -4 }}>tynt docs</div>
-          <div style={{ fontFamily: "monospace", fontSize: 30, marginTop: 18 }}>Build tiny monochrome browser games.</div>
+          <div
+            style={{ fontFamily: "monospace", fontSize: 76, fontWeight: 700, letterSpacing: -4 }}
+          >
+            tynt docs
+          </div>
+          <div style={{ fontFamily: "monospace", fontSize: 30, marginTop: 18 }}>
+            Build tiny monochrome browser games.
+          </div>
         </div>
       </div>
     </div>,

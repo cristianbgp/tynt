@@ -68,7 +68,14 @@ describe("emulator controls", () => {
       ["up", false],
       ["left", false],
     ]);
-    for (const name of ["Direction up", "Direction down", "Direction left", "Direction right", "Action A", "Action B"]) {
+    for (const name of [
+      "Direction up",
+      "Direction down",
+      "Direction left",
+      "Direction right",
+      "Action A",
+      "Action B",
+    ]) {
       expect(screen.getByRole("button", { name })).toBeVisible();
     }
   });
@@ -82,7 +89,10 @@ describe("emulator controls", () => {
     fireEvent.pointerCancel(actionA, { pointerId: 9 });
     fireEvent.lostPointerCapture(actionA, { pointerId: 9 });
 
-    expect(onInput.mock.calls).toEqual([["a", true], ["a", false]]);
+    expect(onInput.mock.calls).toEqual([
+      ["a", true],
+      ["a", false],
+    ]);
   });
 
   test("keeps an action held while the direction thumb slides", () => {

@@ -1,0 +1,7 @@
+dev-dist
+dist
+node_modules
+playwright-report
+test-results
+public/generated
+src/generated

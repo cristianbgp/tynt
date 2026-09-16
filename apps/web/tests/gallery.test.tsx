@@ -7,7 +7,11 @@ import { describe, expect, test } from "vitest";
 import { GalleryPage } from "@/pages/gallery-page";
 
 function renderGallery() {
-  return render(<MemoryRouter initialEntries={["/gallery"]}><GalleryPage /></MemoryRouter>);
+  return render(
+    <MemoryRouter initialEntries={["/gallery"]}>
+      <GalleryPage />
+    </MemoryRouter>,
+  );
 }
 
 describe("cartridge gallery", () => {
@@ -17,9 +21,18 @@ describe("cartridge gallery", () => {
     const previews = screen.getAllByRole("img", { name: /preview$/i });
     expect(previews[0]).toHaveAttribute("width", "320");
     expect(previews[0]).toHaveAttribute("height", "288");
-    expect(screen.getByRole("link", { name: "Play snake.tynt" })).toHaveAttribute("href", "/play/public/snake");
-    expect(screen.getByRole("link", { name: "Open snake.tynt in editor" })).toHaveAttribute("href", "/?cartridge=snake");
-    expect(screen.getByRole("link", { name: "Submit a cartridge" })).toHaveAttribute("data-cuelume-hover", "tick");
+    expect(screen.getByRole("link", { name: "Play snake.tynt" })).toHaveAttribute(
+      "href",
+      "/play/public/snake",
+    );
+    expect(screen.getByRole("link", { name: "Open snake.tynt in editor" })).toHaveAttribute(
+      "href",
+      "/?cartridge=snake",
+    );
+    expect(screen.getByRole("link", { name: "Submit a cartridge" })).toHaveAttribute(
+      "data-cuelume-hover",
+      "tick",
+    );
   });
 
   test("searches public metadata and reports empty results", async () => {

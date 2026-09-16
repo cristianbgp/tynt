@@ -8,7 +8,12 @@ const API_NAMES = new Set<string>(CARTRIDGE_API.map(({ name }) => name));
 const LIFECYCLE_NAMES = new Set<string>(
   CARTRIDGE_API.filter(({ category }) => category === "lifecycle").map(({ name }) => name),
 );
-const IDENTIFIER_NODES = new Set(["VariableName", "VariableDefinition", "TypeName", "TypeDefinition"]);
+const IDENTIFIER_NODES = new Set([
+  "VariableName",
+  "VariableDefinition",
+  "TypeName",
+  "TypeDefinition",
+]);
 const showDefinitionTarget = StateEffect.define<number | null>();
 const definitionTargetTimers = new WeakMap<EditorView, number>();
 
@@ -18,11 +23,14 @@ const definitionTargetField = StateField.define<DecorationSet>({
     let next = targets.map(transaction.changes);
     for (const effect of transaction.effects) {
       if (!effect.is(showDefinitionTarget)) continue;
-      next = effect.value === null
-        ? Decoration.none
-        : Decoration.set([
-            Decoration.line({ class: "cm-definition-target" }).range(transaction.state.doc.lineAt(effect.value).from),
-          ]);
+      next =
+        effect.value === null
+          ? Decoration.none
+          : Decoration.set([
+              Decoration.line({ class: "cm-definition-target" }).range(
+                transaction.state.doc.lineAt(effect.value).from,
+              ),
+            ]);
     }
     return next;
   },
@@ -51,7 +59,10 @@ interface DefinitionCandidate {
 const FUNCTION_NODES = new Set(["FunctionDeclaration", "FunctionExpression", "ArrowFunction"]);
 const SCOPE_NODES = new Set(["Script", "Block", ...FUNCTION_NODES]);
 
-function identifierAt(view: EditorView, position = view.state.selection.main.head): Identifier | null {
+function identifierAt(
+  view: EditorView,
+  position = view.state.selection.main.head,
+): Identifier | null {
   const tree = syntaxTree(view.state);
   for (const side of [1, -1] as const) {
     const node = tree.resolveInner(position, side);
@@ -95,10 +106,12 @@ function localDefinition(view: EditorView, identifier: Identifier): number | nul
     },
   });
   candidates.sort((left, right) => {
-    const scopeDifference = (left.scopeTo - left.scopeFrom) - (right.scopeTo - right.scopeFrom);
+    const scopeDifference = left.scopeTo - left.scopeFrom - (right.scopeTo - right.scopeFrom);
     if (scopeDifference !== 0) return scopeDifference;
-    const leftDistance = left.from <= identifier.from ? identifier.from - left.from : Number.MAX_SAFE_INTEGER;
-    const rightDistance = right.from <= identifier.from ? identifier.from - right.from : Number.MAX_SAFE_INTEGER;
+    const leftDistance =
+      left.from <= identifier.from ? identifier.from - left.from : Number.MAX_SAFE_INTEGER;
+    const rightDistance =
+      right.from <= identifier.from ? identifier.from - right.from : Number.MAX_SAFE_INTEGER;
     return leftDistance - rightDistance;
   });
   return candidates[0]?.from ?? null;
@@ -109,10 +122,12 @@ function isNavigable(view: EditorView, identifier: Identifier): boolean {
 }
 
 function isExportedLifecycleDeclaration(identifier: Identifier): boolean {
-  return LIFECYCLE_NAMES.has(identifier.name)
-    && identifier.node.name === "VariableDefinition"
-    && identifier.node.parent?.name === "FunctionDeclaration"
-    && identifier.node.parent.parent?.name === "ExportDeclaration";
+  return (
+    LIFECYCLE_NAMES.has(identifier.name) &&
+    identifier.node.name === "VariableDefinition" &&
+    identifier.node.parent?.name === "FunctionDeclaration" &&
+    identifier.node.parent.parent?.name === "ExportDeclaration"
+  );
 }
 
 function documentationTarget(view: EditorView, identifier: Identifier): string | null {
@@ -145,10 +160,13 @@ function jumpToDefinition(view: EditorView, position?: number): boolean {
     });
     const currentTimer = definitionTargetTimers.get(view);
     if (currentTimer !== undefined) window.clearTimeout(currentTimer);
-    definitionTargetTimers.set(view, window.setTimeout(() => {
-      view.dispatch({ effects: showDefinitionTarget.of(null) });
-      definitionTargetTimers.delete(view);
-    }, 700));
+    definitionTargetTimers.set(
+      view,
+      window.setTimeout(() => {
+        view.dispatch({ effects: showDefinitionTarget.of(null) });
+        definitionTargetTimers.delete(view);
+      }, 700),
+    );
     view.focus();
     return true;
   }
@@ -213,22 +231,24 @@ export function tyntDefinitionNavigation(): Extension {
       ".cm-definition-link": { cursor: "pointer", textDecoration: "underline" },
       ".cm-definition-target": { backgroundColor: "#e8e8e8" },
     }),
-    ViewPlugin.fromClass(class {
-      private readonly handleKeyUp = (event: KeyboardEvent) => {
-        if (event.key === "Control" || event.key === "Meta") clearHover();
-      };
+    ViewPlugin.fromClass(
+      class {
+        private readonly handleKeyUp = (event: KeyboardEvent) => {
+          if (event.key === "Control" || event.key === "Meta") clearHover();
+        };
 
-      constructor(private readonly view: EditorView) {
-        window.addEventListener("keyup", this.handleKeyUp);
-      }
+        constructor(private readonly view: EditorView) {
+          window.addEventListener("keyup", this.handleKeyUp);
+        }
 
-      destroy() {
-        window.removeEventListener("keyup", this.handleKeyUp);
-        const timer = definitionTargetTimers.get(this.view);
-        if (timer !== undefined) window.clearTimeout(timer);
-        definitionTargetTimers.delete(this.view);
-        clearHover();
-      }
-    }),
+        destroy() {
+          window.removeEventListener("keyup", this.handleKeyUp);
+          const timer = definitionTargetTimers.get(this.view);
+          if (timer !== undefined) window.clearTimeout(timer);
+          definitionTargetTimers.delete(this.view);
+          clearHover();
+        }
+      },
+    ),
   ];
 }

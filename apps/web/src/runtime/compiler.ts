@@ -1,5 +1,10 @@
 import { originalPositionFor, TraceMap } from "@jridgewell/trace-mapping";
-import { initialize, transform as esbuildTransform, type TransformOptions, type TransformResult } from "esbuild-wasm";
+import {
+  initialize,
+  transform as esbuildTransform,
+  type TransformOptions,
+  type TransformResult,
+} from "esbuild-wasm";
 import wasmUrl from "esbuild-wasm/esbuild.wasm?url";
 import { MAX_SOURCE_BYTES } from "@tynt/core";
 import { MAX_COMPILED_BYTES } from "./protocol";
@@ -9,7 +14,10 @@ export interface CompiledCartridge {
   map: string;
 }
 
-type Transform = (source: string, options: TransformOptions) => Promise<Pick<TransformResult, "code" | "map">>;
+type Transform = (
+  source: string,
+  options: TransformOptions,
+) => Promise<Pick<TransformResult, "code" | "map">>;
 
 let initializePromise: Promise<void> | undefined;
 
@@ -20,10 +28,19 @@ async function ensureCompiler(): Promise<void> {
 }
 
 function compilerMessage(error: unknown): string {
-  if (typeof error === "object" && error !== null && "errors" in error && Array.isArray((error as { errors: unknown[] }).errors)) {
-    const first = (error as { errors: Array<{ text?: string; location?: { line: number; column: number } }> }).errors[0];
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "errors" in error &&
+    Array.isArray((error as { errors: unknown[] }).errors)
+  ) {
+    const first = (
+      error as { errors: Array<{ text?: string; location?: { line: number; column: number } }> }
+    ).errors[0];
     if (first) {
-      const location = first.location ? `cartridge.ts:${first.location.line}:${first.location.column + 1}: ` : "";
+      const location = first.location
+        ? `cartridge.ts:${first.location.line}:${first.location.column + 1}: `
+        : "";
       return `${location}${first.text ?? "TypeScript compilation failed"}`;
     }
   }
@@ -47,16 +64,58 @@ function withoutCommentsAndQuotedStrings(code: string): string {
   for (let index = 0; index < code.length; index++) {
     const character = code[index]!;
     const next = code[index + 1];
-    if (state === "code" && character === "/" && next === "/") { state = "line"; result += "  "; index++; continue; }
-    if (state === "code" && character === "/" && next === "*") { state = "block"; result += "  "; index++; continue; }
-    if (state === "line" && character === "\n") { state = "code"; result += "\n"; continue; }
-    if (state === "block" && character === "*" && next === "/") { state = "code"; result += "  "; index++; continue; }
-    if (state === "line" || state === "block") { result += " "; continue; }
-    if (state === "code" && character === "'") { state = "single"; result += " "; continue; }
-    if (state === "code" && character === '"') { state = "double"; result += " "; continue; }
-    if ((state === "single" || state === "double") && character === "\\") { result += "  "; index++; continue; }
-    if (state === "single" && character === "'") { state = "code"; result += " "; continue; }
-    if (state === "double" && character === '"') { state = "code"; result += " "; continue; }
+    if (state === "code" && character === "/" && next === "/") {
+      state = "line";
+      result += "  ";
+      index++;
+      continue;
+    }
+    if (state === "code" && character === "/" && next === "*") {
+      state = "block";
+      result += "  ";
+      index++;
+      continue;
+    }
+    if (state === "line" && character === "\n") {
+      state = "code";
+      result += "\n";
+      continue;
+    }
+    if (state === "block" && character === "*" && next === "/") {
+      state = "code";
+      result += "  ";
+      index++;
+      continue;
+    }
+    if (state === "line" || state === "block") {
+      result += " ";
+      continue;
+    }
+    if (state === "code" && character === "'") {
+      state = "single";
+      result += " ";
+      continue;
+    }
+    if (state === "code" && character === '"') {
+      state = "double";
+      result += " ";
+      continue;
+    }
+    if ((state === "single" || state === "double") && character === "\\") {
+      result += "  ";
+      index++;
+      continue;
+    }
+    if (state === "single" && character === "'") {
+      state = "code";
+      result += " ";
+      continue;
+    }
+    if (state === "double" && character === '"') {
+      state = "code";
+      result += " ";
+      continue;
+    }
     result += state === "code" ? character : " ";
   }
   return result;
@@ -66,8 +125,12 @@ function containsImport(code: string): boolean {
   return /(^|[^\w$.])import\b\s*(?:\(|["'{*]|[\w$])/m.test(withoutCommentsAndQuotedStrings(code));
 }
 
-export async function compileCartridge(source: string, options: { transform?: Transform } = {}): Promise<CompiledCartridge> {
-  if (new TextEncoder().encode(source).byteLength > MAX_SOURCE_BYTES) throw new Error("Cartridge source exceeds 256 KiB");
+export async function compileCartridge(
+  source: string,
+  options: { transform?: Transform } = {},
+): Promise<CompiledCartridge> {
+  if (new TextEncoder().encode(source).byteLength > MAX_SOURCE_BYTES)
+    throw new Error("Cartridge source exceeds 256 KiB");
   if (containsImport(source)) throw new Error("Cartridge imports are not available in tynt v1");
   await ensureCompiler();
   let esm: Pick<TransformResult, "code" | "map">;
@@ -107,7 +170,11 @@ export async function compileCartridge(source: string, options: { transform?: Tr
   return { code: result.code, map: result.map };
 }
 
-export function mapGeneratedPosition(map: string, line: number, column: number): { line: number; column: number } | null {
+export function mapGeneratedPosition(
+  map: string,
+  line: number,
+  column: number,
+): { line: number; column: number } | null {
   try {
     const position = originalPositionFor(new TraceMap(map), { line, column });
     if (position.line === null || position.column === null) return null;

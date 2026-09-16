@@ -8,7 +8,11 @@ import { SoundPage } from "@/pages/sound-page";
 vi.mock("cuelume", () => ({ play: vi.fn() }));
 
 test("paints multiple notes with one touch stroke", () => {
-  render(<MemoryRouter><SoundPage soundEnabled onSoundToggle={() => {}} /></MemoryRouter>);
+  render(
+    <MemoryRouter>
+      <SoundPage soundEnabled onSoundToggle={() => {}} />
+    </MemoryRouter>,
+  );
 
   const first = screen.getByRole("button", { name: "Step 1 C4" });
   const second = screen.getByRole("button", { name: "Step 2 E4" });
@@ -16,7 +20,9 @@ test("paints multiple notes with one touch stroke", () => {
   fireEvent.pointerMove(second, { pointerId: 7, pointerType: "touch", buttons: 1 });
   fireEvent.pointerUp(second, { pointerId: 7, pointerType: "touch", buttons: 0 });
 
-  expect(screen.getByLabelText<HTMLTextAreaElement>("Sound code").value).toContain("[261.63, 329.63, 659.25");
+  expect(screen.getByLabelText<HTMLTextAreaElement>("Sound code").value).toContain(
+    "[261.63, 329.63, 659.25",
+  );
 });
 
 test("composes, previews, clears, and copies a sixteen-step sound effect", async () => {
@@ -29,7 +35,9 @@ test("composes, previews, clears, and copies a sixteen-step sound effect", async
       <SoundPage
         soundEnabled
         onSoundToggle={() => {}}
-        playAudio={(command) => { audioEvents.push(command); }}
+        playAudio={(command) => {
+          audioEvents.push(command);
+        }}
         stopAudio={() => {}}
       />
     </MemoryRouter>,
@@ -38,14 +46,23 @@ test("composes, previews, clears, and copies a sixteen-step sound effect", async
   expect(screen.getByRole("heading", { name: "Sound editor" })).toBeVisible();
   const stepButtons = screen.getAllByRole<HTMLButtonElement>("button", { name: /^Step \d+ / });
   const codeOutput = screen.getByLabelText<HTMLTextAreaElement>("Sound code");
-  const stepButton = (label: string) => stepButtons.find((button) => button.getAttribute("aria-label") === label)!;
+  const stepButton = (label: string) =>
+    stepButtons.find((button) => button.getAttribute("aria-label") === label)!;
   expect(stepButtons).toHaveLength(16 * 37);
   expect(codeOutput.value).toContain("[523.25, 0, 659.25, 0, 783.99");
   fireEvent.click(screen.getByLabelText("Clear sound"));
 
-  fireEvent.pointerDown(stepButton("Step 1 C4"), { pointerId: 1, pointerType: "mouse", buttons: 1 });
+  fireEvent.pointerDown(stepButton("Step 1 C4"), {
+    pointerId: 1,
+    pointerType: "mouse",
+    buttons: 1,
+  });
   fireEvent.pointerUp(stepButton("Step 1 C4"), { pointerId: 1, pointerType: "mouse", buttons: 0 });
-  fireEvent.pointerDown(stepButton("Step 3 E4"), { pointerId: 2, pointerType: "mouse", buttons: 1 });
+  fireEvent.pointerDown(stepButton("Step 3 E4"), {
+    pointerId: 2,
+    pointerType: "mouse",
+    buttons: 1,
+  });
   fireEvent.pointerUp(stepButton("Step 3 E4"), { pointerId: 2, pointerType: "mouse", buttons: 0 });
   expect(codeOutput.value).toContain("[261.63, 0, 329.63");
 
@@ -56,7 +73,11 @@ test("composes, previews, clears, and copies a sixteen-step sound effect", async
   ]);
 
   fireEvent.click(screen.getByLabelText("Copy sound code"));
-  await waitFor(() => expect(writeText).toHaveBeenCalledWith(expect.stringContaining('sfx(sound, 80, 0.15, "square")')));
+  await waitFor(() =>
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining('sfx(sound, 80, 0.15, "square")'),
+    ),
+  );
   expect(screen.getByText("copied", { selector: "p" })).toBeVisible();
 
   fireEvent.click(screen.getByLabelText("Clear sound"));
@@ -74,7 +95,12 @@ test("stops an active preview when app sound is disabled", () => {
 
   rerender(
     <MemoryRouter>
-      <SoundPage soundEnabled={false} onSoundToggle={() => {}} playAudio={() => {}} stopAudio={stopAudio} />
+      <SoundPage
+        soundEnabled={false}
+        onSoundToggle={() => {}}
+        playAudio={() => {}}
+        stopAudio={stopAudio}
+      />
     </MemoryRouter>,
   );
 

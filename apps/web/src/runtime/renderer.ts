@@ -1,6 +1,8 @@
 import { PALETTE, PixelSurface, applyCommand, type DrawCommand } from "@tynt/core";
 
-interface ImageBuffer { data: Uint8ClampedArray }
+interface ImageBuffer {
+  data: Uint8ClampedArray;
+}
 export interface CanvasTarget {
   imageSmoothingEnabled: boolean;
   createImageData(width: number, height: number): ImageBuffer;
@@ -16,7 +18,11 @@ const RGB = PALETTE.map((hex) => [
 export class CanvasRenderer {
   readonly surface: PixelSurface;
 
-  constructor(private readonly context: CanvasTarget, width = 160, height = 144) {
+  constructor(
+    private readonly context: CanvasTarget,
+    width = 160,
+    height = 144,
+  ) {
     this.surface = new PixelSurface(width, height, 0);
     this.context.imageSmoothingEnabled = false;
   }
