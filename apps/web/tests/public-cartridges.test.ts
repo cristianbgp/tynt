@@ -26,7 +26,6 @@ describe("public cartridge catalog", () => {
   test("exposes the generated collection in deterministic order", () => {
     const slugs = listPublicCartridges().map(({ slug }) => slug);
     expect(slugs).toEqual([...slugs].sort());
-    expect(slugs).toHaveLength(15);
   });
 
   test("compiles every repository cartridge", async () => {

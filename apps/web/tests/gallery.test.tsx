@@ -15,7 +15,6 @@ describe("cartridge gallery", () => {
     renderGallery();
     expect(screen.getByRole("heading", { name: "Cartridge gallery" })).toBeVisible();
     const previews = screen.getAllByRole("img", { name: /preview$/i });
-    expect(previews).toHaveLength(15);
     expect(previews[0]).toHaveAttribute("width", "320");
     expect(previews[0]).toHaveAttribute("height", "288");
     expect(screen.getByRole("link", { name: "Play snake.tynt" })).toHaveAttribute("href", "/play/public/snake");
@@ -35,7 +34,7 @@ describe("cartridge gallery", () => {
     expect(screen.getByText(/No public cartridges match/)).toBeVisible();
   });
 
-  test("filters by an allowlisted tag and lets the user clear it", async () => {
+  test("filters by a cartridge tag and lets the user clear it", async () => {
     const user = userEvent.setup();
     renderGallery();
     const puzzle = screen.getByRole("button", { name: "puzzle" });

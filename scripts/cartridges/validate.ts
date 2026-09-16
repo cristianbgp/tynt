@@ -1,10 +1,8 @@
 import {
   ALLOWED_FILES,
   PUBLIC_LICENSES,
-  PUBLIC_TAGS,
   type PublishingMetadata,
   type PublicLicense,
-  type PublicTag,
 } from "./types";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -34,11 +32,15 @@ export function parsePublishingMetadata(text: string): PublishingMetadata {
   if (!Array.isArray(value.tags) || value.tags.length === 0 || !value.tags.every((tag) => typeof tag === "string")) {
     throw new Error("Publishing tags must be a non-empty string array");
   }
-  const tags = value.tags as string[];
-  if (new Set(tags).size !== tags.length) throw new Error("Publishing tags cannot contain duplicate values");
+  if (value.tags.length > 8) throw new Error("Publishing metadata accepts at most 8 tags");
+  const tags = (value.tags as string[]).map((tag) => tag.trim().toLowerCase());
   for (const tag of tags) {
-    if (!(PUBLIC_TAGS as readonly string[]).includes(tag)) throw new Error(`Unsupported tag: ${tag}`);
+    if (tag.length > 24) throw new Error("Publishing tags cannot exceed 24 characters");
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(tag)) {
+      throw new Error("Publishing tags must use letters, numbers, and single hyphens");
+    }
   }
+  if (new Set(tags).size !== tags.length) throw new Error("Publishing tags cannot contain duplicate values");
   if (typeof value.license !== "string" || !(PUBLIC_LICENSES as readonly string[]).includes(value.license)) {
     throw new Error(`Unsupported license: ${String(value.license)}`);
   }
@@ -54,7 +56,7 @@ export function parsePublishingMetadata(text: string): PublishingMetadata {
   }
   return {
     version: 1,
-    tags: tags as PublicTag[],
+    tags,
     license: value.license as PublicLicense,
     ...(value.repository ? { repository: value.repository } : {}),
   };

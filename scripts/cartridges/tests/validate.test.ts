@@ -30,6 +30,14 @@ describe("public cartridge validation", () => {
     });
   });
 
+  test("accepts and normalizes flexible publishing tags", () => {
+    expect(parsePublishingMetadata('{"version":1,"tags":["3D","animation","bullet-hell"],"license":"MIT"}').tags).toEqual([
+      "3d",
+      "animation",
+      "bullet-hell",
+    ]);
+  });
+
   test("accepts only MIT-licensed public cartridges", () => {
     expect(parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"MIT"}').license).toBe("MIT");
     expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"Apache-2.0"}')).toThrow(
@@ -38,8 +46,10 @@ describe("public cartridge validation", () => {
   });
 
   test("rejects publishing metadata that cannot be rendered safely", () => {
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["unknown"],"license":"MIT"}')).toThrow(/Unsupported tag/);
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade","arcade"],"license":"MIT"}')).toThrow(/duplicate/);
+    expect(() => parsePublishingMetadata('{"version":1,"tags":["bad/tag"],"license":"MIT"}')).toThrow(/letters, numbers/);
+    expect(() => parsePublishingMetadata('{"version":1,"tags":["3D","3d"],"license":"MIT"}')).toThrow(/duplicate/);
+    expect(() => parsePublishingMetadata('{"version":1,"tags":["one","two","three","four","five","six","seven","eight","nine"],"license":"MIT"}')).toThrow(/at most 8/);
+    expect(() => parsePublishingMetadata(`{"version":1,"tags":["${"a".repeat(25)}"],"license":"MIT"}`)).toThrow(/24 characters/);
     expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"GPL-3.0"}')).toThrow(/Unsupported license/);
     expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"MIT","repository":"http://example.com"}')).toThrow(/HTTPS/);
     expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"MIT","featured":true}')).toThrow(/Unknown publishing field/);

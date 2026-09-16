@@ -59,6 +59,7 @@ describe("public repository health", () => {
 
     expect(JSON.parse(readProjectFile(configurationPath))).toEqual({
       $schema: "https://openapi.vercel.sh/vercel.json",
+      bunVersion: "1.4.x",
       rewrites: [{ source: "/(.*)", destination: "/index.html" }],
     });
   });
