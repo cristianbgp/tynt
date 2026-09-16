@@ -55,6 +55,7 @@ test("loads, starts, and exposes focused play controls for a local cartridge", a
   expect(screen.getByRole("link", { name: "Open gallery" })).toHaveAttribute("href", "/gallery");
   expect(screen.getByRole("link", { name: "Open library" })).toHaveAttribute("href", "/library");
   expect(screen.getByRole("link", { name: "Open sprites" })).toHaveAttribute("href", "/sprites");
+  expect(screen.getByRole("link", { name: "Open sounds" })).toHaveAttribute("href", "/sounds");
   expect(screen.getByRole("group", { name: "Play controls" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Pause" })).toBeVisible();
   expect(screen.getByRole("button", { name: "Restart" })).toBeVisible();
@@ -75,6 +76,7 @@ test("loads a repository cartridge at its public route", async () => {
   expect(screen.getByRole("link", { name: "Open gallery" })).toHaveAttribute("href", "/gallery");
   expect(screen.getByRole("link", { name: "Open library" })).toHaveAttribute("href", "/library");
   expect(screen.getByRole("link", { name: "Open sprites" })).toHaveAttribute("href", "/sprites");
+  expect(screen.getByRole("link", { name: "Open sounds" })).toHaveAttribute("href", "/sounds");
   expect(runtime.run).toHaveBeenCalledWith(expect.stringContaining("segments"));
 });
 

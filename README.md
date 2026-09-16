@@ -50,6 +50,7 @@ Routes:
 - `/play/public/:slug`: focused play mode for a public cartridge.
 - `/play/local/:id`: focused play mode for a cartridge saved on this device.
 - `/sprites`: an 8×8 four-color sprite editor with cartridge-ready output.
+- `/sounds`: a sixteen-step sound-effect editor with cartridge-ready output.
 
 Root commands:
 
@@ -154,6 +155,8 @@ after(frames: number): boolean
 tone(frequency: number, duration?: number, volume?: number, wave?: "square" | "sine" | "triangle" | "sawtooth"): void
 sfx(notes: number[], step?: number, volume?: number, wave?: "square" | "sine" | "triangle" | "sawtooth"): void
 ```
+
+Use `0` inside an `sfx()` note array for a silent step. The sound editor generates named notes from C3 through C6 and exports their frequencies in this format.
 
 Coordinates are rounded to integers and clipped to the canvas. Color indexes are clamped from 0 to 3. The framebuffer persists between frames unless `clear` is called. The 3×5 `text()` font supports printable ASCII; lowercase letters use the matching uppercase glyph, and unsupported Unicode renders as `?`.
 

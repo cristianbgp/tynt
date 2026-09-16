@@ -129,6 +129,13 @@ describe("tynt creator shell", () => {
     expect(screen.getByRole("button", { name: "Color 0" })).toHaveAttribute("data-cuelume-hover", "tick");
   });
 
+  test("renders the sound editor at its own route", async () => {
+    window.history.replaceState({}, "", "/sounds");
+    await renderApp();
+    expect(screen.getByRole("heading", { name: "Sound editor" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Sounds" })).toHaveAttribute("aria-current", "page");
+  });
+
   test("offers a route back to the editor for unknown paths", async () => {
     window.history.replaceState({}, "", "/missing");
 

@@ -36,7 +36,7 @@ export const CARTRIDGE_API = [
   { name: "every", signature: "every(interval, offset = 0)", description: "Return true on a repeating frame interval.", snippet: "every(${1:interval}, ${2:0})", category: "deterministic" },
   { name: "after", signature: "after(frames)", description: "Return true after a frame threshold.", snippet: "after(${1:frames})", category: "deterministic" },
   { name: "tone", signature: "tone(frequency, duration = 100, volume = 0.15, wave = \"square\")", description: "Play one bounded cartridge tone.", snippet: "tone(${1:440}, ${2:100}, ${3:0.15}, \"${4:square}\")", category: "audio" },
-  { name: "sfx", signature: "sfx(notes, step = 80, volume = 0.15, wave = \"square\")", description: "Play up to 32 frequencies as a short effect.", snippet: "sfx([${1:220}, ${2:440}], ${3:80})", category: "audio" },
+  { name: "sfx", signature: "sfx(notes, step = 80, volume = 0.15, wave = \"square\")", description: "Play up to 32 frequencies as a short effect; use 0 for a rest.", snippet: "sfx([${1:220}, ${2:0}, ${3:440}], ${4:80})", category: "audio" },
 ] as const satisfies readonly CartridgeApiEntry[];
 
 /** @internal Cartridge API names in editor and documentation order. */

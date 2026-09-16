@@ -40,7 +40,7 @@ const every = Object.freeze((interval,offset=0) => { interval=Math.max(1,Math.fl
 const after = Object.freeze((frames) => __frame>=Math.max(0,Math.floor(__finite(frames,"frames"))));
 function __audio(frequency,duration=100,volume=0.15,wave="square",delay=0) { if(__audioEvents>=64)throw new Error("Frame exceeds 64 audio events"); frequency=Math.max(20,Math.min(20000,__finite(frequency,"frequency"))); duration=Math.max(1,Math.min(5000,__finite(duration,"duration"))); volume=Math.max(0,Math.min(1,__finite(volume,"volume"))); if(!["square","sine","triangle","sawtooth"].includes(wave)) throw new Error("wave is invalid"); __audioEvents++; __post({kind:"audio",token:__token,frequency,duration,volume,wave,delay}); }
 const tone = Object.freeze((frequency,duration=100,volume=0.15,wave="square") => __audio(frequency,duration,volume,wave,0));
-const sfx = Object.freeze((notes,step=80,volume=0.15,wave="square") => { notes=__numbers(notes,"notes",32); step=Math.max(1,Math.min(1000,__finite(step,"step"))); notes.forEach((note,index)=>__audio(note,Math.max(1,step-10),volume,wave,index*step)); });
+const sfx = Object.freeze((notes,step=80,volume=0.15,wave="square") => { notes=__numbers(notes,"notes",32); step=Math.max(1,Math.min(1000,__finite(step,"step"))); notes.forEach((note,index)=>{if(note!==0)__audio(note,Math.max(1,step-10),volume,wave,index*step);}); });
 const button = Object.freeze((input) => __input.held.includes(input));
 const buttonPressed = Object.freeze((input) => __input.pressed.includes(input));
 `;

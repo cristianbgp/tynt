@@ -13,6 +13,7 @@ const LocalPlayPage = lazy(() => import("@/pages/local-play-page").then(({ Local
 const NotFoundPage = lazy(() => import("@/pages/not-found-page").then(({ NotFoundPage }) => ({ default: NotFoundPage })));
 const PublicPlayPage = lazy(() => import("@/pages/public-play-page").then(({ PublicPlayPage }) => ({ default: PublicPlayPage })));
 const SpritePage = lazy(() => import("@/pages/sprite-page").then(({ SpritePage }) => ({ default: SpritePage })));
+const SoundPage = lazy(() => import("@/pages/sound-page").then(({ SoundPage }) => ({ default: SoundPage })));
 
 const SOUND_PREFERENCE_KEY = "tynt:sound-enabled";
 
@@ -54,6 +55,7 @@ export function App({ library = browserCartridgeLibrary }: AppProps) {
           <Route path="play/public/:slug" element={<PublicPlayPage soundEnabled={soundEnabled} onSoundToggle={toggleSound} />} />
           <Route path="play/local/:id" element={<LocalPlayPage library={library} soundEnabled={soundEnabled} onSoundToggle={toggleSound} />} />
           <Route path="sprites" element={<SpritePage soundEnabled={soundEnabled} onSoundToggle={toggleSound} />} />
+          <Route path="sounds" element={<SoundPage soundEnabled={soundEnabled} onSoundToggle={toggleSound} />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>

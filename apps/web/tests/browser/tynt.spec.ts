@@ -216,6 +216,23 @@ test("desktop play keeps the game preview close to the top bar", async ({ page }
   expect(topGap).toBe(24);
 });
 
+test("sound editor keeps its composer controls visible and contained", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/sounds");
+  await expect(page.getByRole("heading", { name: "Sound editor" })).toBeVisible();
+
+  const desktop = await page.evaluate(() => {
+    const play = document.querySelector<HTMLButtonElement>('button[aria-label="Play sound"]')!.getBoundingClientRect();
+    return { playBottom: Math.round(play.bottom), viewportHeight: window.innerHeight };
+  });
+  expect(desktop.playBottom).toBeLessThan(desktop.viewportHeight);
+
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/sounds");
+  await expect(page.getByRole("link", { name: "Sounds" })).toBeVisible();
+  await expectNoHorizontalOverflow(page, 320);
+});
+
 test("mobile play disables page zoom and accidental text selection", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/play/public/coin-dash");

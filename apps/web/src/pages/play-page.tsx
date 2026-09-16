@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Draft } from "@tynt/core";
 import { play } from "cuelume";
-import { BookOpen, Code, Expand, GalleryThumbnails, Image, Pause, Play, Refresh } from "pixelarticons/react";
+import { BookOpen, Code, Expand, GalleryThumbnails, Image, Music, Pause, Play, Refresh } from "pixelarticons/react";
 import { Link } from "react-router";
 import { BrandLink, TyntMark } from "@/components/brand";
 import { ErrorConsole } from "@/components/error-console";
@@ -64,12 +64,13 @@ export function PlayPage({ cartridge, editorHref, soundEnabled, onSoundToggle }:
           <h1 className="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13px]">{cartridge.title}</h1>
           <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[10px] text-muted-foreground max-[560px]:hidden">{cartridge.author ? `by ${cartridge.author}` : "local cartridge"}</span>
         </div>
-        <div className="play-actions flex max-[900px]:col-span-full max-[900px]:grid max-[900px]:grid-cols-7 max-[900px]:border-t max-[900px]:border-border">
+        <div className="play-actions flex max-[900px]:col-span-full max-[900px]:grid max-[900px]:grid-cols-8 max-[900px]:border-t max-[900px]:border-border">
           <nav className="play-navigation flex max-[900px]:contents" aria-label="Primary navigation">
             <Link className={playLinkClassName} aria-label="Edit cartridge" to={editorHref} {...soundLinkProps}><Code width={24} height={24} aria-hidden="true" /><span className="max-[560px]:hidden">Editor</span></Link>
             <Link className={playLinkClassName} aria-label="Open gallery" to="/gallery" {...soundLinkProps}><GalleryThumbnails width={24} height={24} aria-hidden="true" /><span className="max-[560px]:hidden">Gallery</span></Link>
             <Link className={playLinkClassName} aria-label="Open library" to="/library" {...soundLinkProps}><BookOpen width={24} height={24} aria-hidden="true" /><span className="max-[560px]:hidden">Library</span></Link>
             <Link className={playLinkClassName} aria-label="Open sprites" to="/sprites" {...soundLinkProps}><Image width={24} height={24} aria-hidden="true" /><span className="max-[560px]:hidden">Sprites</span></Link>
+            <Link className={playLinkClassName} aria-label="Open sounds" to="/sounds" {...soundLinkProps}><Music width={24} height={24} aria-hidden="true" /><span className="max-[560px]:hidden">Sounds</span></Link>
           </nav>
           <div className="play-controls flex max-[900px]:contents" role="group" aria-label="Play controls">
             <Button className={playButtonClassName} aria-label="Restart" onClick={restart}><Refresh width={24} height={24} aria-hidden="true" /><span className="max-[560px]:hidden">Restart</span></Button>

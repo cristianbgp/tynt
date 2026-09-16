@@ -59,3 +59,12 @@ if (pointInRect(playerX + 4, playerY + 4, exitX, exitY, 24, 28)) {
 ```
 
 Use `overlap()` when two rectangular objects interact. Use `pointInRect()` for a center point, cursor, checkpoint, or goal zone.
+
+## Sound effects and rests
+
+Open the sound editor at [tynt.dev/sounds](https://tynt.dev/sounds) to compose and preview a sixteen-step effect. Copied sequences use `0` for a silent step:
+
+```ts
+const pickup = [261.63, 0, 329.63, 392] as const;
+sfx(pickup, 80, 0.15, "square");
+```

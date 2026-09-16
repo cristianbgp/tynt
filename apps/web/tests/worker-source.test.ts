@@ -155,6 +155,20 @@ describe("worker bootstrap", () => {
     ]);
   });
 
+  test("treats zero-frequency sfx steps as timed rests", async () => {
+    const compiled = await compileCartridge(`
+      export function init(){ sfx([220, 0, 330], 50); }
+      export function update(){}
+      export function draw(){}
+    `);
+    const worker = await runWorker(createWorkerSource(compiled.code, token));
+
+    expect(worker.messages.filter((value: any) => value.kind === "audio")).toEqual([
+      { kind: "audio", token, frequency: 220, duration: 40, volume: 0.15, wave: "square", delay: 0 },
+      { kind: "audio", token, frequency: 330, duration: 40, volume: 0.15, wave: "square", delay: 100 },
+    ]);
+  });
+
   test("reports an API error when one frame exceeds its audio budget", async () => {
     const compiled = await compileCartridge(`
       export function init(){ for (let note = 0; note < 65; note++) tone(440); }

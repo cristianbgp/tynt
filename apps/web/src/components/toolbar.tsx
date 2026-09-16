@@ -1,5 +1,5 @@
 import type { ChangeEventHandler, ReactNode, RefObject } from "react";
-import { BookOpen, ChevronDown, Download, GalleryThumbnails, Gamepad, Image, InfoBox, Play, Save, Stop, Upload } from "pixelarticons/react";
+import { BookOpen, ChevronDown, Download, GalleryThumbnails, Gamepad, Image, InfoBox, Music, Play, Save, Stop, Upload } from "pixelarticons/react";
 import { Link } from "react-router";
 import { BrandLink } from "@/components/brand";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,7 @@ interface ToolbarProps {
   onFileChange: ChangeEventHandler<HTMLInputElement>;
 }
 
-const galleryLinkClassName = "gallery-link flex h-full items-center gap-[8px] whitespace-nowrap border-l border-border px-[12px] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background max-[560px]:[&>span]:hidden";
+const galleryLinkClassName = "gallery-link flex h-full items-center gap-[8px] whitespace-nowrap border-l border-border px-[12px] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background max-[560px]:px-[8px] max-[560px]:[&>span]:hidden";
 
 export function Toolbar(props: ToolbarProps) {
   return (
@@ -67,7 +67,7 @@ export function Toolbar(props: ToolbarProps) {
             <button
               type="button"
               aria-label="Examples"
-              className="example-trigger flex h-full min-w-[132px] cursor-pointer items-center justify-between gap-[12px] border-0 border-l border-border bg-transparent px-[12px] text-foreground hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background data-[state=open]:bg-foreground data-[state=open]:text-background max-[560px]:min-w-0 max-[560px]:flex-1"
+              className="example-trigger flex h-full min-w-[132px] cursor-pointer items-center justify-between gap-[12px] border-0 border-l border-border bg-transparent px-[12px] text-foreground hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background data-[state=open]:bg-foreground data-[state=open]:text-background max-[560px]:min-w-0 max-[560px]:flex-1 max-[400px]:gap-0 max-[400px]:px-[8px] max-[400px]:[&>span]:hidden max-[400px]:[&>svg:last-child]:hidden"
               data-cuelume-hover="tick"
               data-cuelume-press=""
               data-cuelume-release=""
@@ -91,6 +91,7 @@ export function Toolbar(props: ToolbarProps) {
         <Link
           className={galleryLinkClassName}
           to="/gallery"
+          aria-label="Gallery"
           data-cuelume-hover="tick"
           data-cuelume-press=""
           data-cuelume-release=""
@@ -101,6 +102,7 @@ export function Toolbar(props: ToolbarProps) {
         <Link
           className={galleryLinkClassName}
           to="/library"
+          aria-label="Library"
           data-cuelume-hover="tick"
           data-cuelume-press=""
           data-cuelume-release=""
@@ -108,9 +110,13 @@ export function Toolbar(props: ToolbarProps) {
           <BookOpen width={24} height={24} data-icon="library" aria-hidden="true" />
           <span>Library</span>
         </Link>
-        <Link className={galleryLinkClassName} to="/sprites" data-cuelume-hover="tick" data-cuelume-press="" data-cuelume-release="">
+        <Link className={galleryLinkClassName} to="/sprites" aria-label="Sprites" data-cuelume-hover="tick" data-cuelume-press="" data-cuelume-release="">
           <Image width={24} height={24} data-icon="sprites" aria-hidden="true" />
           <span>Sprites</span>
+        </Link>
+        <Link className={galleryLinkClassName} to="/sounds" aria-label="Sounds" data-cuelume-hover="tick" data-cuelume-press="" data-cuelume-release="">
+          <Music width={24} height={24} data-icon="sounds" aria-hidden="true" />
+          <span>Sounds</span>
         </Link>
       </div>
       <nav className="actions flex max-[1100px]:[&>*]:px-[8px] max-[1100px]:[&_*span]:hidden max-[760px]:col-span-full max-[760px]:grid max-[760px]:grid-cols-6 max-[760px]:border-t max-[760px]:border-border max-[760px]:[&>*]:w-full max-[760px]:[&>*]:min-w-0 max-[760px]:[&>*]:px-[8px]" aria-label="Cartridge actions">
