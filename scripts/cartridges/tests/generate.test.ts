@@ -10,18 +10,27 @@ import { readPngDimensions } from "../validate";
 const roots: string[] = [];
 
 afterEach(async () => {
-  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
+  await Promise.all(
+    roots.splice(0).map((root) => rm(root, { recursive: true, force: true })),
+  );
 });
 
 async function png(width = 320, height = 288): Promise<Uint8Array> {
-  return encode({ width, height, data: new Uint8Array(width * height * 4), channels: 4, depth: 8 });
+  return encode({
+    width,
+    height,
+    data: new Uint8Array(width * height * 4),
+    channels: 4,
+    depth: 8,
+  });
 }
 
 function crc32(bytes: Uint8Array): number {
   let crc = 0xffffffff;
   for (const byte of bytes) {
     crc ^= byte;
-    for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+    for (let bit = 0; bit < 8; bit++)
+      crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
   }
   return (crc ^ 0xffffffff) >>> 0;
 }
@@ -46,16 +55,27 @@ function withTextChunk(source: Uint8Array): Uint8Array {
 function hasChunk(source: Uint8Array, wanted: string): boolean {
   let offset = 8;
   while (offset + 12 <= source.length) {
-    const view = new DataView(source.buffer, source.byteOffset + offset, source.length - offset);
+    const view = new DataView(
+      source.buffer,
+      source.byteOffset + offset,
+      source.length - offset,
+    );
     const length = view.getUint32(0);
-    const type = new TextDecoder().decode(source.subarray(offset + 4, offset + 8));
+    const type = new TextDecoder().decode(
+      source.subarray(offset + 4, offset + 8),
+    );
     if (type === wanted) return true;
     offset += 12 + length;
   }
   return false;
 }
 
-async function fixture(): Promise<{ root: string; cartridgesDir: string; outputFile: string; coverOutputDir: string }> {
+async function fixture(): Promise<{
+  root: string;
+  cartridgesDir: string;
+  outputFile: string;
+  coverOutputDir: string;
+}> {
   const root = await mkdtemp(join(tmpdir(), "tynt-cartridges-"));
   roots.push(root);
   return {
@@ -66,17 +86,32 @@ async function fixture(): Promise<{ root: string; cartridgesDir: string; outputF
   };
 }
 
-async function addCartridge(root: string, slug: string, source = "export function init(){} export function update(){} export function draw(){}"): Promise<void> {
+async function addCartridge(
+  root: string,
+  slug: string,
+  source = "export function init(){} export function update(){} export function draw(){}",
+): Promise<void> {
   const directory = join(root, slug);
   await mkdir(directory, { recursive: true });
-  await writeFile(join(directory, "game.tynt"), serializeCartridge({
-    title: slug,
-    author: "maker",
-    description: `Play ${slug}`,
-    controls: "A acts",
-    source,
-  }));
-  await writeFile(join(directory, "cartridge.json"), JSON.stringify({ version: 1, tags: ["arcade"], license: "MIT" }));
+  await writeFile(
+    join(directory, "game.tynt"),
+    serializeCartridge({
+      title: slug,
+      author: "maker",
+      description: `Play ${slug}`,
+      controls: "A acts",
+      source,
+    }),
+  );
+  await writeFile(
+    join(directory, "cartridge.json"),
+    JSON.stringify({
+      version: 1,
+      publishedAt: "2026-09-14",
+      tags: ["arcade"],
+      license: "MIT",
+    }),
+  );
   await writeFile(join(directory, "cover.png"), await png());
 }
 
@@ -90,34 +125,61 @@ describe("public cartridge generation", () => {
     expect(result.map(({ slug }) => slug)).toEqual(["alpha", "zebra"]);
     const output = await readFile(paths.outputFile, "utf8");
     expect(output).toContain("export const PUBLIC_CARTRIDGES");
-    expect(output.indexOf('"slug": "alpha"')).toBeLessThan(output.indexOf('"slug": "zebra"'));
-    const publishedCover = new Uint8Array(await readFile(join(paths.coverOutputDir, "alpha.png")));
-    expect(readPngDimensions(publishedCover)).toEqual({ width: 320, height: 288 });
+    expect(output).toContain("publishedAt: string");
+    expect(output).toContain('"publishedAt": "2026-09-14"');
+    expect(output.indexOf('"slug": "alpha"')).toBeLessThan(
+      output.indexOf('"slug": "zebra"'),
+    );
+    const publishedCover = new Uint8Array(
+      await readFile(join(paths.coverOutputDir, "alpha.png")),
+    );
+    expect(readPngDimensions(publishedCover)).toEqual({
+      width: 320,
+      height: 288,
+    });
   });
 
   test("includes README content when present and omits it when absent", async () => {
     const paths = await fixture();
     await addCartridge(paths.cartridgesDir, "documented");
     await addCartridge(paths.cartridgesDir, "minimal");
-    await writeFile(join(paths.cartridgesDir, "documented", "README.md"), "# How to play\n\nPress **A**.");
+    await writeFile(
+      join(paths.cartridgesDir, "documented", "README.md"),
+      "# How to play\n\nPress **A**.",
+    );
 
     const result = await generatePublicCartridges(paths);
 
-    expect(result.find(({ slug }) => slug === "documented")?.readme).toBe("# How to play\n\nPress **A**.");
-    expect(result.find(({ slug }) => slug === "minimal")?.readme).toBeUndefined();
-    expect(await readFile(paths.outputFile, "utf8")).toContain('"readme": "# How to play\\n\\nPress **A**."');
+    expect(result.find(({ slug }) => slug === "documented")?.readme).toBe(
+      "# How to play\n\nPress **A**.",
+    );
+    expect(
+      result.find(({ slug }) => slug === "minimal")?.readme,
+    ).toBeUndefined();
+    expect(await readFile(paths.outputFile, "utf8")).toContain(
+      '"readme": "# How to play\\n\\nPress **A**."',
+    );
   });
 
   test("reports every invalid cartridge without replacing existing output", async () => {
     const paths = await fixture();
     await mkdir(paths.cartridgesDir, { recursive: true });
-    await addCartridge(paths.cartridgesDir, "bad-life", "export function init(){}");
+    await addCartridge(
+      paths.cartridgesDir,
+      "bad-life",
+      "export function init(){}",
+    );
     await addCartridge(paths.cartridgesDir, "bad-cover");
-    await writeFile(join(paths.cartridgesDir, "bad-cover", "cover.png"), await png(12, 12));
+    await writeFile(
+      join(paths.cartridgesDir, "bad-cover", "cover.png"),
+      await png(12, 12),
+    );
     await mkdir(join(paths.root, "generated"), { recursive: true });
     await writeFile(paths.outputFile, "keep me");
 
-    await expect(generatePublicCartridges(paths)).rejects.toThrow(/bad-cover[\s\S]*320 × 288[\s\S]*bad-life[\s\S]*update/);
+    await expect(generatePublicCartridges(paths)).rejects.toThrow(
+      /bad-cover[\s\S]*320 × 288[\s\S]*bad-life[\s\S]*update/,
+    );
     expect(await readFile(paths.outputFile, "utf8")).toBe("keep me");
   });
 
@@ -129,7 +191,9 @@ describe("public cartridge generation", () => {
 
     await generatePublicCartridges(paths);
 
-    const published = new Uint8Array(await readFile(join(paths.coverOutputDir, "alpha.png")));
+    const published = new Uint8Array(
+      await readFile(join(paths.coverOutputDir, "alpha.png")),
+    );
     expect(hasChunk(published, "tEXt")).toBe(false);
     expect(published).not.toEqual(new Uint8Array(await readFile(coverPath)));
   });
@@ -138,17 +202,27 @@ describe("public cartridge generation", () => {
     const paths = await fixture();
     await addCartridge(paths.cartridgesDir, "broken");
     const headerOnly = (await png()).subarray(0, 24);
-    await writeFile(join(paths.cartridgesDir, "broken", "cover.png"), headerOnly);
+    await writeFile(
+      join(paths.cartridgesDir, "broken", "cover.png"),
+      headerOnly,
+    );
 
-    await expect(generatePublicCartridges(paths)).rejects.toThrow(/broken[\s\S]*(decode|PNG|png)/);
+    await expect(generatePublicCartridges(paths)).rejects.toThrow(
+      /broken[\s\S]*(decode|PNG|png)/,
+    );
   });
 
   test("rejects legacy one-times cover dimensions", async () => {
     const paths = await fixture();
     await addCartridge(paths.cartridgesDir, "legacy-cover");
-    await writeFile(join(paths.cartridgesDir, "legacy-cover", "cover.png"), await png(160, 144));
+    await writeFile(
+      join(paths.cartridgesDir, "legacy-cover", "cover.png"),
+      await png(160, 144),
+    );
 
-    await expect(generatePublicCartridges(paths)).rejects.toThrow(/legacy-cover[\s\S]*320 × 288/);
+    await expect(generatePublicCartridges(paths)).rejects.toThrow(
+      /legacy-cover[\s\S]*320 × 288/,
+    );
   });
 
   test("check mode validates a clean clone without requiring generated output", async () => {
@@ -171,6 +245,8 @@ describe("public cartridge generation", () => {
     await generatePublicCartridges(paths);
 
     expect(await Bun.file(staleCover).exists()).toBe(false);
-    expect(await Bun.file(join(paths.coverOutputDir, "coin-dash.png")).exists()).toBe(true);
+    expect(
+      await Bun.file(join(paths.coverOutputDir, "coin-dash.png")).exists(),
+    ).toBe(true);
   });
 });

@@ -1,8 +1,6 @@
 {
   "version": 1,
-  "tags": [
-    "3D",
-    "animation"
-  ],
+  "publishedAt": "2026-09-15",
+  "tags": ["3D", "animation"],
   "license": "MIT"
 }

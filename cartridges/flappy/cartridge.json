@@ -1,8 +1,6 @@
 {
   "version": 1,
-  "tags": [
-    "arcade",
-    "two-button"
-  ],
+  "publishedAt": "2026-09-14",
+  "tags": ["arcade", "two-button"],
   "license": "MIT"
 }

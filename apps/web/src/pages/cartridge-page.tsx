@@ -5,6 +5,7 @@ import { CartridgeReadme } from "@/components/cartridge-readme";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { TyntMark } from "@/components/brand";
 import { findPublicCartridge } from "@/cartridges/public-cartridges";
+import { formatPublicationDate } from "@/lib/publication-date";
 
 const PROJECT_REPOSITORY = "https://github.com/cristianbgp/tynt";
 const soundLinkProps = {
@@ -62,6 +63,12 @@ export function CartridgePage({ soundEnabled, onSoundToggle }: CartridgePageProp
               <dd>{cartridge.controls}</dd>
               <dt>License</dt>
               <dd>{cartridge.license}</dd>
+              <dt>Published</dt>
+              <dd>
+                <time dateTime={cartridge.publishedAt}>
+                  {formatPublicationDate(cartridge.publishedAt)}
+                </time>
+              </dd>
             </dl>
           </div>
           <div className="grid min-w-0 content-start border-l border-foreground max-[800px]:border-t max-[800px]:border-l-0">

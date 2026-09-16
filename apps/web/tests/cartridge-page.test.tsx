@@ -24,6 +24,7 @@ test("shows a public cartridge with canonical actions and repository content", (
   expect(screen.getByRole("heading", { level: 1, name: "starter" })).toBeVisible();
   expect(screen.getByText("starter.tynt")).toBeVisible();
   expect(screen.getByText("MIT")).toBeVisible();
+  expect(screen.getByText("Sep 14, 2026")).toHaveAttribute("datetime", "2026-09-14");
   expect(screen.getByRole("link", { name: "Play starter" })).toHaveAttribute(
     "href",
     "/play/public/starter",

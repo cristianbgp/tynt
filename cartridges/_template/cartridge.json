@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "publishedAt": "YYYY-MM-DD",
   "tags": ["arcade"],
   "license": "MIT"
 }

@@ -17,7 +17,7 @@ Bundled examples and community games use the same contribution path. Each galler
 
 Published cartridges require a non-empty title, author, description, controls, and source inside `game.tynt`. The version 1 file shape is strict and rejects unknown fields. The source must export `init()`, `update()`, and `draw()`, and it cannot import modules or access the network.
 
-Use between 1 and 8 descriptive tags. Each tag may contain 1 to 24 letters, numbers, or single hyphens. Tags are normalized to lowercase, so `3D` is stored as `3d` and still appears as `3D` in the gallery. All submitted cartridge source and artwork must use the MIT License and declare `"license": "MIT"` in `cartridge.json`.
+Set `publishedAt` to the date the cartridge first enters the public gallery using the `YYYY-MM-DD` format. Use between 1 and 8 descriptive tags. Each tag may contain 1 to 24 letters, numbers, or single hyphens. Tags are normalized to lowercase, so `3D` is stored as `3d` and still appears as `3D` in the gallery. All submitted cartridge source and artwork must use the MIT License and declare `"license": "MIT"` in `cartridge.json`.
 
 `game.tynt` source is limited to 256 KiB, `cover.png` to 256 KiB, and the entire cartridge directory to 768 KiB. Only `game.tynt`, `cartridge.json`, `cover.png`, and an optional `README.md` are accepted.
 

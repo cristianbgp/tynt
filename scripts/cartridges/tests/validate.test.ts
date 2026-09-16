@@ -18,51 +18,126 @@ function pngHeader(width: number, height: number): Uint8Array {
 describe("public cartridge validation", () => {
   test("accepts stable lowercase slugs and rejects ambiguous variants", () => {
     expect(validateSlug("tiny-dungeon")).toBe("tiny-dungeon");
-    expect(() => validateSlug("Tiny--Dungeon")).toThrow(/lowercase letters, numbers, and single hyphens/);
-    expect(() => validateSlug("_template")).toThrow(/lowercase letters, numbers, and single hyphens/);
+    expect(() => validateSlug("Tiny--Dungeon")).toThrow(
+      /lowercase letters, numbers, and single hyphens/,
+    );
+    expect(() => validateSlug("_template")).toThrow(
+      /lowercase letters, numbers, and single hyphens/,
+    );
   });
 
   test("normalizes known publishing metadata", () => {
-    expect(parsePublishingMetadata('{"version":1,"tags":["arcade","two-button"],"license":"MIT"}')).toEqual({
+    expect(
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["arcade","two-button"],"license":"MIT"}',
+      ),
+    ).toEqual({
       version: 1,
+      publishedAt: "2026-09-14",
       tags: ["arcade", "two-button"],
       license: "MIT",
     });
   });
 
+  test("requires a real publication date in YYYY-MM-DD format", () => {
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"tags":["arcade"],"license":"MIT"}',
+      ),
+    ).toThrow(/publication date/i);
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"09/14/2026","tags":["arcade"],"license":"MIT"}',
+      ),
+    ).toThrow(/YYYY-MM-DD/);
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-02-30","tags":["arcade"],"license":"MIT"}',
+      ),
+    ).toThrow(/real calendar date/i);
+  });
+
   test("accepts and normalizes flexible publishing tags", () => {
-    expect(parsePublishingMetadata('{"version":1,"tags":["3D","animation","bullet-hell"],"license":"MIT"}').tags).toEqual([
-      "3d",
-      "animation",
-      "bullet-hell",
-    ]);
+    expect(
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["3D","animation","bullet-hell"],"license":"MIT"}',
+      ).tags,
+    ).toEqual(["3d", "animation", "bullet-hell"]);
   });
 
   test("accepts only MIT-licensed public cartridges", () => {
-    expect(parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"MIT"}').license).toBe("MIT");
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"Apache-2.0"}')).toThrow(
-      /Unsupported license/,
-    );
+    expect(
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["arcade"],"license":"MIT"}',
+      ).license,
+    ).toBe("MIT");
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["arcade"],"license":"Apache-2.0"}',
+      ),
+    ).toThrow(/Unsupported license/);
   });
 
   test("rejects publishing metadata that cannot be rendered safely", () => {
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["bad/tag"],"license":"MIT"}')).toThrow(/letters, numbers/);
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["3D","3d"],"license":"MIT"}')).toThrow(/duplicate/);
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["one","two","three","four","five","six","seven","eight","nine"],"license":"MIT"}')).toThrow(/at most 8/);
-    expect(() => parsePublishingMetadata(`{"version":1,"tags":["${"a".repeat(25)}"],"license":"MIT"}`)).toThrow(/24 characters/);
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"GPL-3.0"}')).toThrow(/Unsupported license/);
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"MIT","repository":"http://example.com"}')).toThrow(/HTTPS/);
-    expect(() => parsePublishingMetadata('{"version":1,"tags":["arcade"],"license":"MIT","featured":true}')).toThrow(/Unknown publishing field/);
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["bad/tag"],"license":"MIT"}',
+      ),
+    ).toThrow(/letters, numbers/);
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["3D","3d"],"license":"MIT"}',
+      ),
+    ).toThrow(/duplicate/);
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["one","two","three","four","five","six","seven","eight","nine"],"license":"MIT"}',
+      ),
+    ).toThrow(/at most 8/);
+    expect(() =>
+      parsePublishingMetadata(
+        `{"version":1,"publishedAt":"2026-09-14","tags":["${"a".repeat(25)}"],"license":"MIT"}`,
+      ),
+    ).toThrow(/24 characters/);
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["arcade"],"license":"GPL-3.0"}',
+      ),
+    ).toThrow(/Unsupported license/);
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["arcade"],"license":"MIT","repository":"http://example.com"}',
+      ),
+    ).toThrow(/HTTPS/);
+    expect(() =>
+      parsePublishingMetadata(
+        '{"version":1,"publishedAt":"2026-09-14","tags":["arcade"],"license":"MIT","featured":true}',
+      ),
+    ).toThrow(/Unknown publishing field/);
   });
 
   test("reads dimensions from a real PNG header", () => {
-    expect(readPngDimensions(pngHeader(160, 144))).toEqual({ width: 160, height: 144 });
-    expect(() => readPngDimensions(new Uint8Array([1, 2, 3]))).toThrow(/valid PNG/);
+    expect(readPngDimensions(pngHeader(160, 144))).toEqual({
+      width: 160,
+      height: 144,
+    });
+    expect(() => readPngDimensions(new Uint8Array([1, 2, 3]))).toThrow(
+      /valid PNG/,
+    );
   });
 
   test("allows only documented cartridge files", () => {
-    expect(validateDirectoryEntries(["README.md", "cartridge.json", "cover.png", "game.tynt"])).toEqual([]);
-    expect(validateDirectoryEntries(["game.tynt", "dist", "script.sh"])).toEqual([
+    expect(
+      validateDirectoryEntries([
+        "README.md",
+        "cartridge.json",
+        "cover.png",
+        "game.tynt",
+      ]),
+    ).toEqual([]);
+    expect(
+      validateDirectoryEntries(["game.tynt", "dist", "script.sh"]),
+    ).toEqual([
       "Unexpected cartridge entry: dist",
       "Unexpected cartridge entry: script.sh",
     ]);

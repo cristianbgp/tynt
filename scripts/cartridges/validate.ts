@@ -11,7 +11,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export function validateSlug(value: string): string {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)) {
-    throw new Error("Cartridge slug must use lowercase letters, numbers, and single hyphens");
+    throw new Error(
+      "Cartridge slug must use lowercase letters, numbers, and single hyphens",
+    );
   }
   return value;
 }
@@ -23,29 +25,65 @@ export function parsePublishingMetadata(text: string): PublishingMetadata {
   } catch {
     throw new Error("Publishing metadata is not valid JSON");
   }
-  if (!isRecord(value)) throw new Error("Publishing metadata must be an object");
-  const allowed = new Set(["version", "tags", "license", "repository"]);
+  if (!isRecord(value))
+    throw new Error("Publishing metadata must be an object");
+  const allowed = new Set([
+    "version",
+    "publishedAt",
+    "tags",
+    "license",
+    "repository",
+  ]);
   for (const key of Object.keys(value)) {
     if (!allowed.has(key)) throw new Error(`Unknown publishing field: ${key}`);
   }
-  if (value.version !== 1) throw new Error("Unsupported publishing metadata version");
-  if (!Array.isArray(value.tags) || value.tags.length === 0 || !value.tags.every((tag) => typeof tag === "string")) {
+  if (value.version !== 1)
+    throw new Error("Unsupported publishing metadata version");
+  if (typeof value.publishedAt !== "string") {
+    throw new Error("Publishing metadata requires a publication date");
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value.publishedAt)) {
+    throw new Error("Publishing date must use YYYY-MM-DD format");
+  }
+  const publishedAt = new Date(`${value.publishedAt}T00:00:00Z`);
+  if (
+    Number.isNaN(publishedAt.getTime()) ||
+    publishedAt.toISOString().slice(0, 10) !== value.publishedAt
+  ) {
+    throw new Error("Publishing date must be a real calendar date");
+  }
+  if (
+    !Array.isArray(value.tags) ||
+    value.tags.length === 0 ||
+    !value.tags.every((tag) => typeof tag === "string")
+  ) {
     throw new Error("Publishing tags must be a non-empty string array");
   }
-  if (value.tags.length > 8) throw new Error("Publishing metadata accepts at most 8 tags");
+  if (value.tags.length > 8)
+    throw new Error("Publishing metadata accepts at most 8 tags");
   const tags = (value.tags as string[]).map((tag) => tag.trim().toLowerCase());
   for (const tag of tags) {
-    if (tag.length > 24) throw new Error("Publishing tags cannot exceed 24 characters");
+    if (tag.length > 24)
+      throw new Error("Publishing tags cannot exceed 24 characters");
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(tag)) {
-      throw new Error("Publishing tags must use letters, numbers, and single hyphens");
+      throw new Error(
+        "Publishing tags must use letters, numbers, and single hyphens",
+      );
     }
   }
-  if (new Set(tags).size !== tags.length) throw new Error("Publishing tags cannot contain duplicate values");
-  if (typeof value.license !== "string" || !(PUBLIC_LICENSES as readonly string[]).includes(value.license)) {
+  if (new Set(tags).size !== tags.length)
+    throw new Error("Publishing tags cannot contain duplicate values");
+  if (
+    typeof value.license !== "string" ||
+    !(PUBLIC_LICENSES as readonly string[]).includes(value.license)
+  ) {
     throw new Error(`Unsupported license: ${String(value.license)}`);
   }
   if (value.repository !== undefined) {
-    if (typeof value.repository !== "string" || !value.repository.startsWith("https://")) {
+    if (
+      typeof value.repository !== "string" ||
+      !value.repository.startsWith("https://")
+    ) {
       throw new Error("Publishing repository must be an HTTPS URL");
     }
     try {
@@ -56,15 +94,24 @@ export function parsePublishingMetadata(text: string): PublishingMetadata {
   }
   return {
     version: 1,
+    publishedAt: value.publishedAt,
     tags,
     license: value.license as PublicLicense,
     ...(value.repository ? { repository: value.repository } : {}),
   };
 }
 
-export function readPngDimensions(bytes: Uint8Array): { width: number; height: number } {
-  const signature = [137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82];
-  if (bytes.byteLength < 24 || signature.some((byte, index) => bytes[index] !== byte)) {
+export function readPngDimensions(bytes: Uint8Array): {
+  width: number;
+  height: number;
+} {
+  const signature = [
+    137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82,
+  ];
+  if (
+    bytes.byteLength < 24 ||
+    signature.some((byte, index) => bytes[index] !== byte)
+  ) {
     throw new Error("Cover is not a valid PNG");
   }
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -73,5 +120,8 @@ export function readPngDimensions(bytes: Uint8Array): { width: number; height: n
 
 export function validateDirectoryEntries(entries: string[]): string[] {
   const allowed = new Set<string>(ALLOWED_FILES);
-  return entries.filter((entry) => !allowed.has(entry)).sort().map((entry) => `Unexpected cartridge entry: ${entry}`);
+  return entries
+    .filter((entry) => !allowed.has(entry))
+    .sort()
+    .map((entry) => `Unexpected cartridge entry: ${entry}`);
 }

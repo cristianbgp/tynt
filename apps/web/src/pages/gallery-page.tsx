@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { CartridgePreview } from "@/components/cartridge-preview";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { listPublicCartridges } from "@/cartridges/public-cartridges";
+import { formatPublicationDate } from "@/lib/publication-date";
 
 interface GalleryPageProps {
   soundEnabled?: boolean;
@@ -15,9 +16,13 @@ const soundLinkProps = {
   "data-cuelume-release": "",
 } as const;
 const PROJECT_REPOSITORY = "https://github.com/cristianbgp/tynt";
+const GALLERY_CARTRIDGES = [...listPublicCartridges()].sort(
+  (left, right) =>
+    right.publishedAt.localeCompare(left.publishedAt) || left.slug.localeCompare(right.slug),
+);
 
 export function GalleryPage({ soundEnabled = true, onSoundToggle = () => {} }: GalleryPageProps) {
-  const cartridges = listPublicCartridges();
+  const cartridges = GALLERY_CARTRIDGES;
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<string | null>(null);
   const tags = useMemo(
@@ -141,7 +146,10 @@ export function GalleryPage({ soundEnabled = true, onSoundToggle = () => {} }: G
                   </span>
                 </div>
                 <span className="library-author mt-[6px] text-[10px] text-muted-foreground">
-                  by {cartridge.author}
+                  by {cartridge.author} ·{" "}
+                  <time dateTime={cartridge.publishedAt}>
+                    {formatPublicationDate(cartridge.publishedAt)}
+                  </time>
                 </span>
                 <p className="my-[18px] max-w-[42ch] leading-normal text-[#555555]">
                   {cartridge.description}

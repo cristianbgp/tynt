@@ -1,8 +1,6 @@
 {
   "version": 1,
-  "tags": [
-    "simulation",
-    "procedural"
-  ],
+  "publishedAt": "2026-09-14",
+  "tags": ["simulation", "procedural"],
   "license": "MIT"
 }

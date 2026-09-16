@@ -21,6 +21,10 @@ describe("cartridge gallery", () => {
     const previews = screen.getAllByRole("img", { name: /preview$/i });
     expect(previews[0]).toHaveAttribute("width", "320");
     expect(previews[0]).toHaveAttribute("height", "288");
+    expect(screen.getAllByRole("heading", { level: 2 })[0]).toHaveTextContent(
+      "cube-animation.tynt",
+    );
+    expect(screen.getByText("Sep 15, 2026")).toHaveAttribute("datetime", "2026-09-15");
     expect(screen.getByRole("link", { name: "Play snake.tynt" })).toHaveAttribute(
       "href",
       "/play/public/snake",

@@ -1,7 +1,6 @@
 {
   "version": 1,
-  "tags": [
-    "arcade"
-  ],
+  "publishedAt": "2026-09-14",
+  "tags": ["arcade"],
   "license": "MIT"
 }

@@ -27,4 +27,6 @@ Run `bun run check` from the repository root and submit the complete cartridge d
 
 All submitted cartridge source and artwork must use the MIT License and declare `"license": "MIT"` in `cartridge.json`. By submitting a cartridge, you confirm that you created its contents or have permission to distribute them under MIT.
 
+Set `publishedAt` in `cartridge.json` to the date the cartridge first enters the public gallery, using the `YYYY-MM-DD` format. The gallery displays this date and sorts newer cartridges first.
+
 The gallery generator discovers every valid `cartridges/<slug>/` directory automatically. Contributors never edit a central registry. After a cartridge is merged, its canonical page is `https://tynt.dev/cartridges/<slug>`. The page renders `README.md` when present and falls back to the cartridge description when it is absent. Keep unrelated application, dependency, workflow, and configuration changes out of a cartridge submission.
