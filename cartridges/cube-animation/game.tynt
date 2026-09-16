@@ -1,0 +1,22 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "cube-animation",
+  "author": "byebye",
+  "description": "Testing functionalities",
+  "controls": "Only visualization",
+  "source": "const vertices = [\n  [-1, -1, -1],\n  [ 1, -1, -1],\n  [ 1,  1, -1],\n  [-1,  1, -1],\n  [-1, -1,  1],\n  [ 1, -1,  1],\n  [ 1,  1,  1],\n  [-1,  1,  1],\n] as const;\n\nconst faces = [\n  { vertices: [0, 1, 2, 3], color: 1 },\n  { vertices: [5, 4, 7, 6], color: 2 },\n  { vertices: [4, 0, 3, 7], color: 3 },\n  { vertices: [1, 5, 6, 2], color: 1 },\n  { vertices: [3, 2, 6, 7], color: 2 },\n  { vertices: [4, 5, 1, 0], color: 3 },\n] as const;\n\nlet angleX = 0;\nlet angleY = 0;\n\ntype Point3D = {\n  x: number;\n  y: number;\n  z: number;\n};\n\ntype Point2D = {\n  x: number;\n  y: number;\n};\n\ntype Face = {\n  points: Point3D[];\n  color: number;\n  depth: number;\n};\n\nfunction rotate(point: readonly [number, number, number]): Point3D {\n  const [x, y, z] = point;\n\n  const cosX = Math.cos(angleX);\n  const sinX = Math.sin(angleX);\n\n  const cosY = Math.cos(angleY);\n  const sinY = Math.sin(angleY);\n\n  const y1 = y * cosX - z * sinX;\n  const z1 = y * sinX + z * cosX;\n\n  const x2 = x * cosY + z1 * sinY;\n  const z2 = -x * sinY + z1 * cosY;\n\n  return { x: x2, y: y1, z: z2 };\n}\n\nfunction project(point: Point3D): Point2D {\n  const scale = 32;\n\n  return { x: 80 + point.x * scale, y: 72 + point.y * scale };\n}\n\nfunction cross(a: Point3D, b: Point3D, c: Point3D): Point3D {\n  const abx = b.x - a.x;\n  const aby = b.y - a.y;\n  const abz = b.z - a.z;\n\n  const acx = c.x - a.x;\n  const acy = c.y - a.y;\n  const acz = c.z - a.z;\n\n  return { x: aby * acz - abz * acy, y: abz * acx - abx * acz, z: abx * acy - aby * acx };\n}\n\nfunction drawTriangle(a: Point2D, b: Point2D, c: Point2D, color: number): void {\n  const minY = Math.max(0, Math.floor(Math.min(a.y, b.y, c.y)));\n  const maxY = Math.min(143, Math.ceil(Math.max(a.y, b.y, c.y)));\n\n  for (let y = minY; y <= maxY; y++) {\n    const intersections: number[] = [];\n\n    addIntersection(a, b, y, intersections);\n    addIntersection(b, c, y, intersections);\n    addIntersection(c, a, y, intersections);\n\n    if (intersections.length < 2) continue;\n\n    intersections.sort((a, b) => a - b);\n\n    const x0 = Math.max(0, Math.ceil(intersections[0]));\n    const x1 = Math.min(159, Math.floor(intersections[intersections.length - 1]));\n\n    for (let x = x0; x <= x1; x++) {\n      pixel(x, y, color);\n    }\n  }\n}\n\nfunction addIntersection(a: Point2D, b: Point2D, y: number, intersections: number[]): void {\n  if ((y >= a.y && y < b.y) || (y >= b.y && y < a.y)) {\n    const t = (y - a.y) / (b.y - a.y);\n    \n    intersections.push(a.x + (b.x - a.x) * t);\n  }\n}\n\nfunction drawFace(points: Point2D[], color: number): void {\n  drawTriangle(points[0], points[1], points[2], color);\n  drawTriangle(points[0], points[2], points[3], color);\n}\n\nexport function init(): void {\n  clear(0);\n}\n\nexport function update(): void {\n  angleX += 0.03;\n  angleY += 0.04;\n}\n\nexport function draw(): void {\n  clear(0);\n  \n  const rotated = vertices.map(rotate);\n\n  const visibleFaces: Face[] = [];\n\n  for (const face of faces) {\n    const a = rotated[face.vertices[0]];\n    const b = rotated[face.vertices[1]];\n    const c = rotated[face.vertices[2]];\n\n    const normal = cross(a, b, c);\n\n    if (normal.z >= 0) continue;\n\n    const points = face.vertices.map(index => project(rotated[index]));\n\n    const depth = face.vertices.reduce((sum, index) => sum + rotated[index].z, 0) / 4;\n\n    visibleFaces.push({points, color: face.color, depth });\n  }\n\n  visibleFaces.sort((a, b) => a.depth - b.depth);\n\n  for (const face of visibleFaces) {\n    drawFace(face.points, face.color);\n  }\n\n  for (const face of visibleFaces) {\n    const points = face.points;\n\n    line(points[0].x, points[0].y, points[1].x, points[1].y, 0);\n    line(points[1].x, points[1].y, points[2].x, points[2].y, 0);\n    line(points[2].x, points[2].y, points[3].x, points[3].y, 0);\n    line(points[3].x, points[3].y, points[0].x, points[0].y, 0);\n  }\n}",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": [
+      "#000000",
+      "#555555",
+      "#aaaaaa",
+      "#ffffff"
+    ]
+  }
+}
