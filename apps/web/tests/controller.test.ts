@@ -6,7 +6,7 @@ const compiled = { code: "compiled", map: "{}" };
 function harness() {
   const events: string[] = [];
   const debugStates: Array<{ frame: number; held: readonly string[]; pressed: readonly string[] }> = [];
-  const runs: Array<RuntimeRun & { ready(): void; fail(): void; ticks: unknown[]; stopped: boolean }> = [];
+  const runs: Array<RuntimeRun & { ready(): void; fail(): void; suspend(): void; resume(): void; ticks: unknown[]; stopped: boolean }> = [];
   let frame: ((time: number) => void) | undefined;
   let compileFails = false;
   let now = 0;
@@ -20,6 +20,8 @@ function harness() {
         start() { events.push("start"); },
         tick(input: unknown) { this.ticks.push(input); },
         stop() { if (!this.stopped) { this.stopped = true; this.isActive = false; events.push("stop"); callbacks.onStop?.(); } },
+        suspend() { events.push("run:suspend"); },
+        resume() { events.push("run:resume"); },
         ready() { callbacks.onReady?.(); },
         fail() { callbacks.onError?.({ phase: "update", message: "boom" }); callbacks.onStop?.(); },
       };
@@ -117,17 +119,33 @@ test("pause prevents scheduled updates and resume discards elapsed wall time", a
   testbed.runs[0]!.ready();
 
   expect(controller.pause()).toBe(true);
+  expect(testbed.events).toContain("run:suspend");
   expect(controller.isPaused).toBe(true);
   testbed.frame(5000);
   expect(testbed.runs[0]!.ticks).toEqual([]);
 
   testbed.setNow(5000);
   expect(controller.resume()).toBe(true);
+  expect(testbed.events).toContain("run:resume");
   testbed.frame(5000);
   expect(testbed.runs[0]!.ticks).toEqual([]);
   testbed.frame(5017);
   expect(testbed.runs[0]!.ticks).toHaveLength(1);
   expect(controller.isPaused).toBe(false);
+});
+
+test("a ready worker stays paused when the page was hidden during startup", async () => {
+  const testbed = harness();
+  const controller = new RuntimeController(testbed.dependencies);
+  await controller.run("good");
+
+  expect(controller.pause()).toBe(true);
+  testbed.runs[0]!.ready();
+  testbed.frame(17);
+
+  expect(controller.isPaused).toBe(true);
+  expect(testbed.runs[0]!.ticks).toEqual([]);
+  expect(testbed.events).not.toContain("running");
 });
 
 test("step executes exactly one update while paused and reports its input", async () => {

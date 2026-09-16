@@ -639,6 +639,26 @@ test("watchdog stops an infinite update without freezing the editor", async ({ p
   await expect(page.locator(".cm-content")).toContainText("still responsive");
 });
 
+test("backgrounding the page pauses and resumes without a watchdog error", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Run" }).click();
+  await expect(page.locator("#status")).toHaveText("running");
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", { configurable: true, value: "hidden" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect(page.locator("#status")).toHaveText("paused");
+  await page.waitForTimeout(2_100);
+  await expect(page.locator("#error-console")).toBeHidden();
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", { configurable: true, value: "visible" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect(page.locator("#status")).toHaveText("running");
+});
+
 test("cartridges cannot reach host, storage, cookies, workers, or network", async ({ page }) => {
   const escaped: string[] = [];
   page.on("request", (request) => {

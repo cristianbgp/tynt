@@ -9,6 +9,8 @@ export interface RuntimeRun {
   readonly isActive: boolean;
   start(): void;
   tick(input: InputSnapshot): void;
+  suspend(): void;
+  resume(): void;
   stop(): void;
 }
 
@@ -141,6 +143,7 @@ export class RuntimeController {
     nextRun = this.dependencies.createRun(compiled, {
       onReady: () => {
         if (this.runInstance !== nextRun) return;
+        if (this.paused) return;
         this.paused = false;
         this.dependencies.onStatus("running");
         this.clock.reset(this.dependencies.now());
@@ -219,6 +222,7 @@ export class RuntimeController {
     if (!this.isRunning || this.paused) return false;
     this.paused = true;
     this.stopLoop();
+    this.runInstance?.suspend();
     this.dependencies.onAudioStop?.();
     this.dependencies.onStatus("paused");
     return true;
@@ -228,6 +232,7 @@ export class RuntimeController {
     if (!this.isPaused) return false;
     this.paused = false;
     this.clock.reset(this.dependencies.now());
+    this.runInstance?.resume();
     this.dependencies.onStatus("running");
     this.animationFrame = this.dependencies.requestFrame(this.onAnimationFrame);
     return true;

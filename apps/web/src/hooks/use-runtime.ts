@@ -10,6 +10,37 @@ function messageFrom(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+interface VisibilitySource {
+  readonly visibilityState: "visible" | "hidden";
+  addEventListener(type: "visibilitychange", listener: EventListener): void;
+  removeEventListener(type: "visibilitychange", listener: EventListener): void;
+}
+
+interface VisibilityRuntime {
+  pause(): boolean;
+  resume(): boolean;
+  resetInput(): void;
+}
+
+export function observeRuntimeVisibility(source: VisibilitySource, runtime: VisibilityRuntime): () => void {
+  let automaticallyPaused = false;
+  const syncVisibility = () => {
+    if (source.visibilityState === "hidden") {
+      if (!automaticallyPaused && runtime.pause()) {
+        automaticallyPaused = true;
+        runtime.resetInput();
+      }
+      return;
+    }
+    if (!automaticallyPaused) return;
+    automaticallyPaused = false;
+    runtime.resume();
+  };
+  source.addEventListener("visibilitychange", syncVisibility);
+  syncVisibility();
+  return () => source.removeEventListener("visibilitychange", syncVisibility);
+}
+
 export function useRuntime(soundEnabled = true) {
   const controllerRef = useRef<RuntimeController | null>(null);
   const mountedRef = useRef(true);
@@ -48,6 +79,12 @@ export function useRuntime(soundEnabled = true) {
   }, []);
 
   useEffect(() => controllerRef.current?.setAudioEnabled(soundEnabled), [soundEnabled]);
+
+  useEffect(() => observeRuntimeVisibility(document, {
+    pause: () => controllerRef.current?.pause() ?? false,
+    resume: () => controllerRef.current?.resume() ?? false,
+    resetInput: () => controllerRef.current?.resetInput(),
+  }), []);
 
   const run = useCallback(async (source: string) => {
     setError("");

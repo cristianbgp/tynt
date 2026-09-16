@@ -3,7 +3,7 @@ import { SandboxRun, type SandboxEnvironment, type SandboxFrame } from "../src/r
 
 const compiled = { code: "var __tyntCartridge={init(){},update(){},draw(){}}", map: "{}" };
 
-function harness() {
+function harness({ deferLoad = false } = {}) {
   let messageListener: ((event: MessageEvent) => void) | undefined;
   let loadListener: (() => void) | undefined;
   const posted: unknown[] = [];
@@ -19,7 +19,7 @@ function harness() {
   };
   const environment: SandboxEnvironment = {
     createIframe: () => iframe,
-    appendIframe: () => loadListener?.(),
+    appendIframe: () => { if (!deferLoad) loadListener?.(); },
     addMessageListener: (callback) => { messageListener = callback; },
     removeMessageListener: (callback) => { if (messageListener === callback) messageListener = undefined; },
   };
@@ -27,6 +27,7 @@ function harness() {
     environment,
     iframe,
     posted,
+    load: () => loadListener?.(),
     emit: (source: unknown, data: unknown) => messageListener?.({ source, data } as MessageEvent),
   };
 }
@@ -53,6 +54,16 @@ test("delivers valid frames and tears down idempotently", () => {
   run.stop();
   expect(testbed.iframe.removed).toBe(true);
   expect(run.isActive).toBe(false);
+});
+
+test("preserves suspension when the iframe finishes loading afterward", () => {
+  const testbed = harness({ deferLoad: true });
+  const run = new SandboxRun(compiled, {}, testbed.environment, "0123456789abcdef0123456789abcdef");
+  run.start();
+  run.suspend();
+  testbed.load();
+
+  expect(testbed.posted.at(-1)).toEqual({ kind: "suspend", token: run.token });
 });
 
 test("delivers validated audio requests", () => {

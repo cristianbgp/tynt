@@ -106,4 +106,20 @@ describe("iframe bootstrap", () => {
     expect(harness.relayed).toContainEqual({ kind: "error", token, phase: "init", message: "Worker stopped responding for 2 seconds" });
     expect(harness.workers[0]!.terminated).toBe(true);
   });
+
+  test("suspends an in-flight watchdog until the page resumes", () => {
+    const harness = iframeHarness(createIframeDocument(token));
+    harness.send(harness.parent, { kind: "boot", token, workerSource: "source" });
+    harness.workers[0]!.onmessage?.({ data: { kind: "ready", token } });
+    harness.send(harness.parent, { kind: "tick", token, input: { held: [], pressed: [] } });
+
+    harness.send(harness.parent, { kind: "suspend", token });
+    harness.fire(2000);
+    expect(harness.workers[0]!.terminated).toBe(false);
+
+    harness.send(harness.parent, { kind: "resume", token });
+    harness.fire(2000);
+    expect(harness.relayed).toContainEqual({ kind: "error", token, phase: "init", message: "Worker stopped responding for 2 seconds" });
+    expect(harness.workers[0]!.terminated).toBe(true);
+  });
 });

@@ -53,6 +53,7 @@ export class SandboxRun {
   readonly token: string;
   private iframe: SandboxIframe | null = null;
   private active = false;
+  private suspended = false;
   private readonly environment: SandboxEnvironment;
   private audioWindowStart = 0;
   private audioWindowCount = 0;
@@ -130,6 +131,7 @@ export class SandboxRun {
         token: this.token,
         workerSource: createWorkerSource(this.compiled.code, this.token),
       }, "*");
+      if (this.suspended) iframe.contentWindow?.postMessage({ kind: "suspend", token: this.token }, "*");
     });
     this.environment.addMessageListener(this.onMessage);
     this.environment.appendIframe(iframe);
@@ -140,9 +142,22 @@ export class SandboxRun {
     this.iframe?.contentWindow?.postMessage({ kind: "tick", token: this.token, input }, "*");
   }
 
+  suspend(): void {
+    if (!this.active) return;
+    this.suspended = true;
+    this.iframe?.contentWindow?.postMessage({ kind: "suspend", token: this.token }, "*");
+  }
+
+  resume(): void {
+    if (!this.active) return;
+    this.suspended = false;
+    this.iframe?.contentWindow?.postMessage({ kind: "resume", token: this.token }, "*");
+  }
+
   stop(): void {
     if (!this.active) return;
     this.active = false;
+    this.suspended = false;
     try { this.iframe?.contentWindow?.postMessage({ kind: "stop", token: this.token }, "*"); } catch {}
     this.environment.removeMessageListener(this.onMessage);
     this.iframe?.remove();
