@@ -5,6 +5,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { tyntCompletionSource } from "@/editor/tynt-api";
+import { tyntDefinitionNavigation } from "@/editor/tynt-definitions";
 import { tyntSyntaxHighlighting } from "@/editor/tynt-highlighting";
 
 interface EditorProps {
@@ -31,6 +32,7 @@ export function Editor({ source, onChange }: EditorProps) {
           javascript({ typescript: true }),
           tyntSyntaxHighlighting,
           autocompletion({ override: [tyntCompletionSource] }),
+          tyntDefinitionNavigation(),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) onChangeRef.current(update.state.doc.toString());
           }),
