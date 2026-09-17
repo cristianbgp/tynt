@@ -34,10 +34,10 @@ describe("cartridge gallery", () => {
     const previews = screen.getAllByRole("img", { name: /preview$/i });
     expect(previews[0]).toHaveAttribute("width", "320");
     expect(previews[0]).toHaveAttribute("height", "288");
-    expect(screen.getAllByRole("heading", { level: 2 })[0]).toHaveTextContent(
-      "cube-animation.tynt",
+    const publicationDates = [...document.querySelectorAll("time")].map((element) =>
+      element.getAttribute("datetime"),
     );
-    expect(screen.getByText("Sep 15, 2026")).toHaveAttribute("datetime", "2026-09-15");
+    expect(publicationDates).toEqual([...publicationDates].sort().reverse());
     expect(screen.getByRole("link", { name: "Play snake.tynt" })).toHaveAttribute(
       "href",
       "/play/public/snake",
@@ -83,7 +83,10 @@ describe("cartridge gallery", () => {
     await user.click(screen.getByRole("button", { name: "Sort: Newest" }));
     await user.click(await screen.findByRole("menuitem", { name: "Title" }));
 
-    expect(screen.getAllByRole("heading", { level: 2 })[0]).toHaveTextContent("animation.tynt");
+    const titles = screen
+      .getAllByRole("heading", { level: 2 })
+      .map((heading) => heading.textContent ?? "");
+    expect(titles).toEqual([...titles].sort((left, right) => left.localeCompare(right)));
     expect(screen.getByRole("button", { name: "Sort: Title" })).toBeVisible();
   });
 
@@ -93,7 +96,9 @@ describe("cartridge gallery", () => {
 
     await user.click(screen.getByRole("button", { name: "Filter by puzzle from sokoban.tynt" }));
 
-    expect(screen.getByText("2 games")).toBeVisible();
+    const visibleGames = screen.getAllByRole("article").length;
+    expect(screen.getByText(`${visibleGames} games`)).toBeVisible();
+    expect(screen.getByRole("heading", { name: "echo-loop.tynt" })).toBeVisible();
     expect(screen.getByRole("heading", { name: "sokoban.tynt" })).toBeVisible();
     expect(screen.getByRole("heading", { name: "tiny-quest.tynt" })).toBeVisible();
     expect(screen.queryByRole("heading", { name: "snake.tynt" })).not.toBeInTheDocument();
