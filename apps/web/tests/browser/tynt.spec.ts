@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { importSource, pixel } from "./fixtures";
+import { expectInstantInteractionColors, importSource, pixel } from "./fixtures";
 import { PUBLIC_CARTRIDGES } from "../../src/generated/public-cartridges";
 
 async function expectNoHorizontalOverflow(page: import("@playwright/test").Page, width: number) {
@@ -73,10 +73,28 @@ test("uses intentional hover feedback for editor interactions", async ({ page })
   await expectHoverColors(disabledRun, "rgba(0, 0, 0, 0)", "rgb(119, 119, 119)");
 
   await page.setViewportSize({ width: 320, height: 568 });
+  await page.getByRole("button", { name: "Show code" }).click();
   const gamePane = page.getByRole("button", { name: "Show game" });
   await expectHoverColors(gamePane, "rgb(0, 0, 0)", "rgb(255, 255, 255)");
   await gamePane.click();
   await expectHoverColors(gamePane, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
+});
+
+test("keeps action and navigation color feedback instant", async ({ page }) => {
+  for (const path of [
+    "/",
+    "/gallery",
+    "/library",
+    "/sprites",
+    "/sounds",
+    "/cartridges/starter",
+    "/play/public/starter",
+    "/missing",
+  ]) {
+    await page.goto(path);
+    await page.getByRole("navigation", { name: "Primary navigation" }).waitFor();
+    await expectInstantInteractionColors(page);
+  }
 });
 
 test("gives sprite and recovery controls a distinct hover state", async ({ page }) => {

@@ -14,7 +14,7 @@ const soundLinkProps = {
   "data-cuelume-release": "",
 } as const;
 const actionClassName =
-  "inline-flex min-h-[42px] items-center justify-center gap-[7px] border border-foreground px-[14px] no-underline transition-colors hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background";
+  "inline-flex min-h-[42px] items-center justify-center gap-[7px] border border-foreground px-[14px] no-underline hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background";
 
 interface CartridgePageProps {
   soundEnabled: boolean;

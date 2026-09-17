@@ -178,7 +178,7 @@ export function GalleryPage({ soundEnabled = true, onSoundToggle = () => {} }: G
           >
             {tags.map((value) => (
               <button
-                className="cursor-pointer border border-border bg-transparent px-[7px] py-[5px] font-[inherit] text-[9px] text-muted-foreground uppercase transition-colors hover:border-foreground hover:bg-foreground hover:text-background focus-visible:border-foreground focus-visible:bg-foreground focus-visible:text-background aria-pressed:border-foreground aria-pressed:bg-foreground aria-pressed:text-background aria-pressed:hover:bg-[#555555] max-[700px]:min-h-[40px] max-[700px]:flex-none"
+                className="cursor-pointer border border-border bg-transparent px-[7px] py-[5px] font-[inherit] text-[9px] text-muted-foreground uppercase hover:border-foreground hover:bg-foreground hover:text-background focus-visible:border-foreground focus-visible:bg-foreground focus-visible:text-background aria-pressed:border-foreground aria-pressed:bg-foreground aria-pressed:text-background aria-pressed:hover:bg-[#555555] max-[700px]:min-h-[40px] max-[700px]:flex-none"
                 key={value}
                 type="button"
                 aria-pressed={tag === value}

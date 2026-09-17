@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectInstantInteractionColors } from "./fixtures";
 
 const docs = "http://127.0.0.1:4174";
 
@@ -20,6 +21,19 @@ test("custom docs are creator-first and responsive", async ({ page }) => {
   await expect(navigation).toBeVisible();
   await expect(navigation.getByRole("link", { name: "Getting started" })).toBeVisible();
   await expect(navigation.getByRole("link", { name: "Open the tynt gallery" })).toBeVisible();
+});
+
+test("keeps documentation action and navigation color feedback instant", async ({ page }) => {
+  for (const path of [
+    "/docs",
+    "/docs/getting-started",
+    "/docs/examples",
+    "/docs/publishing",
+    "/docs/reference/cartridge-api",
+  ]) {
+    await page.goto(`${docs}${path}`);
+    await expectInstantInteractionColors(page);
+  }
 });
 
 test("mobile header controls stay separate from the brand and page content", async ({ page }) => {

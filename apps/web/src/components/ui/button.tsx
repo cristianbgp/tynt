@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-10 items-center justify-center gap-2 border-l border-border px-4 font-mono text-[13px] transition-colors outline-none focus-visible:bg-foreground focus-visible:text-background disabled:cursor-wait disabled:text-muted-foreground",
+  "inline-flex min-h-10 items-center justify-center gap-2 border-l border-border px-4 font-mono text-[13px] outline-none focus-visible:bg-foreground focus-visible:text-background disabled:cursor-wait disabled:text-muted-foreground",
   {
     variants: {
       variant: {

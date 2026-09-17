@@ -24,7 +24,7 @@ export function SiteHeader({ active, editorTo = "/" }: { active?: SiteRoute; edi
     <header className="gallery-topbar flex border-b border-border">
       <BrandLink />
       <nav
-        className="site-navigation ml-auto flex [&>a]:flex [&>a]:items-center [&>a]:gap-[7px] [&>a]:border-l [&>a]:border-border [&>a]:px-[16px] [&>a]:no-underline [&>a]:transition-colors max-[700px]:[&>a]:px-[10px] max-[560px]:[&>a]:px-[8px] max-[360px]:[&>a]:px-[4px] [&>a:focus-visible]:bg-foreground [&>a:focus-visible]:text-background [&>a:hover]:bg-foreground [&>a:hover]:text-background max-[700px]:[&>a>span]:hidden [&>a[aria-current=page]]:bg-foreground [&>a[aria-current=page]]:text-background [&>a[aria-current=page]:hover]:bg-[#555555]"
+        className="site-navigation ml-auto flex [&>a]:flex [&>a]:items-center [&>a]:gap-[7px] [&>a]:border-l [&>a]:border-border [&>a]:px-[16px] [&>a]:no-underline max-[700px]:[&>a]:px-[10px] max-[560px]:[&>a]:px-[8px] max-[360px]:[&>a]:px-[4px] [&>a:focus-visible]:bg-foreground [&>a:focus-visible]:text-background [&>a:hover]:bg-foreground [&>a:hover]:text-background max-[700px]:[&>a>span]:hidden [&>a[aria-current=page]]:bg-foreground [&>a[aria-current=page]]:text-background [&>a[aria-current=page]:hover]:bg-[#555555]"
         aria-label="Primary navigation"
       >
         {routes.map(({ id, label, to, Icon }) => (
