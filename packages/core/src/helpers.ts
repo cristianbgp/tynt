@@ -8,17 +8,74 @@ export function createRandom(seed = 1): () => number {
 }
 
 /** Returns whether two axis-aligned rectangles overlap. Touching edges do not count as overlap. */
-export function rectsOverlap(ax: number, ay: number, aw: number, ah: number, bx: number, by: number, bw: number, bh: number): boolean {
-  return aw > 0 && ah > 0 && bw > 0 && bh > 0 && ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+export function rectsOverlap(
+  ax: number,
+  ay: number,
+  aw: number,
+  ah: number,
+  bx: number,
+  by: number,
+  bw: number,
+  bh: number,
+): boolean {
+  return (
+    aw > 0 &&
+    ah > 0 &&
+    bw > 0 &&
+    bh > 0 &&
+    ax < bx + bw &&
+    ax + aw > bx &&
+    ay < by + bh &&
+    ay + ah > by
+  );
 }
 
 /** Returns whether a point lies inside a rectangle whose right and bottom edges are exclusive. */
-export function pointInRect(px: number, py: number, x: number, y: number, width: number, height: number): boolean {
-  return width > 0 && height > 0 && px >= x && px < x + width && py >= y && py < y + height;
+export function pointInRect(
+  px: number,
+  py: number,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): boolean {
+  return (
+    width > 0 &&
+    height > 0 &&
+    px >= x &&
+    px < x + width &&
+    py >= y &&
+    py < y + height
+  );
+}
+
+function finiteRange(value: number, min: number, max: number): void {
+  if (![value, min, max].every(Number.isFinite) || min >= max) {
+    throw new Error(
+      "Range values must be finite and min must be less than max",
+    );
+  }
+}
+
+/** Limits a finite value to the inclusive range from min to max. */
+export function clamp(value: number, min: number, max: number): number {
+  finiteRange(value, min, max);
+  return Math.max(min, Math.min(max, value));
+}
+
+/** Wraps a finite value into the half-open range from min inclusive to max exclusive. */
+export function wrap(value: number, min: number, max: number): number {
+  finiteRange(value, min, max);
+  const size = max - min;
+  return min + ((((value - min) % size) + size) % size);
 }
 
 /** Returns true on frames matching a positive interval and optional offset. */
-export function frameEvery(frame: number, interval: number, offset = 0): boolean {
+export function frameEvery(
+  frame: number,
+  interval: number,
+  offset = 0,
+): boolean {
   const safeInterval = Math.max(1, Math.floor(interval));
   return frame >= offset && (frame - offset) % safeInterval === 0;
 }

@@ -58,7 +58,11 @@ function inputList(value: unknown): InputName[] {
 
 function parseInput(value: unknown): InputSnapshot {
   if (!isRecord(value)) throw new Error("Sandbox input snapshot is invalid");
-  return { held: inputList(value.held), pressed: inputList(value.pressed) };
+  return {
+    held: inputList(value.held),
+    pressed: inputList(value.pressed),
+    released: inputList(value.released),
+  };
 }
 
 export function encodedBytes(value: unknown): number {
@@ -117,6 +121,19 @@ function parseCommand(value: unknown): DrawCommand {
         x: number("x"),
         y: number("y"),
         radius: number("radius"),
+        color: color(),
+        fill: value.fill,
+      };
+    case "triangle":
+      if (typeof value.fill !== "boolean") throw new Error("Drawing command is invalid");
+      return {
+        op: "triangle",
+        x1: number("x1"),
+        y1: number("y1"),
+        x2: number("x2"),
+        y2: number("y2"),
+        x3: number("x3"),
+        y3: number("y3"),
         color: color(),
         fill: value.fill,
       };

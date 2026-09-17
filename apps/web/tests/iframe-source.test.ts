@@ -146,7 +146,11 @@ describe("iframe bootstrap", () => {
     const harness = iframeHarness(createIframeDocument(token));
     harness.send(harness.parent, { kind: "boot", token, workerSource: "source" });
     harness.workers[0]!.onmessage?.({ data: { kind: "ready", token } });
-    harness.send(harness.parent, { kind: "tick", token, input: { held: [], pressed: [] } });
+    harness.send(harness.parent, {
+      kind: "tick",
+      token,
+      input: { held: [], pressed: [], released: [] },
+    });
 
     harness.fire(2000);
 
@@ -163,7 +167,11 @@ describe("iframe bootstrap", () => {
     const harness = iframeHarness(createIframeDocument(token));
     harness.send(harness.parent, { kind: "boot", token, workerSource: "source" });
     harness.workers[0]!.onmessage?.({ data: { kind: "ready", token } });
-    harness.send(harness.parent, { kind: "tick", token, input: { held: [], pressed: [] } });
+    harness.send(harness.parent, {
+      kind: "tick",
+      token,
+      input: { held: [], pressed: [], released: [] },
+    });
 
     harness.send(harness.parent, { kind: "suspend", token });
     harness.fire(2000);

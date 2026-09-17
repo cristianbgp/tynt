@@ -44,7 +44,7 @@ describe("worker bootstrap", () => {
       export function draw(){ clear(0); pixel(count, 1, 3); }
     `);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
-    worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
+    worker.tick({ kind: "tick", token, input: { held: [], pressed: [], released: [] } });
     expect(
       worker.messages.map(
         (value: any) => `${value.kind}:${value.phase ?? ""}:${value.state ?? ""}`,
@@ -71,7 +71,7 @@ describe("worker bootstrap", () => {
     const cartridge = findPublicCartridge("sprites")!;
     const compiled = await compileCartridge(cartridge.source);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
-    worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
+    worker.tick({ kind: "tick", token, input: { held: [], pressed: [], released: [] } });
     const frame = worker.messages.findLast((value: any) => value.kind === "frame") as any;
 
     expect(frame.commands).toContainEqual({
@@ -94,7 +94,7 @@ describe("worker bootstrap", () => {
     expect(cartridge).toBeDefined();
     const compiled = await compileCartridge(cartridge.source);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
-    worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
+    worker.tick({ kind: "tick", token, input: { held: [], pressed: [], released: [] } });
     const frame = worker.messages.findLast((value: any) => value.kind === "frame") as any;
 
     expect(frame.commands).toEqual(
@@ -114,7 +114,11 @@ describe("worker bootstrap", () => {
       export function draw(){ pixel(result, 0, 3); }
     `);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
-    worker.tick({ kind: "tick", token, input: { held: ["a"], pressed: ["a"] } });
+    worker.tick({
+      kind: "tick",
+      token,
+      input: { held: ["a"], pressed: ["a"], released: [] },
+    });
     expect(
       (worker.messages.findLast((value: any) => value.kind === "frame") as any).commands[0].x,
     ).toBe(7);
@@ -128,7 +132,7 @@ describe("worker bootstrap", () => {
       export function draw(){ pixel(0, 0, denied ? 3 : 1); }
     `);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
-    worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
+    worker.tick({ kind: "tick", token, input: { held: [], pressed: [], released: [] } });
     expect(
       (worker.messages.findLast((value: any) => value.kind === "frame") as any).commands[0].color,
     ).toBe(3);
@@ -143,25 +147,36 @@ describe("worker bootstrap", () => {
       export function draw(){ text("x".repeat(1025), 0, 0, 1); }
     `);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
-    worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
+    worker.tick({ kind: "tick", token, input: { held: [], pressed: [], released: [] } });
     const error = worker.messages.findLast((value: any) => value.kind === "error") as any;
     expect(error.phase).toBe("update");
     expect(error.message).toBe("player boom");
     expect(error.stack).toBeUndefined();
   });
 
-  test("provides deterministic helpers, camera, sprites, maps, and audio", async () => {
+  test("provides deterministic helpers, input edges, drawing, camera, and audio", async () => {
     const compiled = await compileCartridge(`
       let value = 0;
       export function init(){ seed(1); value = random(0, 10); tone(440, 80, 0.2); sfx([220, 330], 50); }
-      export function update(){ if (overlap(0,0,2,2,1,1,2,2) && pointInRect(1,1,0,0,2,2) && after(1)) value += every(1) ? 1 : 0; }
-      export function draw(){ camera(2,3); pixel(10,10,3); sprite([1,0,2,3],2,2,12,13,0); map([0],1,2,2,[1,2,3,0],1,14,15,0); camera(); pixel(value,0,2); }
+      export function update(){ if (overlap(0,0,2,2,1,1,2,2) && pointInRect(1,1,0,0,2,2) && after(1)) value += every(1) ? 1 : 0; if (buttonReleased("a")) value = wrap(clamp(value, 4, 8) + 5, 4, 8); }
+      export function draw(){ camera(2,3); pixel(10,10,3); triangle(2,3,6,3,2,7,3,true); sprite([1,0,2,3],2,2,12,13,0); map([0],1,2,2,[1,2,3,0],1,14,15,0); camera(); pixel(value,0,2); }
     `);
     const worker = await runWorker(createWorkerSource(compiled.code, token));
-    worker.tick({ kind: "tick", token, input: { held: [], pressed: [] } });
+    worker.tick({ kind: "tick", token, input: { held: [], pressed: [], released: ["a"] } });
     const frame = worker.messages.findLast((value: any) => value.kind === "frame") as any;
     expect(frame.commands).toEqual([
       { op: "pixel", x: 8, y: 7, color: 3 },
+      {
+        op: "triangle",
+        x1: 0,
+        y1: 0,
+        x2: 4,
+        y2: 0,
+        x3: 0,
+        y3: 4,
+        color: 3,
+        fill: true,
+      },
       { op: "sprite", pixels: [1, 0, 2, 3], width: 2, height: 2, x: 10, y: 10, transparent: 0 },
       {
         op: "map",
@@ -175,7 +190,7 @@ describe("worker bootstrap", () => {
         y: 12,
         transparent: 0,
       },
-      { op: "pixel", x: 3.3645552527159452, y: 0, color: 2 },
+      { op: "pixel", x: 5, y: 0, color: 2 },
     ]);
     expect(worker.messages.filter((value: any) => value.kind === "audio")).toEqual([
       { kind: "audio", token, frequency: 440, duration: 80, volume: 0.2, wave: "square", delay: 0 },

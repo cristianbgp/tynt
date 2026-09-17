@@ -123,7 +123,7 @@ test("fixed frames send update snapshots and stop resets input", async () => {
   testbed.runs[0]!.ready();
   controller.setKey("KeyZ", true);
   testbed.frame(17);
-  expect(testbed.runs[0]!.ticks).toEqual([{ held: ["a"], pressed: ["a"] }]);
+  expect(testbed.runs[0]!.ticks).toEqual([{ held: ["a"], pressed: ["a"], released: [] }]);
   controller.stop();
   expect(controller.isRunning).toBe(false);
   expect(testbed.events).toContain("audio:stop");
@@ -136,10 +136,14 @@ test("direct emulator inputs use the same runtime snapshots", async () => {
   testbed.runs[0]!.ready();
   controller.setInput("right", true);
   testbed.frame(17);
-  expect(testbed.runs[0]!.ticks).toEqual([{ held: ["right"], pressed: ["right"] }]);
+  expect(testbed.runs[0]!.ticks).toEqual([{ held: ["right"], pressed: ["right"], released: [] }]);
   controller.setInput("right", false);
   testbed.frame(34);
-  expect(testbed.runs[0]!.ticks.at(-1)).toEqual({ held: [], pressed: [] });
+  expect(testbed.runs[0]!.ticks.at(-1)).toEqual({
+    held: [],
+    pressed: [],
+    released: ["right"],
+  });
 });
 
 test("runtime failure stops scheduling and reports the error", async () => {
@@ -215,8 +219,8 @@ test("step executes exactly one update while paused and reports its input", asyn
   expect(controller.step()).toBe(true);
 
   expect(testbed.runs[0]!.ticks).toEqual([
-    { held: ["a"], pressed: ["a"] },
-    { held: ["a"], pressed: [] },
+    { held: ["a"], pressed: ["a"], released: [] },
+    { held: ["a"], pressed: [], released: [] },
   ]);
   expect(testbed.debugStates.at(-1)).toEqual({ frame: 2, held: ["a"], pressed: [] });
 });

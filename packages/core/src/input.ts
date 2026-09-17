@@ -9,10 +9,11 @@ const KEY_TO_INPUT: Readonly<Record<string, InputName>> = {
   KeyX: "b",
 };
 
-/** Tracks held inputs and one-update press transitions. */
+/** Tracks held inputs and one-update press and release transitions. */
 export class InputState {
   private readonly held = new Set<InputName>();
   private readonly pendingPressed = new Set<InputName>();
+  private readonly pendingReleased = new Set<InputName>();
 
   /** Marks an input as held and queues a press transition when newly held. */
   press(input: InputName): void {
@@ -22,9 +23,9 @@ export class InputState {
     }
   }
 
-  /** Removes an input from the held set. */
+  /** Removes an input from the held set and queues a release transition when previously held. */
   release(input: InputName): void {
-    this.held.delete(input);
+    if (this.held.delete(input)) this.pendingReleased.add(input);
   }
 
   /**
@@ -50,21 +51,24 @@ export class InputState {
   }
 
   /**
-   * Creates the next input snapshot and consumes queued press transitions.
-   * @returns Held inputs and inputs newly pressed for this update.
+   * Creates the next input snapshot and consumes queued edge transitions.
+   * @returns Held inputs and inputs newly pressed or released for this update.
    */
   beginUpdate(): InputSnapshot {
     const snapshot = {
       held: INPUT_NAMES.filter((input) => this.held.has(input)),
       pressed: INPUT_NAMES.filter((input) => this.pendingPressed.has(input)),
+      released: INPUT_NAMES.filter((input) => this.pendingReleased.has(input)),
     };
     this.pendingPressed.clear();
+    this.pendingReleased.clear();
     return snapshot;
   }
 
-  /** Clears every held input and pending press transition. */
+  /** Clears every held input and pending edge transition. */
   reset(): void {
     this.held.clear();
     this.pendingPressed.clear();
+    this.pendingReleased.clear();
   }
 }

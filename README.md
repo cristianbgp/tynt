@@ -141,16 +141,20 @@ pixel(x: number, y: number, color: number): void
 line(x0: number, y0: number, x1: number, y1: number, color: number): void
 rect(x: number, y: number, width: number, height: number, color: number, fill?: boolean): void
 circle(x: number, y: number, radius: number, color: number, fill?: boolean): void
+triangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, color: number, fill?: boolean): void
 text(value: string, x: number, y: number, color: number): void
 sprite(pixels: number[], width: number, height: number, x: number, y: number, transparent?: number): void
 map(tiles: number[], columns: number, tileWidth: number, tileHeight: number, spritesheet: number[], sheetColumns: number, x?: number, y?: number, transparent?: number): void
 camera(x?: number, y?: number): void
 button(input: "left" | "right" | "up" | "down" | "a" | "b"): boolean
 buttonPressed(input: "left" | "right" | "up" | "down" | "a" | "b"): boolean
+buttonReleased(input: "left" | "right" | "up" | "down" | "a" | "b"): boolean
 seed(value?: number): void
 random(min?: number, max?: number): number
 overlap(ax: number, ay: number, aw: number, ah: number, bx: number, by: number, bw: number, bh: number): boolean
 pointInRect(px: number, py: number, x: number, y: number, width: number, height: number): boolean
+clamp(value: number, min: number, max: number): number
+wrap(value: number, min: number, max: number): number
 frame(): number
 every(interval: number, offset?: number): boolean
 after(frames: number): boolean
@@ -161,6 +165,8 @@ sfx(notes: number[], step?: number, volume?: number, wave?: "square" | "sine" | 
 Use `0` inside an `sfx()` note array for a silent step. The sound editor generates named notes from C3 through C6 and exports their frequencies in this format.
 
 Coordinates are rounded to integers and clipped to the canvas. Color indexes are clamped from 0 to 3. The framebuffer persists between frames unless `clear` is called. The 3×5 `text()` font supports printable ASCII; lowercase letters use the matching uppercase glyph, and unsupported Unicode renders as `?`.
+
+`clamp()` uses an inclusive range. `wrap()` uses a half-open range where `min` is included and `max` wraps back to `min`. Invalid or non-finite ranges stop the cartridge with a visible API error.
 
 ## Public cartridges
 

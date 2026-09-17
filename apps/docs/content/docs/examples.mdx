@@ -26,8 +26,11 @@ The gallery shows newer publications first by default. Sort by title or author w
 | `seed()` and `random()`             | reaction, snake, lunar, pong, flappy, asteroids, coin dash, tiny quest                                           |
 | `overlap()`                         | pong, platformer, flappy, coin dash, tiny quest                                                                  |
 | `pointInRect()`                     | snake, tiny quest                                                                                                |
+| `clamp()` and `wrap()`              | starter, animation, soundboard                                                                                   |
 | `frame()`, `every()`, and `after()` | reaction, sprites, lunar, soundboard, coin dash                                                                  |
 | `camera()`                          | coin dash, tiny quest                                                                                            |
+| `buttonReleased()`                  | starter, soundboard                                                                                              |
+| `triangle()`                        | starter, shapes                                                                                                  |
 | `tone()` and `sfx()`                | reaction, soundboard, snake, asteroids, platformer, flappy, pong, lunar, sokoban, sprites, coin dash, tiny quest |
 
 ## Fixed HUD with a moving camera
@@ -61,6 +64,27 @@ if (pointInRect(playerX + 4, playerY + 4, exitX, exitY, 24, 28)) {
 ```
 
 Use `overlap()` when two rectangular objects interact. Use `pointInRect()` for a center point, cursor, checkpoint, or goal zone.
+
+## Movement ranges and input edges
+
+```ts
+x = clamp(x + velocityX, 0, 152);
+shade = wrap(shade + 1, 1, 4);
+
+if (buttonReleased("a")) {
+  launchChargedShot();
+}
+```
+
+`clamp()` includes both ends of its range. `wrap()` includes `min` but wraps `max` back to `min`. `buttonReleased()` is true for exactly one update after a held input is released.
+
+## Triangles
+
+```ts
+triangle(80, 36, 104, 84, 56, 84, 3, true);
+```
+
+The final argument selects a filled triangle. Omit it or pass `false` to draw only the three edges. Triangle coordinates follow `camera()` like every other drawing primitive.
 
 ## Sound effects and rests
 

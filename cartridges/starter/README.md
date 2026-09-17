@@ -1,6 +1,6 @@
 # starter
 
-Start with movement, actions, reset, and a simple score.
+Start with clamped movement, wrapped values, press and release input, drawing, reset, and a simple score.
 
 **Controls:** Arrows move · A changes shade · B resets
 

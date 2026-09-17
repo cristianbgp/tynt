@@ -2,9 +2,9 @@
   "format": "tynt",
   "version": 1,
   "title": "animation",
-  "source": "let x = 16;\nlet velocity = 1;\n\nexport function init(): void {\n  clear(0);\n}\n\nexport function update(): void {\n  x += velocity;\n  if (x >= 144 || x <= 16) velocity *= -1;\n}\n\nexport function draw(): void {\n  clear(0);\n  line(16, 82, 144, 82, 1);\n  circle(x, 72, 8, 3, true);\n  text(\"60 FPS\", 64, 102, 2);\n}\n",
+  "source": "let x = 16;\n\nexport function init(): void {\n  clear(0);\n}\n\nexport function update(): void {\n  x = wrap(x + 1, -8, 168);\n}\n\nexport function draw(): void {\n  clear(0);\n  line(0, 82, 159, 82, 1);\n  circle(x, 72, 8, 3, true);\n  text(\"60 FPS LOOP\", 56, 102, 2);\n}\n",
   "author": "tynt",
-  "description": "Learn fixed-step movement with a bouncing marker.",
+  "description": "Learn fixed-step movement with a looping marker.",
   "controls": "No input · automatic animation",
   "canvas": {
     "width": 160,

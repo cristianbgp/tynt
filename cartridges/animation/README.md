@@ -1,6 +1,6 @@
 # animation
 
-Learn fixed-step movement with a bouncing marker.
+Learn fixed-step movement with a looping marker and `wrap()`.
 
 **Controls:** No input · automatic animation
 

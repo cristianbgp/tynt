@@ -73,6 +73,26 @@ export type DrawCommand =
       fill: boolean;
     }
   | {
+      /** Selects the triangle operation. */
+      op: "triangle";
+      /** First vertex horizontal coordinate. */
+      x1: number;
+      /** First vertex vertical coordinate. */
+      y1: number;
+      /** Second vertex horizontal coordinate. */
+      x2: number;
+      /** Second vertex vertical coordinate. */
+      y2: number;
+      /** Third vertex horizontal coordinate. */
+      x3: number;
+      /** Third vertex vertical coordinate. */
+      y3: number;
+      /** Indexed palette color. */
+      color: number;
+      /** Whether to fill the triangle interior. */
+      fill: boolean;
+    }
+  | {
       /** Selects the text operation. */
       op: "text";
       /** Printable ASCII text to draw with the built-in 3×5 bitmap font. Unsupported Unicode uses the question-mark glyph. */
@@ -129,4 +149,6 @@ export interface InputSnapshot {
   held: InputName[];
   /** Inputs newly pressed since the previous update. */
   pressed: InputName[];
+  /** Inputs newly released since the previous update. */
+  released: InputName[];
 }

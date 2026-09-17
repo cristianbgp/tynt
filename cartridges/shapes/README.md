@@ -1,6 +1,6 @@
 # shapes
 
-See every drawing primitive on one cartridge.
+See every drawing primitive, including filled triangles, on one cartridge.
 
 **Controls:** No input · drawing reference
 

@@ -59,6 +59,12 @@ Draw an outlined or filled rectangle.
 
 Draw an outlined or filled circle.
 
+### `triangle`
+
+`triangle(x1, y1, x2, y2, x3, y3, color, fill = false)`
+
+Draw an outlined or filled triangle.
+
 ### `text`
 
 `text(value, x, y, color)`
@@ -90,6 +96,12 @@ Check whether an input is currently held.
 `buttonPressed(input)`
 
 Check whether an input was pressed this update.
+
+### `buttonReleased`
+
+`buttonReleased(input)`
+
+Check whether an input was released this update.
 
 ## World and camera
 
@@ -124,6 +136,18 @@ Check two axis-aligned rectangles for overlap.
 `pointInRect(px, py, x, y, width, height)`
 
 Check whether a point is inside a rectangle.
+
+### `clamp`
+
+`clamp(value, min, max)`
+
+Limit a value to an inclusive range.
+
+### `wrap`
+
+`wrap(value, min, max)`
+
+Wrap a value into the half-open range from min to max.
 
 ### `frame`
 

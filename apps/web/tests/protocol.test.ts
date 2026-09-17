@@ -21,15 +21,21 @@ describe("sandbox protocol", () => {
 
   test("accepts valid host messages and rejects stale or malformed ones", () => {
     expect(
-      parseHostMessage({ kind: "tick", token, input: { held: ["left"], pressed: ["a"] } }, token),
+      parseHostMessage(
+        { kind: "tick", token, input: { held: ["left"], pressed: ["a"], released: ["b"] } },
+        token,
+      ),
     ).toEqual({
       kind: "tick",
       token,
-      input: { held: ["left"], pressed: ["a"] },
+      input: { held: ["left"], pressed: ["a"], released: ["b"] },
     });
     expect(() => parseHostMessage({ kind: "stop", token: "stale" }, token)).toThrow(/token/i);
     expect(() =>
-      parseHostMessage({ kind: "tick", token, input: { held: ["nope"], pressed: [] } }, token),
+      parseHostMessage(
+        { kind: "tick", token, input: { held: ["nope"], pressed: [], released: [] } },
+        token,
+      ),
     ).toThrow(/input/i);
   });
 
@@ -165,6 +171,36 @@ describe("sandbox protocol", () => {
         },
       ]),
     ).toThrow(/map/i);
+  });
+
+  test("accepts bounded triangle drawing commands", () => {
+    expect(
+      validateFrame([
+        {
+          op: "triangle",
+          x1: 1,
+          y1: 2,
+          x2: 3,
+          y2: 4,
+          x3: 5,
+          y3: 6,
+          color: 3,
+          fill: true,
+        },
+      ]),
+    ).toEqual([
+      {
+        op: "triangle",
+        x1: 1,
+        y1: 2,
+        x2: 3,
+        y2: 4,
+        x3: 5,
+        y3: 6,
+        color: 3,
+        fill: true,
+      },
+    ]);
   });
 
   test("counts encoded UTF-8 and enforces the frame byte limit", () => {

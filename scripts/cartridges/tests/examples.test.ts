@@ -4,14 +4,31 @@ import { join, resolve } from "node:path";
 import { parseCartridge } from "../../../packages/core/src/cartridge";
 
 const cartridgesDir = resolve(import.meta.dirname, "../../../cartridges");
-const newerHelpers = ["seed", "random", "overlap", "pointInRect", "frame", "every", "after", "camera", "tone", "sfx"] as const;
+const newerHelpers = [
+  "seed",
+  "random",
+  "overlap",
+  "pointInRect",
+  "clamp",
+  "wrap",
+  "frame",
+  "every",
+  "after",
+  "camera",
+  "buttonReleased",
+  "triangle",
+  "tone",
+  "sfx",
+] as const;
 
 async function publicSources(): Promise<Map<string, string>> {
   const entries = await readdir(cartridgesDir, { withFileTypes: true });
   const sources = new Map<string, string>();
   for (const entry of entries) {
     if (!entry.isDirectory() || entry.name.startsWith("_")) continue;
-    const cartridge = parseCartridge(await readFile(join(cartridgesDir, entry.name, "game.tynt"), "utf8"));
+    const cartridge = parseCartridge(
+      await readFile(join(cartridgesDir, entry.name, "game.tynt"), "utf8"),
+    );
     sources.set(entry.name, cartridge.source);
   }
   return sources;
@@ -30,8 +47,13 @@ describe("repository cartridge examples", () => {
 
     for (const helper of newerHelpers) {
       const pattern = new RegExp(`\\b${helper}\\s*\\(`);
-      const examples = [...sources].filter(([, source]) => pattern.test(source)).map(([slug]) => slug);
-      expect(examples.length, `${helper} should have at least two cartridge examples`).toBeGreaterThanOrEqual(2);
+      const examples = [...sources]
+        .filter(([, source]) => pattern.test(source))
+        .map(([slug]) => slug);
+      expect(
+        examples.length,
+        `${helper} should have at least two cartridge examples`,
+      ).toBeGreaterThanOrEqual(2);
     }
   });
 });

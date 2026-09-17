@@ -79,6 +79,7 @@ export class RuntimeController {
   private frameCount = 0;
   private readonly inspectedHeld = new Set<InputName>();
   private readonly inspectedPressed = new Set<InputName>();
+  private readonly inspectedReleased = new Set<InputName>();
 
   static forBrowser(
     onStatus: RuntimeDependencies["onStatus"],
@@ -102,6 +103,7 @@ export class RuntimeController {
     return {
       held: INPUT_NAMES.filter((input) => this.inspectedHeld.has(input)),
       pressed: INPUT_NAMES.filter((input) => this.inspectedPressed.has(input)),
+      released: INPUT_NAMES.filter((input) => this.inspectedReleased.has(input)),
     };
   }
 
@@ -110,6 +112,7 @@ export class RuntimeController {
       if (!this.inspectedHeld.has(input)) this.inspectedPressed.add(input);
       this.inspectedHeld.add(input);
     } else {
+      if (this.inspectedHeld.has(input)) this.inspectedReleased.add(input);
       this.inspectedHeld.delete(input);
     }
   }
@@ -127,12 +130,14 @@ export class RuntimeController {
     this.frameCount = 0;
     this.inspectedHeld.clear();
     this.inspectedPressed.clear();
-    this.publishDebugState({ held: [], pressed: [] });
+    this.inspectedReleased.clear();
+    this.publishDebugState({ held: [], pressed: [], released: [] });
   }
 
   private tick(active: RuntimeRun): void {
     const input = this.input.beginUpdate();
     this.inspectedPressed.clear();
+    this.inspectedReleased.clear();
     active.tick(input);
     this.frameCount++;
     this.publishDebugState(input);
@@ -230,6 +235,7 @@ export class RuntimeController {
     this.input.reset();
     this.inspectedHeld.clear();
     this.inspectedPressed.clear();
+    this.inspectedReleased.clear();
     this.publishDebugState();
   }
 

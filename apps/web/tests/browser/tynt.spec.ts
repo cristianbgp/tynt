@@ -1171,7 +1171,7 @@ test("loads bundled examples from the top bar with visible file extensions", asy
   await examples.click();
   await page.getByRole("menuitem", { name: "animation.tynt", exact: true }).click();
   await expect(page.getByLabel("Current cartridge file")).toHaveText("animation.tynt");
-  await expect(page.locator(".cm-content")).toContainText("velocity");
+  await expect(page.locator(".cm-content")).toContainText("wrap(x + 1, -8, 168)");
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#status")).toHaveText("running");
 });

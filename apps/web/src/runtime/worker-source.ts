@@ -13,10 +13,11 @@ for (const __name of __blocked) {
 }
 const fetch=undefined, XMLHttpRequest=undefined, WebSocket=undefined, WebTransport=undefined, RTCPeerConnection=undefined, EventSource=undefined, importScripts=undefined, Worker=undefined, SharedWorker=undefined, BroadcastChannel=undefined, indexedDB=undefined, caches=undefined, localStorage=undefined, sessionStorage=undefined, navigator=undefined, postMessage=undefined, setTimeout=undefined, setInterval=undefined, Function=undefined;
 let __commands = [], __audioEvents = 0;
-let __input = { held: [], pressed: [] };
+let __input = { held: [], pressed: [], released: [] };
 let __phase = "init";
 let __cameraX = 0, __cameraY = 0, __frame = 0, __seed = 1;
 function __finite(value, name) { if (typeof value !== "number" || !Number.isFinite(value)) throw new Error(name + " must be a finite number"); return value; }
+function __range(value,min,max) { value=__finite(value,"value"); min=__finite(min,"min"); max=__finite(max,"max"); if(min>=max)throw new Error("Range min must be less than max"); return [value,min,max]; }
 function __color(value) { return __finite(value, "color"); }
 function __append(command) { if (__commands.length >= ${MAX_COMMANDS}) throw new Error("Frame exceeds 32,768 drawing commands"); __commands.push(command); }
 const clear = Object.freeze((color=0) => __append({op:"clear",color:__color(color)}));
@@ -27,6 +28,7 @@ const pixel = Object.freeze((x,y,color) => __append({op:"pixel",x:__x(x),y:__y(y
 const line = Object.freeze((x0,y0,x1,y1,color) => __append({op:"line",x0:__x(x0,"x0"),y0:__y(y0,"y0"),x1:__x(x1,"x1"),y1:__y(y1,"y1"),color:__color(color)}));
 const rect = Object.freeze((x,y,width,height,color,fill=false) => __append({op:"rect",x:__x(x),y:__y(y),width:__finite(width,"width"),height:__finite(height,"height"),color:__color(color),fill:Boolean(fill)}));
 const circle = Object.freeze((x,y,radius,color,fill=false) => __append({op:"circle",x:__x(x),y:__y(y),radius:__finite(radius,"radius"),color:__color(color),fill:Boolean(fill)}));
+const triangle = Object.freeze((x1,y1,x2,y2,x3,y3,color,fill=false) => __append({op:"triangle",x1:__x(x1,"x1"),y1:__y(y1,"y1"),x2:__x(x2,"x2"),y2:__y(y2,"y2"),x3:__x(x3,"x3"),y3:__y(y3,"y3"),color:__color(color),fill:Boolean(fill)}));
 const text = Object.freeze((value,x,y,color) => { value=String(value); if ([...value].length>${MAX_TEXT_CODE_POINTS}) throw new Error("text() accepts at most 1,024 characters"); __append({op:"text",value,x:__x(x),y:__y(y),color:__color(color)}); });
 const camera = Object.freeze((x=0,y=0) => { __cameraX=__finite(x,"camera x"); __cameraY=__finite(y,"camera y"); });
 const sprite = Object.freeze((pixels,width,height,x,y,transparent=0) => __append({op:"sprite",pixels:__numbers(pixels,"pixels",65536),width:__finite(width,"width"),height:__finite(height,"height"),x:__x(x),y:__y(y),transparent:__color(transparent)}));
@@ -35,6 +37,8 @@ const seed = Object.freeze((value=1) => { __seed=__finite(value,"seed")>>>0; });
 const random = Object.freeze((min=0,max=1) => { min=__finite(min,"min"); max=__finite(max,"max"); __seed=(Math.imul(1664525,__seed)+1013904223)>>>0; return min+(__seed/4294967296)*(max-min); });
 const overlap = Object.freeze((ax,ay,aw,ah,bx,by,bw,bh) => [ax,ay,aw,ah,bx,by,bw,bh].every(Number.isFinite)&&aw>0&&ah>0&&bw>0&&bh>0&&ax<bx+bw&&ax+aw>bx&&ay<by+bh&&ay+ah>by);
 const pointInRect = Object.freeze((px,py,x,y,width,height) => [px,py,x,y,width,height].every(Number.isFinite)&&width>0&&height>0&&px>=x&&px<x+width&&py>=y&&py<y+height);
+const clamp = Object.freeze((value,min,max) => { [value,min,max]=__range(value,min,max); return Math.max(min,Math.min(max,value)); });
+const wrap = Object.freeze((value,min,max) => { [value,min,max]=__range(value,min,max); const size=max-min; return min+(((value-min)%size)+size)%size; });
 const frame = Object.freeze(() => __frame);
 const every = Object.freeze((interval,offset=0) => { interval=Math.max(1,Math.floor(__finite(interval,"interval"))); offset=Math.floor(__finite(offset,"offset")); return __frame>=offset&&(__frame-offset)%interval===0; });
 const after = Object.freeze((frames) => __frame>=Math.max(0,Math.floor(__finite(frames,"frames"))));
@@ -43,6 +47,7 @@ const tone = Object.freeze((frequency,duration=100,volume=0.15,wave="square") =>
 const sfx = Object.freeze((notes,step=80,volume=0.15,wave="square") => { notes=__numbers(notes,"notes",32); step=Math.max(1,Math.min(1000,__finite(step,"step"))); notes.forEach((note,index)=>{if(note!==0)__audio(note,Math.max(1,step-10),volume,wave,index*step);}); });
 const button = Object.freeze((input) => __input.held.includes(input));
 const buttonPressed = Object.freeze((input) => __input.pressed.includes(input));
+const buttonReleased = Object.freeze((input) => __input.released.includes(input));
 `;
   const compiledStartLine = prefix.split("\n").length;
   const suffix = `
@@ -71,7 +76,7 @@ __listen("message", (event) => {
   const message = event.data;
   if (!message || message.token !== __token || message.kind !== "tick" || !message.input) return;
   try {
-    __input = { held: Array.isArray(message.input.held) ? message.input.held.slice() : [], pressed: Array.isArray(message.input.pressed) ? message.input.pressed.slice() : [] };
+    __input = { held: Array.isArray(message.input.held) ? message.input.held.slice() : [], pressed: Array.isArray(message.input.pressed) ? message.input.pressed.slice() : [], released: Array.isArray(message.input.released) ? message.input.released.slice() : [] };
     __frame++;
     __audioEvents = 0;
     __commands = [];
@@ -99,6 +104,7 @@ __listen("message", (event) => {
     "__input",
     "__phase",
     "__finite",
+    "__range",
     "__color",
     "__append",
     "__x",
