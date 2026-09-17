@@ -8,6 +8,7 @@ import { Editor } from "@/components/editor";
 import { ErrorConsole } from "@/components/error-console";
 import { Preview } from "@/components/preview";
 import { MobilePaneSwitch, type MobilePane } from "@/components/mobile-pane-switch";
+import { NewCartridgeDialog } from "@/components/new-cartridge-dialog";
 import { StatusBar } from "@/components/status-bar";
 import { Toolbar } from "@/components/toolbar";
 import { SiteHeader } from "@/components/site-chrome";
@@ -22,6 +23,7 @@ import {
   findPublicCartridge,
   listPublicCartridges,
 } from "@/cartridges/public-cartridges";
+import type { CartridgeTemplate } from "@/cartridges/templates";
 
 function copyDraft(value: Draft): Draft {
   return {
@@ -54,6 +56,7 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
   const [draft, setDraft] = useState(() => initialDraft(selectedPublicSlug));
   const [libraryId, setLibraryId] = useState<string | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [newCartridgeOpen, setNewCartridgeOpen] = useState(false);
   const [mobilePane, setMobilePane] = useState<MobilePane>("code");
   const draftRef = useRef(draft);
   draftRef.current = draft;
@@ -150,6 +153,19 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
     setLibraryId(null);
     setDraft(nextDraft);
     runtime.clearError();
+  };
+
+  const startTemplate = (template: CartridgeTemplate) => {
+    const nextDraft = copyDraft(template.draft);
+    draftRef.current = nextDraft;
+    runtime.stop();
+    setLibraryId(null);
+    setDraft(nextDraft);
+    setDraftStatus("new draft");
+    setMobilePane("code");
+    runtime.clearError();
+    setNewCartridgeOpen(false);
+    play("success");
   };
 
   const importCartridge = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -265,6 +281,7 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
         running={runtime.isRunning}
         compiling={runtime.isCompiling}
         fileInputRef={fileInputRef}
+        onNew={() => setNewCartridgeOpen(true)}
         onExampleChange={loadExample}
         onRun={runOrStop}
         onSave={() => {
@@ -326,6 +343,11 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
           setDraft(nextDraft);
           setDraftStatus("unsaved changes");
         }}
+      />
+      <NewCartridgeDialog
+        open={newCartridgeOpen}
+        onOpenChange={setNewCartridgeOpen}
+        onSelect={startTemplate}
       />
     </div>
   );

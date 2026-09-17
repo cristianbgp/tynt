@@ -98,6 +98,8 @@ Run or rerun focuses the preview automatically so gameplay keys are ready immedi
 
 On phones, the editor uses **Code** and **Play** panes instead of placing both full workspaces in one long page. A successful run selects Play and focuses the console; switching back preserves the editor and running game state.
 
+Use **New** in the editor toolbar to start from Blank, Arcade, Platformer, Puzzle, or Top-down scaffolding. Choosing a template replaces the current editor draft, so save or export work that should remain as a separate copy.
+
 ## Cartridge basics
 
 A cartridge exports three functions. tynt calls `init` once, then calls `update` followed by `draw` at a fixed 60 Hz.
@@ -180,7 +182,7 @@ The editor dropdown and gallery are generated from the top-level `cartridges/` c
 - `sokoban.tynt`: a compact tile-map pushing puzzle.
 - `lunar.tynt`: gravity, limited fuel, procedural terrain, and safe landing.
 
-Every gallery game has a canonical `/cartridges/<slug>` page with its cover, publication date, metadata, controls, rendered README, source, Play action, and Remix action. Newer publication dates appear first in the gallery. Remix opens an editable local copy in the editor. Every game shown in the gallery, including tynt's bundled examples, is a normal repository submission under `cartridges/<slug>/` containing `game.tynt`, `cartridge.json`, `cover.png`, and an optional README. The catalog discovers these directories automatically; adding a game does not require editing an application registry or central list. The Bun generator validates and compiles them before they can enter a production build.
+Every gallery game has a canonical `/cartridges/<slug>` page with its cover, publication date, metadata, controls, rendered README, source, Play action, and Remix action. Newer publication dates appear first by default; the gallery can also sort by title or author, use card tags as filters, and open a random game from the visible results. Remix opens an editable local copy in the editor. Every game shown in the gallery, including tynt's bundled examples, is a normal repository submission under `cartridges/<slug>/` containing `game.tynt`, `cartridge.json`, `cover.png`, and an optional README. The catalog discovers these directories automatically; adding a game does not require editing an application registry or central list. The Bun generator validates and compiles them before they can enter a production build.
 
 To submit a game, copy `cartridges/_template`, export your cartridge from the editor, add a 320 × 288 nearest-neighbor cover captured from the 160 × 144 game canvas, run `bun run check`, and open a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete format and license requirements. Merging the pull request publishes the cartridge; no account or upload server is required.
 

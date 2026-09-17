@@ -105,7 +105,7 @@ test("gives sprite and recovery controls a distinct hover state", async ({ page 
     "rgb(85, 85, 85)",
     "rgb(255, 255, 255)",
   );
-  const puzzle = page.getByRole("button", { name: "puzzle" });
+  const puzzle = page.getByRole("button", { name: "puzzle", exact: true });
   await puzzle.click();
   await expectHoverColors(puzzle, "rgb(85, 85, 85)", "rgb(255, 255, 255)");
 });

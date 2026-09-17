@@ -5,6 +5,7 @@ import {
   Gamepad,
   InfoBox,
   Play,
+  PlusBox,
   Save,
   Stop,
   Upload,
@@ -57,6 +58,7 @@ interface ToolbarProps {
   compiling: boolean;
   fileInputRef: RefObject<HTMLInputElement | null>;
   onExampleChange(id: string): void;
+  onNew(): void;
   onRun(): void;
   onSave(): void;
   onPlay(): void;
@@ -77,6 +79,14 @@ export function Toolbar(props: ToolbarProps) {
         >
           {props.filename}
         </span>
+        <Button
+          className="h-full flex-none px-[12px] max-[400px]:px-[8px]"
+          aria-label="New cartridge"
+          onClick={props.onNew}
+        >
+          <PlusBox width={24} height={24} data-icon="new" aria-hidden="true" />
+          <span className="max-[460px]:hidden">New</span>
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button

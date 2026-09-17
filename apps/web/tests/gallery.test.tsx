@@ -2,7 +2,7 @@
 
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useLocation } from "react-router";
 import { describe, expect, test } from "vitest";
 import { GalleryPage } from "@/pages/gallery-page";
 
@@ -10,6 +10,19 @@ function renderGallery() {
   return render(
     <MemoryRouter initialEntries={["/gallery"]}>
       <GalleryPage />
+    </MemoryRouter>,
+  );
+}
+
+function CurrentPath() {
+  return <output aria-label="Current path">{useLocation().pathname}</output>;
+}
+
+function renderNavigableGallery() {
+  return render(
+    <MemoryRouter initialEntries={["/gallery"]}>
+      <GalleryPage />
+      <CurrentPath />
     </MemoryRouter>,
   );
 }
@@ -61,5 +74,40 @@ describe("cartridge gallery", () => {
     expect(screen.queryByRole("heading", { name: "snake.tynt" })).not.toBeInTheDocument();
     await user.click(puzzle);
     expect(screen.getByRole("heading", { name: "snake.tynt" })).toBeVisible();
+  });
+
+  test("sorts visible cartridges by title", async () => {
+    const user = userEvent.setup();
+    renderGallery();
+
+    await user.click(screen.getByRole("button", { name: "Sort: Newest" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Title" }));
+
+    expect(screen.getAllByRole("heading", { level: 2 })[0]).toHaveTextContent("animation.tynt");
+    expect(screen.getByRole("button", { name: "Sort: Title" })).toBeVisible();
+  });
+
+  test("uses card tags as filters and reports the visible result count", async () => {
+    const user = userEvent.setup();
+    renderGallery();
+
+    await user.click(screen.getByRole("button", { name: "Filter by puzzle from sokoban.tynt" }));
+
+    expect(screen.getByText("2 games")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "sokoban.tynt" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "tiny-quest.tynt" })).toBeVisible();
+    expect(screen.queryByRole("heading", { name: "snake.tynt" })).not.toBeInTheDocument();
+  });
+
+  test("opens a random game from the currently visible results", async () => {
+    const user = userEvent.setup();
+    renderNavigableGallery();
+
+    await user.type(screen.getByRole("searchbox", { name: "Search cartridges" }), "lunar");
+    await user.click(screen.getByRole("button", { name: "Random game" }));
+
+    expect(screen.getByRole("status", { name: "Current path" })).toHaveTextContent(
+      "/play/public/lunar",
+    );
   });
 });

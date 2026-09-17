@@ -298,6 +298,29 @@ describe("tynt creator shell", () => {
     expect(runtime.stop).toHaveBeenCalledOnce();
   });
 
+  test("starts a clean cartridge from a focused template", async () => {
+    const user = userEvent.setup();
+    await renderApp();
+
+    const newButton = screen.getByRole("button", { name: "New cartridge" });
+    expect(newButton).toHaveAttribute("data-cuelume-hover", "tick");
+    await user.click(newButton);
+
+    expect(screen.getByRole("dialog", { name: "New cartridge" })).toBeVisible();
+    expect(screen.getByText(/replaces the current editor draft/i)).toBeVisible();
+    expect(screen.getAllByRole("button", { name: /^Start with / })).toHaveLength(5);
+
+    await user.click(screen.getByRole("button", { name: "Start with Platformer" }));
+
+    expect(screen.queryByRole("dialog", { name: "New cartridge" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Current cartridge file")).toHaveTextContent(
+      "platformer-game.tynt",
+    );
+    expect(document.querySelector(".cm-content")).toHaveTextContent("velocityY");
+    expect(runtime.stop).toHaveBeenCalledOnce();
+    expect(runtime.clearError).toHaveBeenCalledOnce();
+  });
+
   test("disables silently and confirms only after sound is enabled again", async () => {
     await renderApp();
     sound.play.mockClear();
