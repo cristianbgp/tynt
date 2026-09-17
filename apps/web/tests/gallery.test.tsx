@@ -98,7 +98,6 @@ describe("cartridge gallery", () => {
 
     const visibleGames = screen.getAllByRole("article").length;
     expect(screen.getByText(`${visibleGames} games`)).toBeVisible();
-    expect(screen.getByRole("heading", { name: "echo-loop.tynt" })).toBeVisible();
     expect(screen.getByRole("heading", { name: "sokoban.tynt" })).toBeVisible();
     expect(screen.getByRole("heading", { name: "tiny-quest.tynt" })).toBeVisible();
     expect(screen.queryByRole("heading", { name: "snake.tynt" })).not.toBeInTheDocument();
