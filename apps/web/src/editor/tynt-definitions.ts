@@ -15,6 +15,7 @@ const IDENTIFIER_NODES = new Set([
   "TypeDefinition",
 ]);
 const showDefinitionTarget = StateEffect.define<number | null>();
+const showDefinitionLink = StateEffect.define<{ from: number; to: number } | null>();
 const definitionTargetTimers = new WeakMap<EditorView, number>();
 
 const definitionTargetField = StateField.define<DecorationSet>({
@@ -37,9 +38,31 @@ const definitionTargetField = StateField.define<DecorationSet>({
   provide: (field) => EditorView.decorations.from(field),
 });
 
+const definitionLinkField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(links, transaction) {
+    let next = links.map(transaction.changes);
+    for (const effect of transaction.effects) {
+      if (!effect.is(showDefinitionLink)) continue;
+      next =
+        effect.value === null
+          ? Decoration.none
+          : Decoration.set([
+              Decoration.mark({ class: "cm-definition-link" }).range(
+                effect.value.from,
+                effect.value.to,
+              ),
+            ]);
+    }
+    return next;
+  },
+  provide: (field) => EditorView.decorations.from(field),
+});
+
 interface Identifier {
   name: string;
   from: number;
+  to: number;
   node: TreeNode;
 }
 
@@ -70,6 +93,7 @@ function identifierAt(
       return {
         name: view.state.doc.sliceString(node.from, node.to),
         from: node.from,
+        to: node.to,
         node: node as TreeNode,
       };
     }
@@ -174,14 +198,23 @@ function jumpToDefinition(view: EditorView, position?: number): boolean {
 }
 
 export function tyntDefinitionNavigation(): Extension {
-  let hoveredElement: Element | null = null;
-  const clearHover = () => {
-    hoveredElement?.classList.remove("cm-definition-link");
-    hoveredElement = null;
+  let hoveredIdentifier: { from: number; to: number } | null = null;
+  const clearHover = (view: EditorView) => {
+    if (!hoveredIdentifier) return;
+    hoveredIdentifier = null;
+    view.dispatch({ effects: showDefinitionLink.of(null) });
+  };
+  const showHover = (view: EditorView, identifier: Identifier) => {
+    if (hoveredIdentifier?.from === identifier.from && hoveredIdentifier.to === identifier.to) {
+      return;
+    }
+    hoveredIdentifier = { from: identifier.from, to: identifier.to };
+    view.dispatch({ effects: showDefinitionLink.of(hoveredIdentifier) });
   };
 
   return [
     definitionTargetField,
+    definitionLinkField,
     keymap.of([{ key: "F12", run: jumpToDefinition }]),
     EditorView.domEventHandlers({
       mousedown(event, view) {
@@ -201,29 +234,24 @@ export function tyntDefinitionNavigation(): Extension {
       },
       mousemove(event, view) {
         if (!event.metaKey && !event.ctrlKey) {
-          clearHover();
+          clearHover(view);
           return false;
         }
         const position = view.posAtCoords({ x: event.clientX, y: event.clientY });
         const identifier = position === null ? null : identifierAt(view, position);
-        const target = event.target instanceof Element ? event.target : null;
-        if (!identifier || !target || !isNavigable(view, identifier)) {
-          clearHover();
+        if (!identifier || !isNavigable(view, identifier)) {
+          clearHover(view);
           return false;
         }
-        if (target !== hoveredElement) {
-          clearHover();
-          target.classList.add("cm-definition-link");
-          hoveredElement = target;
-        }
+        showHover(view, identifier);
         return false;
       },
-      mouseleave() {
-        clearHover();
+      mouseleave(_event, view) {
+        clearHover(view);
         return false;
       },
-      keyup(event) {
-        if (event.key === "Control" || event.key === "Meta") clearHover();
+      keyup(event, view) {
+        if (event.key === "Control" || event.key === "Meta") clearHover(view);
         return false;
       },
     }),
@@ -234,7 +262,7 @@ export function tyntDefinitionNavigation(): Extension {
     ViewPlugin.fromClass(
       class {
         private readonly handleKeyUp = (event: KeyboardEvent) => {
-          if (event.key === "Control" || event.key === "Meta") clearHover();
+          if (event.key === "Control" || event.key === "Meta") clearHover(this.view);
         };
 
         constructor(private readonly view: EditorView) {
@@ -246,7 +274,7 @@ export function tyntDefinitionNavigation(): Extension {
           const timer = definitionTargetTimers.get(this.view);
           if (timer !== undefined) window.clearTimeout(timer);
           definitionTargetTimers.delete(this.view);
-          clearHover();
+          hoveredIdentifier = null;
         }
       },
     ),

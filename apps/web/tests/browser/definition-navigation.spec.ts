@@ -73,6 +73,30 @@ export function draw() {}`,
   await expect(link).toHaveCount(0);
 });
 
+test("modifier hover underlines only a plain variable reference", async ({ page }) => {
+  await page.goto("/");
+  await importSource(
+    page,
+    `const speed = 1;
+
+export function init() {}
+export function update() { return speed; }
+export function draw() {}`,
+  );
+
+  const referenceLine = page.locator(".cm-line").filter({ hasText: "return speed" });
+  const point = await textPoint(referenceLine, "speed");
+  await page.keyboard.down("Meta");
+  await page.mouse.move(point.x, point.y);
+
+  const link = page.locator(".cm-definition-link");
+  await expect(link).toHaveText("speed");
+  await expect(link).toHaveCSS("text-decoration-line", "underline");
+
+  await page.keyboard.up("Meta");
+  await expect(link).toHaveCount(0);
+});
+
 test("F12 briefly highlights the local definition after jumping", async ({ page }) => {
   await page.goto("/");
   await importSource(
