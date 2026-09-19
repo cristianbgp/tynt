@@ -23,7 +23,14 @@ export const metadata: Metadata = {
     title: "tynt docs",
     description: "Build and publish tiny monochrome browser games.",
   },
-  icons: { icon: "/tynt-mark.svg" },
+  icons: {
+    icon: [
+      { url: "/tynt-mark.svg", type: "image/svg+xml", sizes: "any" },
+      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
+  },
 };
 
 const themeScript = `(() => {

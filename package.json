@@ -21,11 +21,12 @@
     "dev:docs": "bun run --cwd apps/docs dev",
     "docs:dev": "bun run --cwd apps/docs dev",
     "docs:build": "bun run --cwd apps/docs build",
+    "brand:assets": "bun run --cwd apps/web brand:assets",
     "format": "bun run --cwd apps/web format && bun run --cwd apps/docs format",
     "format:check": "bun run --cwd apps/web format:check && bun run --cwd apps/docs format:check",
     "cartridges:generate": "bun run scripts/cartridges/generate.ts",
     "cartridges:check": "bun run scripts/cartridges/generate.ts --check",
-    "test": "bun run cartridges:generate && bun test scripts/cartridges/tests scripts/repository/tests && bun run --cwd packages/core test && bun run --cwd apps/web test",
+    "test": "bun run cartridges:generate && bun test scripts/cartridges/tests scripts/repository/tests && bun run --cwd packages/core test && bun run --cwd apps/web test && bun run --cwd apps/docs test:unit",
     "test:e2e": "bun run --cwd apps/web test:e2e",
     "build": "bun run cartridges:generate && bun run --cwd packages/core build && bun run --cwd apps/web build && bun run docs:build",
     "check": "bun run format:check && bun run cartridges:check && bun run test && bun run test:e2e && bun run build"

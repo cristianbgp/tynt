@@ -488,10 +488,43 @@ test("responsive content routes reflow without footer overlap", async ({ page })
 
 test("serves the browser icon metadata", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
+
+  await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute(
+    "href",
+    "/tynt-mark.svg",
+  );
+  await expect(page.locator('link[rel="icon"][sizes="32x32"]')).toHaveAttribute(
+    "href",
+    "/favicon-32x32.png",
+  );
+  await expect(page.locator('link[rel="icon"][sizes="48x48"]')).toHaveAttribute(
+    "href",
+    "/favicon-48x48.png",
+  );
+  await expect(page.locator('link[rel="apple-touch-icon"][sizes="180x180"]')).toHaveAttribute(
     "href",
     "/apple-touch-icon.png",
   );
+
+  for (const [source, expectedSize] of [
+    ["/favicon-32x32.png", 32],
+    ["/favicon-48x48.png", 48],
+    ["/apple-touch-icon.png", 180],
+  ] as const) {
+    await expect
+      .poll(() =>
+        page.evaluate(
+          async ([url, size]) => {
+            const image = new Image();
+            image.src = url;
+            await image.decode();
+            return image.naturalWidth === size && image.naturalHeight === size;
+          },
+          [source, expectedSize] as const,
+        ),
+      )
+      .toBe(true);
+  }
 });
 
 test("content routes do not load editor or compiler resources", async ({ page }) => {
