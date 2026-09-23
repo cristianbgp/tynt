@@ -16,6 +16,10 @@ async function expectHoverColors(
   await expect(locator).toHaveCSS("color", color);
 }
 
+async function showEmulatorControls(page: import("@playwright/test").Page) {
+  await page.getByRole("button", { name: "Show controls" }).click();
+}
+
 const validCartridge = {
   format: "tynt",
   version: 1,
@@ -43,6 +47,7 @@ test("shows the compact controls and two-pane workspace", async ({ page }) => {
 
 test("uses intentional hover feedback for editor interactions", async ({ page }) => {
   await page.goto("/");
+  await showEmulatorControls(page);
 
   await expectHoverColors(
     page.getByRole("link", { name: "tynt editor" }),
@@ -319,17 +324,47 @@ test("responsive play keeps the game and controls close together", async ({ page
     const geometry = await page.evaluate(() => {
       const toolbar = document.querySelector(".play-topbar")!.getBoundingClientRect();
       const canvas = document.querySelector("canvas")!.getBoundingClientRect();
+      const toggle = document
+        .querySelector<HTMLButtonElement>('[aria-controls][aria-expanded="true"]')!
+        .getBoundingClientRect();
       const controls = document.querySelector(".emulator-controls")!.getBoundingClientRect();
       return {
         canvasWidth: canvas.width,
         headerGap: canvas.top - toolbar.bottom,
+        toggleGap: toggle.top - canvas.bottom,
         controlsGap: controls.top - canvas.bottom,
       };
     });
     expect(geometry.canvasWidth).toBe(320);
     expect(geometry.headerGap).toBeLessThan(110);
-    expect(geometry.controlsGap).toBeLessThan(48);
+    expect(geometry.toggleGap).toBeLessThan(48);
+    expect(geometry.controlsGap).toBeLessThan(80);
   }
+});
+
+test("collapses screen controls by default on desktop and expands them on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/play/public/starter");
+
+  const showControls = page.getByRole("button", { name: "Show controls" });
+  await expect(showControls).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByRole("button", { name: "Direction right" })).toHaveCount(0);
+  await showControls.click();
+  await expect(page.getByRole("button", { name: "Hide controls" })).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
+  await expect(page.getByRole("button", { name: "Direction right" })).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Hide controls" })).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
+  await expect(page.getByRole("button", { name: "Action A" })).toBeVisible();
 });
 
 test("desktop play keeps the game preview close to the top bar", async ({ page }) => {
@@ -658,6 +693,7 @@ test("plays a saved cartridge with focused pause, resume, and restart controls",
     "href",
     /\?local=/,
   );
+  await showEmulatorControls(page);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(1280);
   await expect
     .poll(() =>
@@ -835,6 +871,7 @@ test("compiles and runs the centered default cartridge, then stops", async ({ pa
 
 test("the default cartridge demonstrates clickable directions, A, and B", async ({ page }) => {
   await page.goto("/");
+  await showEmulatorControls(page);
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#status")).toHaveText("running");
   await expect.poll(() => pixel(page, 76, 61)).toEqual([255, 255, 255, 255]);
@@ -1118,6 +1155,7 @@ test("keeps the editor footer actions contiguous without horizontal overflow", a
 
 test("keeps keyboard focus on the screen and renders the D-pad as one cross", async ({ page }) => {
   await page.goto("/");
+  await showEmulatorControls(page);
   const preview = page.locator("#preview");
   const frame = page.locator(".preview-frame");
   await preview.focus();
@@ -1145,6 +1183,7 @@ test("keeps keyboard focus on the screen and renders the D-pad as one cross", as
 
 test("uses matching 48 pixel touch targets for every part of the D-pad", async ({ page }) => {
   await page.goto("/");
+  await showEmulatorControls(page);
   await expect(page.locator(".dpad button, .dpad-center")).toHaveCount(5);
   const cells = await page.locator(".dpad button, .dpad-center").evaluateAll((elements) =>
     elements.map((element) => {
@@ -1158,6 +1197,7 @@ test("uses matching 48 pixel touch targets for every part of the D-pad", async (
 
 test("uses the same black surface and pressed feedback for A and B", async ({ page }) => {
   await page.goto("/");
+  await showEmulatorControls(page);
   const actionA = page.getByRole("button", { name: "Action A" });
   const actionB = page.getByRole("button", { name: "Action B" });
 

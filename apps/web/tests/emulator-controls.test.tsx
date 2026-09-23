@@ -1,8 +1,30 @@
 // @vitest-environment jsdom
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { EmulatorControls } from "@/components/emulator-controls";
+
+function useMobileViewport(matches: boolean) {
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn().mockImplementation((query: string) => ({
+      matches,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  );
+}
+
+function renderExpanded(onInput = vi.fn()) {
+  useMobileViewport(true);
+  render(<EmulatorControls onInput={onInput} />);
+  return onInput;
+}
 
 function mockDpadBounds() {
   const dpad = screen.getByLabelText("Direction pad");
@@ -21,9 +43,52 @@ function mockDpadBounds() {
 }
 
 describe("emulator controls", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  test("defaults to collapsed on desktop and toggles accessible screen controls", () => {
+    useMobileViewport(false);
+    render(<EmulatorControls onInput={vi.fn()} />);
+
+    const toggle = screen.getByRole("button", { name: "Show controls" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveAttribute("data-cuelume-press", "");
+    expect(screen.queryByLabelText("Direction pad")).not.toBeInTheDocument();
+
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: "Hide controls" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    expect(screen.getByLabelText("Direction pad")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide controls" }));
+    expect(screen.queryByLabelText("Direction pad")).not.toBeInTheDocument();
+  });
+
+  test("defaults to expanded on mobile", () => {
+    useMobileViewport(true);
+    render(<EmulatorControls onInput={vi.fn()} />);
+
+    expect(screen.getByRole("button", { name: "Hide controls" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    expect(screen.getByLabelText("Direction pad")).toBeVisible();
+  });
+
+  test("releases held inputs before collapsing", () => {
+    const onInput = renderExpanded();
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Action A" }), { pointerId: 9 });
+    fireEvent.click(screen.getByRole("button", { name: "Hide controls" }));
+
+    expect(onInput.mock.calls).toEqual([
+      ["a", true],
+      ["a", false],
+    ]);
+  });
+
   test("slides from one direction into a diagonal without lifting", () => {
-    const onInput = vi.fn();
-    render(<EmulatorControls onInput={onInput} />);
+    const onInput = renderExpanded();
     const dpad = mockDpadBounds();
     const left = screen.getByRole("button", { name: "Direction left" });
     const up = screen.getByRole("button", { name: "Direction up" });
@@ -54,8 +119,7 @@ describe("emulator controls", () => {
   });
 
   test("releases a cancelled diagonal once and labels every control", () => {
-    const onInput = vi.fn();
-    render(<EmulatorControls onInput={onInput} />);
+    const onInput = renderExpanded();
     const dpad = mockDpadBounds();
 
     fireEvent.pointerDown(dpad, { pointerId: 9, clientX: 24, clientY: 24 });
@@ -81,8 +145,7 @@ describe("emulator controls", () => {
   });
 
   test("releases a cancelled action once", () => {
-    const onInput = vi.fn();
-    render(<EmulatorControls onInput={onInput} />);
+    const onInput = renderExpanded();
     const actionA = screen.getByRole("button", { name: "Action A" });
 
     fireEvent.pointerDown(actionA, { pointerId: 9 });
@@ -96,8 +159,7 @@ describe("emulator controls", () => {
   });
 
   test("keeps an action held while the direction thumb slides", () => {
-    const onInput = vi.fn();
-    render(<EmulatorControls onInput={onInput} />);
+    const onInput = renderExpanded();
     const dpad = mockDpadBounds();
     const actionA = screen.getByRole("button", { name: "Action A" });
 
@@ -119,8 +181,7 @@ describe("emulator controls", () => {
   });
 
   test("ignores a second direction thumb until the first releases", () => {
-    const onInput = vi.fn();
-    render(<EmulatorControls onInput={onInput} />);
+    const onInput = renderExpanded();
     const dpad = mockDpadBounds();
     const right = screen.getByRole("button", { name: "Direction right" });
 
