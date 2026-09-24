@@ -50,12 +50,17 @@ test("introduces tynt at home and starts the featured game on demand", async ({ 
     page.getByRole("button", { name: "Restart" }).locator("..").getByRole("status"),
   ).toHaveText("running");
   await expect(page.locator("#preview")).toBeFocused();
+  // A route change can leave the old page visible while the editor chunk loads.
+  await page.route("**/src/pages/editor-page.tsx*", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 6_000));
+    await route.continue();
+  });
   await page
     .getByRole("navigation", { name: "Primary navigation" })
     .getByRole("link", { name: "Editor" })
     .click();
   await expect(page).toHaveURL(/\/editor$/);
-  await expect(page.getByRole("button", { name: "Run" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Run" })).toBeVisible({ timeout: 20_000 });
 });
 
 test("keeps the home page within a mobile viewport", async ({ page }) => {
