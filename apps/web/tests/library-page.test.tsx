@@ -38,7 +38,10 @@ describe("local library page", () => {
     renderPage();
 
     expect(await screen.findByRole("heading", { name: "Your library is empty" })).toBeVisible();
-    expect(screen.getByRole("link", { name: "Create a cartridge" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Create a cartridge" })).toHaveAttribute(
+      "href",
+      "/editor",
+    );
     expect(screen.getByRole("link", { name: "Browse examples" })).toHaveAttribute(
       "href",
       "/gallery",

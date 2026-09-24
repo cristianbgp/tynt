@@ -14,7 +14,7 @@ export function NotFoundPage() {
         <h1>Page not found</h1>
         <Link
           className="border-b border-current px-[2px] pb-[2px] hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background"
-          to="/"
+          to="/editor"
           data-cuelume-hover="tick"
           data-cuelume-press=""
           data-cuelume-release=""

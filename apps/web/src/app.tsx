@@ -8,6 +8,9 @@ import type { CartridgeLibrary } from "@/library/cartridge-library";
 const EditorPage = lazy(() =>
   import("@/pages/editor-page").then(({ EditorPage }) => ({ default: EditorPage })),
 );
+const HomePage = lazy(() =>
+  import("@/pages/home-page").then(({ HomePage }) => ({ default: HomePage })),
+);
 const CartridgePage = lazy(() =>
   import("@/pages/cartridge-page").then(({ CartridgePage }) => ({ default: CartridgePage })),
 );
@@ -74,6 +77,10 @@ export function App({ library = browserCartridgeLibrary }: AppProps) {
         <Routes>
           <Route
             index
+            element={<HomePage soundEnabled={soundEnabled} onSoundToggle={toggleSound} />}
+          />
+          <Route
+            path="editor"
             element={
               <EditorPage
                 library={library}

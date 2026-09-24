@@ -14,7 +14,7 @@ export function PublicPlayPage({ soundEnabled, onSoundToggle }: PublicPlayPagePr
   return (
     <PlayPage
       cartridge={cartridge}
-      editorHref={`/?cartridge=${cartridge.slug}`}
+      editorHref={`/editor?cartridge=${cartridge.slug}`}
       soundEnabled={soundEnabled}
       onSoundToggle={onSoundToggle}
     />

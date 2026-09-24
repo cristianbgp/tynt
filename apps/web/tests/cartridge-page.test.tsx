@@ -31,7 +31,7 @@ test("shows a public cartridge with canonical actions and repository content", (
   );
   expect(screen.getByRole("link", { name: "Remix starter" })).toHaveAttribute(
     "href",
-    "/?cartridge=starter",
+    "/editor?cartridge=starter",
   );
   expect(screen.getByRole("link", { name: "View starter on GitHub" })).toHaveAttribute(
     "rel",

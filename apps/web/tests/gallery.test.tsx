@@ -44,7 +44,7 @@ describe("cartridge gallery", () => {
     );
     expect(screen.getByRole("link", { name: "Open snake.tynt in editor" })).toHaveAttribute(
       "href",
-      "/?cartridge=snake",
+      "/editor?cartridge=snake",
     );
     expect(screen.getByRole("link", { name: "Submit a cartridge" })).toHaveAttribute(
       "data-cuelume-hover",

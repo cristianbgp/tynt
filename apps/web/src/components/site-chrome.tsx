@@ -10,7 +10,7 @@ const soundLinkProps = {
 } as const;
 
 const routes = [
-  { id: "editor", label: "Editor", to: "/", Icon: Code },
+  { id: "editor", label: "Editor", to: "/editor", Icon: Code },
   { id: "gallery", label: "Gallery", to: "/gallery", Icon: GalleryThumbnails },
   { id: "library", label: "Library", to: "/library", Icon: BookOpen },
   { id: "sprites", label: "Sprites", to: "/sprites", Icon: Image },
@@ -19,7 +19,13 @@ const routes = [
 
 export type SiteRoute = (typeof routes)[number]["id"];
 
-export function SiteHeader({ active, editorTo = "/" }: { active?: SiteRoute; editorTo?: string }) {
+export function SiteHeader({
+  active,
+  editorTo = "/editor",
+}: {
+  active?: SiteRoute;
+  editorTo?: string;
+}) {
   return (
     <header className="gallery-topbar flex border-b border-border">
       <BrandLink />
@@ -56,7 +62,7 @@ export function SiteFooter({
   return (
     <footer className="gallery-footer flex items-center border-t border-border pl-[12px] text-[11px] text-[#555555] max-[560px]:min-h-[41px] max-[560px]:pb-[env(safe-area-inset-bottom)] max-[560px]:pl-0 [&>.footer-actions_.sound-toggle]:mr-0 [&>a]:flex [&>a]:items-center [&>a]:gap-[7px] [&>a]:self-stretch [&>a]:border-l [&>a]:border-border [&>a]:px-[16px] [&>a]:no-underline [&>a:first-of-type]:ml-auto [&>a:focus-visible]:bg-foreground [&>a:focus-visible]:text-background [&>a:hover]:bg-foreground [&>a:hover]:text-background max-[560px]:[&>span:first-child]:hidden">
       <span>{summary}</span>
-      <Link to="/" {...soundLinkProps}>
+      <Link to="/editor" {...soundLinkProps}>
         Open editor
       </Link>
       <FooterActions soundEnabled={soundEnabled} onSoundToggle={onSoundToggle} />

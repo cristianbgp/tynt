@@ -68,7 +68,7 @@ async function renderApp(library?: CartridgeLibrary) {
 describe("tynt creator shell", () => {
   beforeEach(() => {
     window.localStorage.clear();
-    window.history.replaceState({}, "", "/");
+    window.history.replaceState({}, "", "/editor");
     runtime.error = "";
     runtime.showPreviewError = false;
     vi.clearAllMocks();
@@ -85,7 +85,7 @@ describe("tynt creator shell", () => {
       "page",
     );
     expect(screen.getByRole("navigation", { name: "Cartridge actions" })).toBeVisible();
-    const brand = screen.getByRole("link", { name: "tynt editor" });
+    const brand = screen.getByRole("link", { name: "tynt home" });
     expect(brand.querySelector(".brand-mark")).toBeVisible();
     expect(brand.querySelector(".brand-wordmark")).toHaveTextContent("tynt");
     expect(screen.queryByRole("textbox", { name: "Cartridge title" })).not.toBeInTheDocument();
@@ -201,7 +201,7 @@ describe("tynt creator shell", () => {
     expect(screen.getByRole("heading", { name: "Page not found" })).toBeVisible();
     expect(screen.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
     expect(document.querySelector(".state-mark .brand-mark")).toBeVisible();
-    expect(screen.getByRole("link", { name: "Open editor" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Open editor" })).toHaveAttribute("href", "/editor");
   });
 
   test("loads a saved local cartridge into the editor", async () => {
@@ -210,7 +210,7 @@ describe("tynt creator shell", () => {
       now: () => "2026-09-14T00:00:00.000Z",
     });
     await library.save({ draft: { title: "local game", source: "const localMarker = true;" } });
-    window.history.replaceState({}, "", "/?local=local-one");
+    window.history.replaceState({}, "", "/editor?local=local-one");
 
     await renderApp(library);
 
@@ -221,7 +221,7 @@ describe("tynt creator shell", () => {
   });
 
   test("opens a public cartridge through the canonical editor query", async () => {
-    window.history.replaceState({}, "", "/?cartridge=snake");
+    window.history.replaceState({}, "", "/editor?cartridge=snake");
 
     await renderApp();
 

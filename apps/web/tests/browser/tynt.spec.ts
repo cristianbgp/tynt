@@ -32,8 +32,43 @@ const validCartridge = {
   palette: { model: "indexed", colors: ["#000000", "#555555", "#aaaaaa", "#ffffff"] },
 };
 
-test("shows the compact controls and two-pane workspace", async ({ page }) => {
+test("introduces tynt at home and starts the featured game on demand", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Play games" })).toHaveAttribute("href", "/gallery");
+  await expect(page.getByRole("link", { name: "Open editor" }).first()).toHaveAttribute(
+    "href",
+    "/editor",
+  );
+  await expect(page.getByRole("button", { name: "Play here" })).toHaveAttribute(
+    "data-cuelume-hover",
+    "tick",
+  );
+  await page.getByRole("button", { name: "Play here" }).click();
+  await expect(page.getByRole("region", { name: "Game preview" })).toBeVisible();
+  await expect(page.getByRole("status", { name: "" }).first()).toHaveText("running");
+  await expect(page.locator("#preview")).toBeFocused();
+  await page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Editor" })
+    .click();
+  await expect(page).toHaveURL(/\/editor$/);
+  await expect(page.getByRole("button", { name: "Run" })).toBeVisible();
+});
+
+test("keeps the home page within a mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Play here" })).toBeVisible();
+  await expectNoHorizontalOverflow(page, 320);
+  await page.getByRole("button", { name: "Play here" }).click();
+  await expect(page.getByRole("button", { name: "Direction left" })).toBeVisible();
+  await expectNoHorizontalOverflow(page, 320);
+});
+
+test("shows the compact controls and two-pane workspace", async ({ page }) => {
+  await page.goto("/editor");
   await expect(page.getByText("tynt", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Run" })).toBeVisible();
   await expect(page.locator("main")).toHaveCSS("grid-template-columns", /.+ .+/);
@@ -46,11 +81,11 @@ test("shows the compact controls and two-pane workspace", async ({ page }) => {
 });
 
 test("uses intentional hover feedback for editor interactions", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await showEmulatorControls(page);
 
   await expectHoverColors(
-    page.getByRole("link", { name: "tynt editor" }),
+    page.getByRole("link", { name: "tynt home" }),
     "rgb(0, 0, 0)",
     "rgb(255, 255, 255)",
   );
@@ -232,7 +267,7 @@ test("uses strong hover feedback for every docs control in explicit light and da
 
 test("responsive editor switches from code to a focused game", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
-  await page.goto("/");
+  await page.goto("/editor");
   await expect(page.getByRole("button", { name: "Show code" })).toHaveAttribute(
     "aria-pressed",
     "true",
@@ -252,7 +287,7 @@ test("responsive editor switches from code to a focused game", async ({ page }) 
 
 test("mobile editor keeps the global header above its contextual toolbar", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto("/");
+  await page.goto("/editor");
   await expect(page.locator(".topbar")).toBeVisible();
 
   const geometry = await page.evaluate(() => {
@@ -522,7 +557,7 @@ test("responsive content routes reflow without footer overlap", async ({ page })
 });
 
 test("serves the browser icon metadata", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
 
   await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute(
     "href",
@@ -599,7 +634,7 @@ test("opens a responsive cartridge detail page from the gallery", async ({ page 
   );
   await expect(page.getByRole("link", { name: "Remix starter" })).toHaveAttribute(
     "href",
-    "/?cartridge=starter",
+    "/editor?cartridge=starter",
   );
   await expect(page.getByRole("heading", { name: "About this cartridge" })).toBeVisible();
   await expectNoHorizontalOverflow(page, 320);
@@ -608,7 +643,7 @@ test("opens a responsive cartridge detail page from the gallery", async ({ page 
 test("pauses, steps, restarts, and captures a cartridge in the editor debugger", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#status")).toHaveText("running");
   await page.getByRole("button", { name: "Open debugger" }).click();
@@ -645,13 +680,13 @@ test("opens a bundled cartridge from the gallery as an editable copy", async ({ 
 
   await page.getByRole("link", { name: "Open snake.tynt in editor" }).click();
 
-  await expect(page).toHaveURL("http://127.0.0.1:4173/");
+  await expect(page).toHaveURL("http://127.0.0.1:4173/editor");
   await expect(page.locator("#filename")).toHaveText("snake.tynt");
   await expect(page.locator(".cm-content")).toContainText("segments");
 });
 
 test("saves metadata to the local library and manages a persistent copy", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.getByRole("button", { name: "Details" }).click();
   await page.getByRole("textbox", { name: "Title" }).fill("local demo");
   await page.getByRole("textbox", { name: "Author" }).fill("cristianbgp");
@@ -676,7 +711,7 @@ test("saves metadata to the local library and manages a persistent copy", async 
 test("plays a saved cartridge with focused pause, resume, and restart controls", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.getByRole("button", { name: "Play" }).click();
   await expect(page).toHaveURL(/\/play\/local\/[^/]+$/);
   await expect(page.getByRole("heading", { name: "starter" })).toBeVisible();
@@ -710,8 +745,9 @@ test("plays a saved cartridge with focused pause, resume, and restart controls",
 });
 
 test("runs every repository cartridge", async ({ page }) => {
+  test.slow();
   for (const cartridge of PUBLIC_CARTRIDGES) {
-    await page.goto(`/?cartridge=${cartridge.slug}`);
+    await page.goto(`/editor?cartridge=${cartridge.slug}`);
     await page.getByRole("button", { name: "Run" }).click();
     await expect(page.locator("#status"), cartridge.slug).toHaveText("running");
     await page.getByRole("button", { name: "Stop" }).click();
@@ -719,7 +755,7 @@ test("runs every repository cartridge", async ({ page }) => {
 });
 
 test("imports and exports a readable v1 cartridge", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.locator("#file-input").setInputFiles({
     name: "round-trip.tynt",
     mimeType: "application/json",
@@ -739,7 +775,7 @@ test("imports and exports a readable v1 cartridge", async ({ page }) => {
 });
 
 test("toolbar shortcuts run, import, and export", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   const editor = page.locator(".cm-content");
   const preview = page.locator("#preview");
   const source = await editor.textContent();
@@ -767,7 +803,7 @@ test("toolbar shortcuts run, import, and export", async ({ page }) => {
 });
 
 test("opens tynt API suggestions with Control+Space", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.locator(".cm-content").click();
   await page.keyboard.press("Control+Space");
 
@@ -782,7 +818,7 @@ test("opens tynt API suggestions with Control+Space", async ({ page }) => {
 });
 
 test("highlights TypeScript with the tynt monochrome token palette", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   const tokenStyles = await page.locator(".cm-content").evaluate((content) => {
     const spans = [...content.querySelectorAll("span")];
     const keyword = spans.find((span) => span.textContent === "export");
@@ -805,7 +841,7 @@ test("highlights TypeScript with the tynt monochrome token palette", async ({ pa
 });
 
 test("failed import leaves the current editor intact", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     'export function init(){}\nexport function update(){}\nexport function draw(){ text("KEEP ME",0,0,3); }',
@@ -825,7 +861,7 @@ test("failed import leaves the current editor intact", async ({ page }) => {
 });
 
 test("compiles and runs the centered default cartridge, then stops", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.getByRole("button", { name: "Stop" })).toBeVisible();
   await expect(page.locator("#status")).toHaveText("running");
@@ -870,7 +906,7 @@ test("compiles and runs the centered default cartridge, then stops", async ({ pa
 });
 
 test("the default cartridge demonstrates clickable directions, A, and B", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await showEmulatorControls(page);
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#status")).toHaveText("running");
@@ -918,7 +954,7 @@ test("the default cartridge demonstrates clickable directions, A, and B", async 
 });
 
 test("reruns successfully and preserves the old run after a compile error", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `export function init(){}\nexport function update(){}\nexport function draw(){ clear(0); pixel(0,0,1); }`,
@@ -945,7 +981,7 @@ test("reruns successfully and preserves the old run after a compile error", asyn
 test("delivers held and pressed keyboard transitions while preview is focused", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `
@@ -971,7 +1007,7 @@ test("delivers held and pressed keyboard transitions while preview is focused", 
 });
 
 test("maps runtime errors to cartridge source and tears down the sandbox", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `export function init(){}\nexport function update(){\n  throw new Error("player boom");\n}\nexport function draw(){}`,
@@ -988,7 +1024,7 @@ test("maps runtime errors to cartridge source and tears down the sandbox", async
 });
 
 test("watchdog stops an infinite update without freezing the editor", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `export function init(){}\nexport function update(){ while(true){} }\nexport function draw(){}`,
@@ -1005,7 +1041,7 @@ test("watchdog stops an infinite update without freezing the editor", async ({ p
 });
 
 test("backgrounding the page pauses and resumes without a watchdog error", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.getByRole("button", { name: "Run" }).click();
   await expect(page.locator("#status")).toHaveText("running");
 
@@ -1034,7 +1070,7 @@ test("cartridges cannot reach host, storage, cookies, workers, or network", asyn
     )
       escaped.push(request.url());
   });
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `
@@ -1060,7 +1096,7 @@ test("cartridges cannot reach host, storage, cookies, workers, or network", asyn
 test("keeps the workspace accessible and fits the preview frame to an integer-scaled canvas", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await expect(page.getByLabel("Current cartridge file")).toHaveText("starter.tynt");
   await expect(page.getByRole("button", { name: "Examples" })).toHaveAttribute(
     "aria-haspopup",
@@ -1101,7 +1137,7 @@ test("keeps the workspace accessible and fits the preview frame to an integer-sc
 test("keeps the status bar flush with the viewport when errors are hidden or visible", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   const statusBox = () =>
     page.locator(".status-bar").evaluate((status) => {
       const bounds = status.getBoundingClientRect();
@@ -1136,7 +1172,7 @@ test("keeps the public play footer flush with the viewport", async ({ page }) =>
 });
 
 test("keeps the editor footer actions contiguous without horizontal overflow", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
 
   const footerActions = page.locator(".status-bar .footer-actions");
   await expect(footerActions).toBeVisible();
@@ -1154,7 +1190,7 @@ test("keeps the editor footer actions contiguous without horizontal overflow", a
 });
 
 test("keeps keyboard focus on the screen and renders the D-pad as one cross", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await showEmulatorControls(page);
   const preview = page.locator("#preview");
   const frame = page.locator(".preview-frame");
@@ -1182,7 +1218,7 @@ test("keeps keyboard focus on the screen and renders the D-pad as one cross", as
 });
 
 test("uses matching 48 pixel touch targets for every part of the D-pad", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await showEmulatorControls(page);
   await expect(page.locator(".dpad button, .dpad-center")).toHaveCount(5);
   const cells = await page.locator(".dpad button, .dpad-center").evaluateAll((elements) =>
@@ -1196,7 +1232,7 @@ test("uses matching 48 pixel touch targets for every part of the D-pad", async (
 });
 
 test("uses the same black surface and pressed feedback for A and B", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await showEmulatorControls(page);
   const actionA = page.getByRole("button", { name: "Action A" });
   const actionB = page.getByRole("button", { name: "Action B" });
@@ -1216,7 +1252,7 @@ test("uses the same black surface and pressed feedback for A and B", async ({ pa
 });
 
 test("shows local draft progress and prevents duplicate runs while compiling", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await page.locator(".cm-content").click();
   await page.keyboard.press("Control+End");
   await page.keyboard.type("\n// saved demo");
@@ -1230,7 +1266,7 @@ test("shows local draft progress and prevents duplicate runs while compiling", a
 });
 
 test("loads bundled examples from the top bar with visible file extensions", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   const examples = page.getByRole("button", { name: "Examples" });
   await examples.click();
   await page.getByRole("menuitem", { name: "shapes.tynt" }).click();

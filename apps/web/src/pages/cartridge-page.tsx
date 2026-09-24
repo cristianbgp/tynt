@@ -103,7 +103,7 @@ export function CartridgePage({ soundEnabled, onSoundToggle }: CartridgePageProp
                 <Link
                   className={actionClassName}
                   aria-label={`Remix ${cartridge.title}`}
-                  to={`/?cartridge=${cartridge.slug}`}
+                  to={`/editor?cartridge=${cartridge.slug}`}
                   {...soundLinkProps}
                 >
                   <Code width={18} height={18} aria-hidden="true" />

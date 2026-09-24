@@ -137,7 +137,7 @@ export function LibraryPage({ library, soundEnabled, onSoundToggle }: LibraryPag
               Save a cartridge from the editor and it will stay on this device.
             </p>
             <div className="mt-[10px] flex min-h-[41px] border border-l-0 border-border max-[360px]:grid max-[360px]:w-full max-[360px]:grid-cols-1 max-[360px]:[&>*]:w-full [&>a]:flex [&>a]:min-w-0 [&>a]:items-center [&>a]:justify-center [&>a]:gap-[7px] [&>a]:border-l [&>a]:border-border [&>a]:px-[10px] [&>a]:no-underline [&>a:focus-visible]:bg-foreground [&>a:focus-visible]:text-background [&>a:hover]:bg-foreground [&>a:hover]:text-background">
-              <Link to="/" {...soundLinkProps}>
+              <Link to="/editor" {...soundLinkProps}>
                 Create a cartridge
               </Link>
               <Link to="/gallery" {...soundLinkProps}>
@@ -204,7 +204,7 @@ export function LibraryPage({ library, soundEnabled, onSoundToggle }: LibraryPag
               <div className="library-card-actions col-span-full grid grid-cols-5 border-t border-border max-[560px]:[&_span]:hidden [&>a]:flex [&>a]:min-w-0 [&>a]:items-center [&>a]:justify-center [&>a]:gap-[7px] [&>a]:border-l [&>a]:border-border [&>a]:px-[10px] [&>a]:no-underline [&>a:focus-visible]:bg-foreground [&>a:focus-visible]:text-background [&>a:hover]:bg-foreground [&>a:hover]:text-background [&>button]:min-w-0 [&>button]:px-[10px]">
                 <Link
                   aria-label={`Open ${record.title}`}
-                  to={`/?local=${record.id}`}
+                  to={`/editor?local=${record.id}`}
                   {...soundLinkProps}
                 >
                   <Code width={24} height={24} aria-hidden="true" />

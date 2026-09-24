@@ -29,7 +29,7 @@ export function BrandLink() {
     <Link
       className="brand flex min-w-[94px] items-center justify-center gap-[8px] bg-foreground px-[14px] font-[650] tracking-[-0.04em] text-background no-underline"
       to="/"
-      aria-label="tynt editor"
+      aria-label="tynt home"
       {...soundLinkProps}
     >
       <TyntMark />

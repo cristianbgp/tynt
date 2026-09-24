@@ -31,7 +31,7 @@ export function LocalPlayPage({ library, soundEnabled, onSoundToggle }: LocalPla
   if (record === undefined)
     return (
       <div className="grid min-h-full grid-rows-[41px_minmax(0,1fr)]">
-        <SiteHeader editorTo={`/?local=${id}`} />
+        <SiteHeader editorTo={`/editor?local=${id}`} />
         <main className="flex items-center justify-center gap-[12px]" aria-live="polite">
           <span className="state-mark">
             <TyntMark />
@@ -44,7 +44,7 @@ export function LocalPlayPage({ library, soundEnabled, onSoundToggle }: LocalPla
   return (
     <PlayPage
       cartridge={record}
-      editorHref={`/?local=${record.id}`}
+      editorHref={`/editor?local=${record.id}`}
       soundEnabled={soundEnabled}
       onSoundToggle={onSoundToggle}
     />

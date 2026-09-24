@@ -43,7 +43,8 @@ The app opens at `http://127.0.0.1:4173`.
 
 Routes:
 
-- `/`: cartridge editor and game preview.
+- `/`: a compact introduction with a randomly featured playable cartridge and recent games.
+- `/editor`: cartridge editor and game preview.
 - `/gallery`: searchable bundled and community-submitted games.
 - `/cartridges/:slug`: cartridge details, README, source, and play/remix actions.
 - `/library`: searchable cartridges saved on this device.

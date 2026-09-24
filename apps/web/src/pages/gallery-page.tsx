@@ -268,7 +268,7 @@ export function GalleryPage({ soundEnabled = true, onSoundToggle = () => {} }: G
                   </Link>
                   <Link
                     aria-label={`Open ${cartridge.filename} in editor`}
-                    to={`/?cartridge=${cartridge.slug}`}
+                    to={`/editor?cartridge=${cartridge.slug}`}
                     {...soundLinkProps}
                   >
                     <Code width={18} height={18} aria-hidden="true" />

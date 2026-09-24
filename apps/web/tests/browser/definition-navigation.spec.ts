@@ -18,7 +18,7 @@ async function textPoint(line: Locator, text: string): Promise<{ x: number; y: n
 }
 
 test("Ctrl-click jumps from a local function call to its declaration", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `function helper() { return 1; }
@@ -49,7 +49,7 @@ export function draw() {}`,
 });
 
 test("modifier hover marks only navigable identifiers as links", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `function helper() { return 1; }
@@ -74,7 +74,7 @@ export function draw() {}`,
 });
 
 test("modifier hover underlines only a plain variable reference", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `const speed = 1;
@@ -98,7 +98,7 @@ export function draw() {}`,
 });
 
 test("F12 briefly highlights the local definition after jumping", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `function helper() { return 1; }
@@ -119,7 +119,7 @@ export function draw() {}`,
 test("Ctrl-click on an exported lifecycle declaration opens its documentation", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/editor");
   await importSource(
     page,
     `export function init() {}
