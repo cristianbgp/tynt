@@ -3,6 +3,7 @@ import type { InputName } from "@tynt/core";
 import { RuntimeController } from "@/runtime/controller";
 import { createRuntimeDebugStore } from "@/runtime/debug-store";
 import { CanvasRenderer, type CanvasTarget } from "@/runtime/renderer";
+import { useGamepadInput } from "@/hooks/use-gamepad-input";
 
 type RuntimeStatus =
   | "ready"
@@ -127,6 +128,11 @@ export function useRuntime(soundEnabled = true) {
     (input: InputName, down: boolean) => controllerRef.current?.setInput(input, down),
     [],
   );
+  const setGamepadInput = useCallback(
+    (input: InputName, down: boolean) => controllerRef.current?.setGamepadInput(input, down),
+    [],
+  );
+  const gamepadConnected = useGamepadInput(setGamepadInput);
   const resetInput = useCallback(() => controllerRef.current?.resetInput(), []);
   const clearError = useCallback(() => {
     setError("");
@@ -157,6 +163,7 @@ export function useRuntime(soundEnabled = true) {
     step,
     setKey,
     setInput,
+    gamepadConnected,
     resetInput,
     clearError,
     reportError,

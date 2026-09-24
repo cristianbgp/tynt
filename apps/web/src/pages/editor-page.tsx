@@ -311,6 +311,7 @@ export function EditorPage({ library, soundEnabled, onSoundToggle }: EditorPageP
           onKeyUp={(code) => runtime.setKey(code, false)}
           onInput={runtime.setInput}
           onBlur={runtime.resetInput}
+          gamepadConnected={runtime.gamepadConnected}
           showError={runtime.showPreviewError}
           debuggerPanel={
             <RuntimeDebugger

@@ -16,11 +16,14 @@ import {
   ArrowUp,
   ChevronDown,
   ChevronUp,
+  Gamepad,
 } from "pixelarticons/react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface EmulatorControlsProps {
   onInput(input: InputName, down: boolean): void;
+  gamepadConnected?: boolean;
 }
 
 const directionInputs = ["up", "left", "right", "down"] as const satisfies readonly InputName[];
@@ -90,7 +93,7 @@ function directionsAtPoint(
   return directions;
 }
 
-export function EmulatorControls({ onInput }: EmulatorControlsProps) {
+export function EmulatorControls({ onInput, gamepadConnected = false }: EmulatorControlsProps) {
   const active = useRef(new Map<InputName, number>());
   const directionPointer = useRef<number | null>(null);
   const onInputRef = useRef(onInput);
@@ -214,7 +217,24 @@ export function EmulatorControls({ onInput }: EmulatorControlsProps) {
 
   return (
     <div className="emulator-controls-section">
-      <div className="mt-[10px] flex justify-end">
+      <div className="mt-[10px] flex items-center justify-end gap-[4px]">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span
+              className={`grid h-8 w-7 place-items-center border border-border outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground ${gamepadConnected ? "bg-foreground text-background" : "bg-background text-muted-foreground"}`}
+              role="status"
+              aria-label={gamepadConnected ? "Gamepad connected" : "No standard gamepad detected"}
+              tabIndex={0}
+            >
+              <Gamepad width={18} height={18} aria-hidden="true" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            {gamepadConnected
+              ? "Gamepad connected"
+              : "Connect a standard gamepad and press a button"}
+          </TooltipContent>
+        </Tooltip>
         <Button
           className="min-h-8 border border-border px-[10px] text-[10px] tracking-[0.06em] uppercase"
           aria-controls={controlsId}

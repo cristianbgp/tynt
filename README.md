@@ -85,11 +85,13 @@ The docs are organized for cartridge creators: overview, getting started, exampl
 
 ## Controls
 
-The emulator buttons and keyboard feed the same input state:
+The emulator buttons, keyboard, and a standard gamepad feed the same input state:
 
 - Arrow keys or the D-pad move the square.
 - Z or A changes the square's shade.
 - X or B resets its position and shade.
+
+On a gamepad, the D-pad or left stick moves, the bottom face button is A, and the right face button is B. Press a controller button once if the browser has not detected it yet. The gamepad icon beside **Show controls** is always visible; hover or focus it to see the connection status. Non-standard controller layouts are not mapped. Keyboard, touch, and gamepad inputs can be held together; disconnecting the controller releases only its inputs.
 
 Run or rerun focuses the preview automatically so gameplay keys are ready immediately. Toolbar actions also have global shortcuts:
 

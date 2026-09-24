@@ -71,6 +71,11 @@ function browserDependencies(
 
 export class RuntimeController {
   private readonly input = new InputState();
+  private readonly inputSources = {
+    keyboard: new Set<InputName>(),
+    touch: new Set<InputName>(),
+    gamepad: new Set<InputName>(),
+  };
   private readonly clock = new FixedClock();
   private runInstance: RuntimeRun | null = null;
   private animationFrame: number | null = null;
@@ -134,6 +139,22 @@ export class RuntimeController {
     this.publishDebugState({ held: [], pressed: [], released: [] });
   }
 
+  private setSourceInput(
+    source: keyof RuntimeController["inputSources"],
+    input: InputName,
+    down: boolean,
+  ): void {
+    const inputs = this.inputSources[source];
+    if (inputs.has(input) === down) return;
+    if (down) inputs.add(input);
+    else inputs.delete(input);
+    const held = Object.values(this.inputSources).some((sourceInputs) => sourceInputs.has(input));
+    if (held) this.input.press(input);
+    else this.input.release(input);
+    this.setInspectedInput(input, held);
+    this.publishDebugState();
+  }
+
   private tick(active: RuntimeRun): void {
     const input = this.input.beginUpdate();
     this.inspectedPressed.clear();
@@ -163,7 +184,7 @@ export class RuntimeController {
     this.stopLoop();
     this.dependencies.onAudioStop?.();
     this.runInstance?.stop();
-    this.input.reset();
+    this.resetInput();
     this.resetDebugState();
     let nextRun: RuntimeRun;
     nextRun = this.dependencies.createRun(compiled, {
@@ -187,13 +208,13 @@ export class RuntimeController {
         this.dependencies.onError(error, false);
         this.stopLoop();
         this.dependencies.onAudioStop?.();
-        this.input.reset();
+        this.resetInput();
         this.resetDebugState();
       },
       onStop: () => {
         if (this.runInstance !== nextRun) return;
         this.stopLoop();
-        this.input.reset();
+        this.resetInput();
         this.resetDebugState();
         this.runInstance = null;
       },
@@ -215,24 +236,23 @@ export class RuntimeController {
   };
 
   setKey(code: string, down: boolean): boolean {
-    const handled = down ? this.input.keyDown(code) : this.input.keyUp(code);
     const input = KEY_TO_INPUT[code];
-    if (handled && input) {
-      this.setInspectedInput(input, down);
-      this.publishDebugState();
-    }
-    return handled;
+    if (!input) return false;
+    this.setSourceInput("keyboard", input, down);
+    return true;
   }
 
   setInput(input: InputName, down: boolean): void {
-    if (down) this.input.press(input);
-    else this.input.release(input);
-    this.setInspectedInput(input, down);
-    this.publishDebugState();
+    this.setSourceInput("touch", input, down);
+  }
+
+  setGamepadInput(input: InputName, down: boolean): void {
+    this.setSourceInput("gamepad", input, down);
   }
 
   resetInput(): void {
     this.input.reset();
+    for (const source of Object.values(this.inputSources)) source.clear();
     this.inspectedHeld.clear();
     this.inspectedPressed.clear();
     this.inspectedReleased.clear();
@@ -282,7 +302,7 @@ export class RuntimeController {
     this.stopLoop();
     active?.stop();
     this.dependencies.onAudioStop?.();
-    this.input.reset();
+    this.resetInput();
     this.resetDebugState();
     this.dependencies.onStatus("stopped");
   }

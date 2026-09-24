@@ -46,7 +46,9 @@ test("introduces tynt at home and starts the featured game on demand", async ({ 
   );
   await page.getByRole("button", { name: "Play here" }).click();
   await expect(page.getByRole("region", { name: "Game preview" })).toBeVisible();
-  await expect(page.getByRole("status", { name: "" }).first()).toHaveText("running");
+  await expect(
+    page.getByRole("button", { name: "Restart" }).locator("..").getByRole("status"),
+  ).toHaveText("running");
   await expect(page.locator("#preview")).toBeFocused();
   await page
     .getByRole("navigation", { name: "Primary navigation" })
@@ -78,6 +80,60 @@ test("shows the compact controls and two-pane workspace", async ({ page }) => {
   await expect(page.locator("#draft-status")).toHaveText("autosave on");
   await expect(page.locator(".actions")).toHaveCSS("border-left-width", "0px");
   await expect(page.locator("#run-button")).toHaveCSS("border-left-width", "1px");
+  const gamepad = page.getByRole("status", { name: "No standard gamepad detected" });
+  await expect(gamepad).toBeVisible();
+  await gamepad.hover();
+  await expect(page.getByRole("tooltip")).toHaveText(
+    "Connect a standard gamepad and press a button",
+  );
+  const gamepadBounds = await gamepad.boundingBox();
+  const toggleBounds = await page.getByRole("button", { name: "Show controls" }).boundingBox();
+  expect(gamepadBounds!.x + gamepadBounds!.width).toBeLessThanOrEqual(toggleBounds!.x);
+});
+
+test("standard gamepad controls the running cartridge alongside the keyboard", async ({ page }) => {
+  await page.addInitScript(() => {
+    const pad = {
+      connected: true,
+      mapping: "standard",
+      axes: [0, 0],
+      buttons: Array.from({ length: 17 }, () => ({ pressed: false })),
+    };
+    (window as Window & { testGamepad?: typeof pad }).testGamepad = pad;
+    Object.defineProperty(navigator, "getGamepads", { configurable: true, value: () => [pad] });
+  });
+  await page.goto("/editor");
+  await expect(page.getByRole("status", { name: "Gamepad connected" })).toBeVisible();
+  await page.getByRole("status", { name: "Gamepad connected" }).hover();
+  await expect(page.getByRole("tooltip")).toHaveText("Gamepad connected");
+  await page.getByRole("button", { name: "Run" }).click();
+  await expect(page.locator("#status")).toHaveText("running");
+  await page.getByRole("button", { name: "Open debugger" }).click();
+  const inputA = page.locator('[aria-label="Input state"] span').filter({ hasText: /^a$/ });
+
+  await page.evaluate(() => {
+    (
+      window as Window & { testGamepad?: { buttons: { pressed: boolean }[] } }
+    ).testGamepad!.buttons[0]!.pressed = true;
+  });
+  await expect(inputA).toHaveAttribute("data-held", "true");
+
+  await page.locator("#preview").focus();
+  await page.keyboard.down("z");
+  await page.evaluate(() => {
+    (
+      window as Window & { testGamepad?: { buttons: { pressed: boolean }[] } }
+    ).testGamepad!.buttons[0]!.pressed = false;
+  });
+  await expect(inputA).toHaveAttribute("data-held", "true");
+  await page.keyboard.up("z");
+  await expect(inputA).toHaveAttribute("data-held", "false");
+
+  await page.goto("/play/public/snake");
+  await expect(page.getByRole("status", { name: "Gamepad connected" })).toBeVisible();
+  await page.goto("/");
+  await page.getByRole("button", { name: "Play here" }).click();
+  await expect(page.getByRole("status", { name: "Gamepad connected" })).toBeVisible();
 });
 
 test("uses intentional hover feedback for editor interactions", async ({ page }) => {
@@ -715,13 +771,13 @@ test("plays a saved cartridge with focused pause, resume, and restart controls",
   await page.getByRole("button", { name: "Play" }).click();
   await expect(page).toHaveURL(/\/play\/local\/[^/]+$/);
   await expect(page.getByRole("heading", { name: "starter" })).toBeVisible();
-  await expect(page.getByRole("status")).toHaveText("running");
+  await expect(page.locator(".play-footer").getByRole("status")).toHaveText("running");
   await expect(page.locator("#preview")).toBeFocused();
 
   await page.getByRole("button", { name: "Pause" }).click();
-  await expect(page.getByRole("status")).toHaveText("paused");
+  await expect(page.locator(".play-footer").getByRole("status")).toHaveText("paused");
   await page.getByRole("button", { name: "Resume" }).click();
-  await expect(page.getByRole("status")).toHaveText("running");
+  await expect(page.locator(".play-footer").getByRole("status")).toHaveText("running");
   await page.getByRole("button", { name: "Restart" }).click();
   await expect(page.locator("#preview")).toBeFocused();
   await expect(page.getByRole("link", { name: "Editor", exact: true })).toHaveAttribute(

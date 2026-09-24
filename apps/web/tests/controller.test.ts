@@ -146,6 +146,44 @@ test("direct emulator inputs use the same runtime snapshots", async () => {
   });
 });
 
+test("releasing touch does not release a direction still held on the keyboard", async () => {
+  const testbed = harness();
+  const controller = new RuntimeController(testbed.dependencies);
+  await controller.run("good");
+  testbed.runs[0]!.ready();
+
+  controller.setKey("ArrowRight", true);
+  controller.setInput("right", true);
+  testbed.frame(17);
+  controller.setInput("right", false);
+  testbed.frame(34);
+  expect(testbed.runs[0]!.ticks.at(-1)).toEqual({ held: ["right"], pressed: [], released: [] });
+
+  controller.setKey("ArrowRight", false);
+  testbed.frame(51);
+  expect(testbed.runs[0]!.ticks.at(-1)).toEqual({ held: [], pressed: [], released: ["right"] });
+});
+
+test("releasing a gamepad button leaves the same keyboard button held", async () => {
+  const testbed = harness();
+  const controller = new RuntimeController(testbed.dependencies);
+  await controller.run("good");
+  testbed.runs[0]!.ready();
+
+  controller.setGamepadInput("a", true);
+  controller.setKey("KeyZ", true);
+  testbed.frame(17);
+  expect(testbed.runs[0]!.ticks.at(-1)).toEqual({ held: ["a"], pressed: ["a"], released: [] });
+
+  controller.setGamepadInput("a", false);
+  testbed.frame(34);
+  expect(testbed.runs[0]!.ticks.at(-1)).toEqual({ held: ["a"], pressed: [], released: [] });
+
+  controller.setKey("KeyZ", false);
+  testbed.frame(51);
+  expect(testbed.runs[0]!.ticks.at(-1)).toEqual({ held: [], pressed: [], released: ["a"] });
+});
+
 test("runtime failure stops scheduling and reports the error", async () => {
   const testbed = harness();
   const controller = new RuntimeController(testbed.dependencies);

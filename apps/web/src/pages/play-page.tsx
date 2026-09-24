@@ -157,6 +157,7 @@ export function PlayPage({ cartridge, editorHref, soundEnabled, onSoundToggle }:
           onKeyUp={(code) => runtime.setKey(code, false)}
           onInput={runtime.setInput}
           onBlur={runtime.resetInput}
+          gamepadConnected={runtime.gamepadConnected}
           showError={runtime.showPreviewError}
         />
       </main>

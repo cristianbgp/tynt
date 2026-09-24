@@ -160,7 +160,7 @@ describe("tynt creator shell", () => {
       .querySelector("svg");
     expect(docsIcon?.innerHTML).not.toBe(libraryIcon?.innerHTML);
     expect(screen.getByRole("region", { name: "Game preview" })).toBeVisible();
-    expect(screen.getByRole("status")).toHaveTextContent("ready");
+    expect(document.querySelector("#status")).toHaveTextContent("ready");
   });
 
   test("renders the cartridge gallery at its own route", async () => {

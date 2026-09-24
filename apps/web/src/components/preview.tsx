@@ -9,6 +9,7 @@ interface PreviewProps {
   onKeyUp(code: string): boolean;
   onInput(input: InputName, down: boolean): void;
   onBlur(): void;
+  gamepadConnected?: boolean;
   showError?: boolean;
   debuggerPanel?: ReactNode;
 }
@@ -20,6 +21,7 @@ export function Preview({
   onKeyUp,
   onInput,
   onBlur,
+  gamepadConnected = false,
   showError = false,
   debuggerPanel,
 }: PreviewProps) {
@@ -69,7 +71,7 @@ export function Preview({
           <span>160 × 144</span>
           <span>ARROWS · Z / X</span>
         </div>
-        <EmulatorControls onInput={onInput} />
+        <EmulatorControls onInput={onInput} gamepadConnected={gamepadConnected} />
         {debuggerPanel}
       </div>
     </section>

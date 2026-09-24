@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, expect, test, vi } from "vitest";
 import { createCartridgeLibrary, createMemoryAdapter } from "@/library/cartridge-library";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const runtime = vi.hoisted(() => ({
   canvasRef: () => {},
@@ -39,14 +40,16 @@ function makeLibrary() {
 
 function renderPage(library: ReturnType<typeof makeLibrary>, id = "play-one") {
   return render(
-    <MemoryRouter initialEntries={[`/play/local/${id}`]}>
-      <Routes>
-        <Route
-          path="play/local/:id"
-          element={<LocalPlayPage library={library} soundEnabled onSoundToggle={() => {}} />}
-        />
-      </Routes>
-    </MemoryRouter>,
+    <TooltipProvider>
+      <MemoryRouter initialEntries={[`/play/local/${id}`]}>
+        <Routes>
+          <Route
+            path="play/local/:id"
+            element={<LocalPlayPage library={library} soundEnabled onSoundToggle={() => {}} />}
+          />
+        </Routes>
+      </MemoryRouter>
+    </TooltipProvider>,
   );
 }
 
@@ -80,14 +83,16 @@ test("loads, starts, and exposes focused play controls for a local cartridge", a
 
 test("loads a repository cartridge at its public route", async () => {
   render(
-    <MemoryRouter initialEntries={["/play/public/snake"]}>
-      <Routes>
-        <Route
-          path="play/public/:slug"
-          element={<PublicPlayPage soundEnabled onSoundToggle={() => {}} />}
-        />
-      </Routes>
-    </MemoryRouter>,
+    <TooltipProvider>
+      <MemoryRouter initialEntries={["/play/public/snake"]}>
+        <Routes>
+          <Route
+            path="play/public/:slug"
+            element={<PublicPlayPage soundEnabled onSoundToggle={() => {}} />}
+          />
+        </Routes>
+      </MemoryRouter>
+    </TooltipProvider>,
   );
 
   expect(await screen.findByRole("heading", { name: "snake" })).toBeVisible();

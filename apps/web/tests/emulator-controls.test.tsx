@@ -1,8 +1,14 @@
 // @vitest-environment jsdom
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render as testingRender, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import type { ReactElement } from "react";
 import { EmulatorControls } from "@/components/emulator-controls";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+function render(element: ReactElement) {
+  return testingRender(<TooltipProvider>{element}</TooltipProvider>);
+}
 
 function useMobileViewport(matches: boolean) {
   vi.stubGlobal(

@@ -30,6 +30,8 @@ export function draw(): void {
 
 Press **Run** or <kbd>Control</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd>. The preview receives focus automatically. Use arrow keys to move, Z for A, and X for B. The on-screen controls work the same way.
 
+A standard gamepad also works in the editor preview and on game pages. Use its D-pad or left stick for directions, the bottom face button for A, and the right face button for B. Press a controller button if the browser has not detected it yet. The gamepad icon beside **Show controls** is always visible; hover or focus it to see whether a standard gamepad is connected. Keyboard, on-screen controls, and gamepad input can be used together. Controllers without the standard browser mapping are not supported yet.
+
 Colors are indexes from `0` to `3`: black, dark gray, light gray, and white. Coordinates are rounded to pixels and clipped to 160 × 144.
 
 Open **Debugger** below the editor preview when you need to inspect a game. It shows the current frame and input state, and lets you pause, advance one update, resume, restart, or download a 2× PNG screenshot. Frame stepping is available only while a cartridge is paused.
