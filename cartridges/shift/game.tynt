@@ -1,0 +1,17 @@
+{
+  "format": "tynt",
+  "version": 1,
+  "title": "SHIFT",
+  "author": "cristianbgp",
+  "description": "Slip through one safe lane as barriers close in.",
+  "controls": "Up/A rises · Down/B drops · any direction retries",
+  "source": "const PLAYER_X = 24;\nconst LANE_Y = [38, 72, 106];\n\nlet lane = 1;\nlet safeLane = 1;\nlet barrierX = 160;\nlet score = 0;\nlet best = 0;\nlet over = false;\nlet ticks = 0;\n\nfunction nextBarrier(): void {\n  barrierX = 160;\n  safeLane = Math.floor(random(0, 3));\n}\n\nfunction resetRun(): void {\n  lane = 1;\n  score = 0;\n  over = false;\n  ticks = 0;\n  nextBarrier();\n}\n\nexport function init(): void {\n  resetRun();\n}\n\nexport function update(): void {\n  const rise = buttonPressed(\"up\") || buttonPressed(\"a\");\n  const fall = buttonPressed(\"down\") || buttonPressed(\"b\");\n  if (over) {\n    if (rise || fall) resetRun();\n    return;\n  }\n  if (rise && !fall) {\n    lane = Math.max(0, lane - 1);\n    tone(430, 22, 0.035);\n  } else if (fall && !rise) {\n    lane = Math.min(2, lane + 1);\n    tone(330, 22, 0.035);\n  }\n\n  ticks++;\n  if (ticks % 2 !== 0) return;\n  barrierX -= score < 5 ? 3 : score < 10 ? 4 : 5;\n  if (overlap(PLAYER_X, LANE_Y[lane], 12, 12, barrierX, LANE_Y[lane], 12, 12) && lane !== safeLane) {\n    over = true;\n    sfx([220, 150, 90], 55, 0.09, \"triangle\");\n    return;\n  }\n  if (barrierX + 12 < 0) {\n    score++;\n    best = Math.max(best, score);\n    tone(740, 48, 0.075, \"triangle\");\n    nextBarrier();\n  }\n}\n\nexport function draw(): void {\n  clear(0);\n  text(\"SHIFT\", 6, 7, 3);\n  text(\"SCORE \" + score, 54, 7, 3);\n  text(\"BEST \" + best, 113, 7, 2);\n  line(0, 24, 159, 24, 1);\n  line(0, 64, 159, 64, 1);\n  line(0, 98, 159, 98, 1);\n  line(0, 132, 159, 132, 1);\n  for (let index = 0; index < 3; index++) {\n    if (index !== safeLane) rect(barrierX, LANE_Y[index], 12, 12, 2, true);\n  }\n  rect(PLAYER_X, LANE_Y[lane], 12, 12, 3, true);\n  rect(PLAYER_X + 8, LANE_Y[lane] + 4, 2, 4, 0, true);\n  if (over) {\n    rect(36, 54, 88, 38, 0, true);\n    rect(36, 54, 88, 38, 3, false);\n    text(\"CHOQUE\", 68, 62, 3);\n    text(\"PULSA Y REINICIA\", 48, 77, 2);\n  }\n}",
+  "canvas": {
+    "width": 160,
+    "height": 144
+  },
+  "palette": {
+    "model": "indexed",
+    "colors": ["#000000", "#555555", "#aaaaaa", "#ffffff"]
+  }
+}
